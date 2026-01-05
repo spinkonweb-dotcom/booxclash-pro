@@ -1,0 +1,64 @@
+{
+  "curriculum": "Zambia ECZ",
+  "grade": "8",
+  "subject": "Biology",
+  "topics": [
+    {
+      "unit": "Concepts and Methods in Biology",
+      "subtopics": [
+        "Nature of Science Inquiry in Biology",
+        "Nature of Biology",
+        "Levels of Biological Organisation",
+        "Characteristics of Living Things"
+      ],
+      "learning_outcomes": "Apply scientific inquiry in carrying out scientific investigations by Describing the scientific inquiry method; Investigating the stages of scientific inquiry ( observation, identifying a problem, forming hypothesis, testing hypothesis through experimentation, recording and analysing data, forming a conclusion ); Applying scientific inquiry method in investigating biological facts and phenomena given a situation; Sharing the findings of the investigations with peers; Using the findings of the investigations to solve real life problems. Categorise the study of Biology by Exploring the nature of Biology; Identifying the branches of biology ( botany, zoology, entomology, genetics, mycology ); Creating a concept map on the nature of Biology. Classify the levels of biological organisation from simple to complex by Classifying levels of biological organisation ( atom, molecule, cell, tissue, organ, system, organism, population, communities, ecosystem, biosphere ). Analyse the characteristics of living things by Investigating the characteristics of living things(feeding/nutrition, respiration, excretion, reproduction, sensitivity/irritability, movement/locomotion, growth ); Distinguishing living things from non-living things; Analysing the concept of life. Categorise life processes of living organisms by Describing life processes in living organisms; Analysing life processes in living organisms; Categorising life processes of living organisms ( catabolism and anabolism )."
+    },
+    {
+      "unit": "Principles of Cellular Life",
+      "subtopics": [
+        "Microscopes",
+        "Basic Cell Structure",
+        "Types of Cells",
+        "Cell Specialisation"
+      ],
+      "learning_outcomes": "Use different types of microscopes to examine specimens by Exploring different types of microscopes ( simple and compound microscopes ); Relating parts of a compound microscope to the functions(eye piece lens, objective lenses, body tube, adjustment knobs revolving nose piece, stage, diaphragm, aperture, light source, arm and base ); Practicing the use of microscopes ( preparing the specimen slides, mounting, focussing and observing ); Calculating magnification of examined specimen. Explore the basic cell structure by Examining the basic structure of cells using a microscope(use cells of different organisms ); Illustrating the basic structure of cells; Creating models of cells showing basic structure. Distinguish between eukaryotic and prokaryotic cells by Investigating eukaryotic cells (plant and animal cells, fungi, amoeba ) and prokaryotic cells (bacterial cells ); Differentiating eukaryotic and prokaryotic cells ( structure ); Explaining the functions of animal and plant cell organelles; Comparing and contrasting animal and plant cells. Relate adaptive features of specialised cells to their functions by Identifying specialised cells in animals and plants ( nerve cell, blood cells, ciliated cell, muscle cell, sperm cell, root hair cell, palisade cell, guard cell, phloem, xylem ); Observing adaptive features of specialised cells ( use pictures, slides, models, videos, simulations ); Relating the adaptive features of observed cells to their functions."
+    },
+    {
+      "unit": "Maintenance of the Organism",
+      "subtopics": [
+        "Nutrition in Man",
+        "Dietary Needs of Different Persons",
+        "Plant Nutrients",
+        "Nutritional Deficiency Diseases and Disorders"
+      ],
+      "learning_outcomes": "Classify types of food nutrients by Exploring sources of food nutrients ( carbohydrates e.g. cereals; proteins e.g. meat and legumes; lipids e.g. butter, cooking oil; vitamins e.g. fruits and vegetables; roughage e.g. vegetables and unpolished cereals ); Classifying foods according to their nutrient content(carbohydrates, proteins, lipids, vitamins, minerals, roughage, water ); Discussing the importance of food nutrients in humans (tissue repair, energy supply, growth, and protection\u2026 ). Apply good eating practices for good health by Designing appropriate diets for persons with different nutritional needs ( infants, adolescents, manual workers, pregnant women, lactating women, sick /invalids, the aged ); Justifying the designed diets for persons with different nutritional needs. Categorise types of plant nutrients by Identifying plant nutrients; Classifying macro and micro nutrients ( macro: nitrogen, phosphorous, potassium; micro: magnesium, boron, sulphur, copper, iron, calcium, molybdenum, zinc ); Analysing the effects of macro nutrients (NPK) on plant growth. Recommend appropriate nutrients to address deficiency diseases and disorders in plants and human beings by Investigating nutritional deficiency diseases and disorders in human beings(Kwashiorkor, marasmus, rickets, beriberi, scurvy, pellagra, goitre, anaemia, obesity ); Investigating the deficiency diseases and disorders in plants associated with lack of one or more nutrients ( chlorosis, poor root development, stunted growth, abnormal colouration, shortened internodes ); Treating the deficiency diseases and disorders in plants and human beings."
+    },
+    {
+      "unit": "Continuity of Life",
+      "subtopics": [
+        "Reproduction in Living Organisms",
+        "Reproduction and Development in Human Beings",
+        "Reproduction in Viruses, Protozoa, Bacteria and Fungi"
+      ],
+      "learning_outcomes": "Demonstrate understanding of how living organisms reproduce by Investigating reproduction in different living organisms; Demonstrating asexual and sexual reproduction using seeds, spores, and vegetative parts; Comparing and contrasting asexual and sexual reproduction in living organisms. Demonstrate understanding of reproductive system in human beings by Describing the reproduction system in human beings; Drawing the male and female reproductive system; Explaining functions of different parts of the reproductive system; Outlining the secondary sexual characteristics ( male: pubic hair, armpit hair, beards, deepening of voice, widening of the chest, production of sperms and enlargement of the penis and testes; female: widening of hips, menstruation, enlargement of breasts, pubic hair, underarm hair, and vagina ); Practicing personal hygiene. Demonstrate understanding of reproduction in viruses, protozoa, bacteria and fungi by Outlining the processes of reproduction in viruses (replication in suitable host ), protozoa and bacteria ( binary fission ), and fungi ( spore formation ); Investigating the structure of fungi ( growing fungi on food- Rhizopus and Mucor )."
+    },
+    {
+      "unit": "Coordination and Response",
+      "subtopics": [
+        "Coordination and Response in Plants",
+        "Coordination and Response in Animals"
+      ],
+      "learning_outcomes": "Explore tropisms in plants and their relevance by Describing tropisms in plants; Investigating the effect of light and gravity on shoots and roots(phototropism and geotropism ); Investigating the effect of water on roots ( hydrotropism ); Investigating the effect of chemicals on roots(chemotropism ); Evaluating the importance of tropisms. Explore taxic responses in invertebrates and their relevance by Describing taxic responses; Investigating taxic responses to light, chemicals and gravity (phototaxis: cockroaches, woodlice, flying ants, bed bugs; geotaxis: earthworms; chemotaxis: bacteria, liver fluke ); Evaluating the relevance of taxic responses to the organism; Applying the mechanism of taxic responses to eliminate pests and insects in homes; Differentiating tropic from taxic responses."
+    },
+    {
+      "unit": "Ecological Relationships and Evolution",
+      "subtopics": [
+        "Ecosystem",
+        "Biotic and Abiotic Interactions",
+        "Waste Management",
+        "The Soil - Composition and Fertility"
+      ],
+      "learning_outcomes": "Explore features of ecosystems in the local environment by Describing an ecosystem; Observing key features of terrestrial and aquatic ecosystems in the local environment; Recording key features in the ecosystems under study; Applying best practices to protect ecosystems ( Protecting habitats, restoring habitats, planting indigenous plants\u2026); Constructing models of different ecosystems. Interpret biotic and abiotic interactions by Distinguishing biotic and abiotic factors in an ecosystem; Analysing the three kinds of relationships that exists in an ecosystem ( Refer to the interaction in the biotic community; interaction between the biotic community and the physical environment, and Interactions within the physical environment ). Manage waste in the local environment by Analysing types of waste found in the environment ( Wet and dry waste; sources of waste\u2026 ); Evaluating the benefits of living in waste-free environment; Devising different ways of managing wastes in the local environment ( The three Rs, incineration, correct disposal of waste in designated places\u2026 ); Identifying the challenges communities face which lead to accumulation of waste in the environment. Creating waste-free zones in the environment ( School project ); Reaching out to communities in creating awareness on effective waste management practices. Analyse soil composition and fertility by Identifying different soil components ( air, microorganisms, soil particles and humus); Classifying types of soil ( clay, sandy and loamy) and their properties (capillarity, particle size, drainage); Investigating features of fertile soil; Investigating causes of loss of soil fertility; Practicing ways to improve and retain soil fertility; Comparing crop yield in different types of soil."
+    }
+  ]
+}

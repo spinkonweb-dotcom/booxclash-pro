@@ -1,0 +1,172 @@
+{
+  "curriculum": "Zambia ECZ Chemistry Syllabus",
+  "grade": "10",
+  "subject": "Chemistry",
+  "topics": [
+    {
+      "unit": "1.0 STOICHIOMETRY AND THE MOLE CONCEPT",
+      "subtopics": [
+        {
+          "subtopic": "Relative Formula Mass Relative Molecular Mass RFM RMM",
+          "learning_outcomes": "The relative formula mass and relative molecular mass determined correctly"
+        },
+        {
+          "subtopic": "Mass Composition Percentage Composition",
+          "learning_outcomes": "The mass composition and percentage composition applied correctly"
+        },
+        {
+          "subtopic": "The Mole",
+          "learning_outcomes": "The number of moles determined correctly"
+        },
+        {
+          "subtopic": "Empirical and Molecular Formula",
+          "learning_outcomes": "Empirical and molecular formula determined correctly"
+        },
+        {
+          "subtopic": "Concentration of Solutions",
+          "learning_outcomes": "Understanding of concentration of solutions demonstrated correctly"
+        },
+        {
+          "subtopic": "Standard Solutions",
+          "learning_outcomes": "Standard solutions prepared suitably and correctly"
+        },
+        {
+          "subtopic": "Reacting Quantities",
+          "learning_outcomes": "Calculations involving stoichiometric reacting quantities carried out correctly"
+        },
+        {
+          "subtopic": "Determine the number of moles in hydrates",
+          "learning_outcomes": "Number of moles in hydrates determined correctly"
+        },
+        {
+          "subtopic": "Determine percentage yield",
+          "learning_outcomes": "Percentage yield determined correctly"
+        },
+        {
+          "subtopic": "Determine percentage purity",
+          "learning_outcomes": "Percentage purity determined correctly"
+        },
+        {
+          "subtopic": "Environmental Stoichiometry",
+          "learning_outcomes": "Stoichiometric principles used to solve environmental problems"
+        },
+        {
+          "subtopic": "Explore the benefits of atom economy",
+          "learning_outcomes": "The benefits of atom economy explored accordingly"
+        }
+      ]
+    },
+    {
+      "unit": "2.0 THERMOCHEMISTRY",
+      "subtopics": [
+        {
+          "subtopic": "Thermochemical Reactions",
+          "learning_outcomes": "Understanding of thermal reactions demonstrated correctly"
+        },
+        {
+          "subtopic": "Determine the enthalpy change of endothermic and exothermic reactions",
+          "learning_outcomes": "The enthalpy change of endothermic and exothermic reactions determined correctly"
+        },
+        {
+          "subtopic": "Sources of Energy",
+          "learning_outcomes": "The need to harness alternative sources of energy justified accordingly"
+        },
+        {
+          "subtopic": "Nuclear Energy",
+          "learning_outcomes": "Understanding of nuclear energy demonstrated accordingly"
+        },
+        {
+          "subtopic": "Analyse the uses of nuclear energy in our daily life",
+          "learning_outcomes": "The use of nuclear energy in our daily life analysed accordingly"
+        }
+      ]
+    },
+    {
+      "unit": "3.0 EQUILIBRIUM",
+      "subtopics": [
+        {
+          "subtopic": "Chemical Equilibrium",
+          "learning_outcomes": "Understanding of chemical equilibrium demonstrated correctly"
+        },
+        {
+          "subtopic": "Reversible Reactions",
+          "learning_outcomes": "Reversibility of chemical reactions demonstrated correctly"
+        },
+        {
+          "subtopic": "Dynamic Equilibrium",
+          "learning_outcomes": "The characteristics of a chemical reaction in a dynamic equilibrium analysed correctly"
+        },
+        {
+          "subtopic": "Evaluate the factors that affect position of dynamic equilibrium",
+          "learning_outcomes": "The factors that affect position of dynamic equilibrium evaluated correctly"
+        }
+      ]
+    },
+    {
+      "unit": "4.0 ELECTRICITY AND CHEMISTRY",
+      "subtopics": [
+        {
+          "subtopic": "Electrochemistry",
+          "learning_outcomes": "Understanding of electrochemistry demonstrated correctly"
+        },
+        {
+          "subtopic": "Conductors and Non Conductors",
+          "learning_outcomes": "Properties and applications of conductors and non conductors evaluated correctly"
+        },
+        {
+          "subtopic": "Electrolysis",
+          "learning_outcomes": "Understanding of electrolytic processes demonstrated correctly"
+        },
+        {
+          "subtopic": "Quantitative Electrolysis Faraday s Laws",
+          "learning_outcomes": "Quantities of electrolytic products determined correctly"
+        },
+        {
+          "subtopic": "Industrial Application of Electrolysis",
+          "learning_outcomes": "Uses of electrolytic processes in industries analysed accordingly"
+        },
+        {
+          "subtopic": "Chemical Cell",
+          "learning_outcomes": "Electrolytic cells constructed correctly"
+        }
+      ]
+    },
+    {
+      "unit": "5.0 PERIODICITY",
+      "subtopics": [
+        {
+          "subtopic": "Periodic Table",
+          "learning_outcomes": "Understanding of Groups and Periods of the Periodic table demonstrated correctly"
+        },
+        {
+          "subtopic": "Apply periodic trends to determine metallic and non metallic nature of elements",
+          "learning_outcomes": "The Periodic trends to determine metallic and non metallic nature of elements applied correctly"
+        },
+        {
+          "subtopic": "Apply periodic trends to predict the properties of newly discovered elements",
+          "learning_outcomes": "The Periodic trends applied to predict the properties of newly discovered elements correctly"
+        },
+        {
+          "subtopic": "Analyse the uses of elements in particular groups",
+          "learning_outcomes": "The uses of elements in particular Groups analysed accordingly"
+        },
+        {
+          "subtopic": "Design sustainable solutions to reduce the environmental impact of halogen compounds",
+          "learning_outcomes": "Sustainable solutions to reduce the environmental impact of halogen compounds designed correctly"
+        },
+        {
+          "subtopic": "Transition Metals",
+          "learning_outcomes": "Properties and uses of transition elements investigated sustainably"
+        },
+        {
+          "subtopic": "Properties of Metals",
+          "learning_outcomes": "Physical and chemical properties of metals investigated correctly"
+        },
+        {
+          "subtopic": "Reactivity Series",
+          "learning_outcomes": "The reactivity series of metals determined correctly"
+        }
+      ]
+    }
+  ]
+}

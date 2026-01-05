@@ -1,0 +1,166 @@
+{
+  "curriculum": "Zambia ECZ",
+  "grade": "5",
+  "subject": "Integrated Science",
+  "topics": [
+    {
+      "unit": "5.1.0 The human body",
+      "subtopics": [
+        "Function of the heart",
+        "Structure of the heart",
+        "Taking the pulse"
+      ],
+      "learning_outcomes": "State the function of the heart. Describe the structure of the heart. Demonstrate how to take the pulse."
+    },
+    {
+      "unit": "5.1.0 The human body",
+      "subtopics": [
+        "Male and female body parts",
+        "Changes at puberty"
+      ],
+      "learning_outcomes": "Identify male and female parts of the body. Describe changes that occur at puberty in human beings."
+    },
+    {
+      "unit": "5.2.0 Health",
+      "subtopics": [
+        "Importance of ventilation",
+        "Ways of good ventilation",
+        "First Aid for suffocation"
+      ],
+      "learning_outcomes": "Explain the importance of good ventilation. Explain ways of providing good ventilation in buildings. Demonstrate ways of treating a suffocated person."
+    },
+    {
+      "unit": "5.2.0 Health",
+      "subtopics": [
+        "Common airborne and waterborne diseases",
+        "Symptoms of airborne and waterborne diseases",
+        "Prevention of airborne and waterborne diseases"
+      ],
+      "learning_outcomes": "Name common airborne and waterborne diseases in Zambia. Describe symptoms of common air borne and water borne diseases. Describe how to prevent air and water borne diseases."
+    },
+    {
+      "unit": "5.2.0 Health",
+      "subtopics": [
+        "Causes of malaria",
+        "Symptoms of malaria",
+        "Prevention and treatment of malaria"
+      ],
+      "learning_outcomes": "Identify causes of malaria. State the symptoms of malaria. Describe ways of preventing and treating of malaria."
+    },
+    {
+      "unit": "5.2.0 Health",
+      "subtopics": [
+        "Transmission of STIs and HIV",
+        "Prevention of STIs and HIV",
+        "Care and treatment for AIDS patients"
+      ],
+      "learning_outcomes": "Describe ways in which STIs and HIV are transmitted. Identify ways of preventing the spread of HIV and STIs. Describe the care and treatment for AIDS patients."
+    },
+    {
+      "unit": "5.2.0 Health",
+      "subtopics": [
+        "Harmful substances",
+        "Harmful effects of substance abuse",
+        "Effects of alcohol"
+      ],
+      "learning_outcomes": "Mention the substances which are harmful to the human body. State the harmful effects of substance abuse on the body. Explain the effects of drinking alcohol."
+    },
+    {
+      "unit": "5.3.0 The Environment",
+      "subtopics": [
+        "Importance of water in soil",
+        "Water retention in soil",
+        "Drainage rates of soils"
+      ],
+      "learning_outcomes": "Explain the importance of water in the soil. Mention ways in which water can be retained in the soil. Demonstrate the drainage rates of soils."
+    },
+    {
+      "unit": "5.3.0 The Environment",
+      "subtopics": [
+        "Organic and inorganic fertilizers",
+        "Preparing compost manure",
+        "Importance of composted materials",
+        "Advantages and disadvantages of chemical fertilizers"
+      ],
+      "learning_outcomes": "Explain what organic and inorganic fertilizers are. Demonstrate how to prepare compost manure. Explain the importance of maintaining a supply of composted materials. Explain the advantages and disadvantages of chemical fertilizers in agriculture."
+    },
+    {
+      "unit": "5.4.0 Plants and Animals",
+      "subtopics": [
+        "Types of non-flowering plants",
+        "Uses of ferns and fungi"
+      ],
+      "learning_outcomes": "Identify different types of non-flowering plants. Identify use of ferns and fungi."
+    },
+    {
+      "unit": "5.4.0 Plants and Animals",
+      "subtopics": [
+        "Types of invertebrate animals",
+        "Basic structure of insects",
+        "Difference between insects and spiders",
+        "Usefulness of insects"
+      ],
+      "learning_outcomes": "Identify the different types of invertebrate animals. Investigate the basic structure of insects. Explain the difference between insects and spiders. State ways in which insects are useful."
+    },
+    {
+      "unit": "5.4.0 Plants and Animals",
+      "subtopics": [
+        "Common pests and parasites",
+        "Harm caused by pests and parasites",
+        "Pest and parasite control",
+        "Harmful effects of chemical pesticides"
+      ],
+      "learning_outcomes": "Identify common pests and parasites in the local environment. Describe the harm caused by pests and parasites on plants and animals. Explain how pests and parasites can be controlled using local plant materials and commercial chemicals. Explain how chemical pesticides can cause harm to the environment."
+    },
+    {
+      "unit": "5.5.0 Materials and energy",
+      "subtopics": [
+        "Uses of electricity",
+        "Sources of electricity",
+        "Electrical appliances",
+        "Good and bad conductors of electricity",
+        "Uses of conductors",
+        "Conserving electricity"
+      ],
+      "learning_outcomes": "State what electricity can do. Identify sources of electricity. Identify electrical appliances used at home, school and in the community. Identify good and bad conductors of electricity. Describe the uses of good and bad conductors of electricity. Explain methods of conserving electricity in homes and schools."
+    },
+    {
+      "unit": "5.5.0 Materials and energy",
+      "subtopics": [
+        "Definition of heat",
+        "Temperature measurement",
+        "Good and bad conductors of heat",
+        "Heat insulators",
+        "Uses of heat conductors and insulators"
+      ],
+      "learning_outcomes": "Describe what heat is. Determine the temperature of human body; boiling water; and air inside and outside the classroom. Distinguish good and bad conductors of heat. Identify materials which are good insulators. Explain the uses of good and bad conductors of heat."
+    },
+    {
+      "unit": "5.5.0 Materials and energy",
+      "subtopics": [
+        "Instruments for measuring mass and weight",
+        "Effect of gravity",
+        "Difference between mass and weight"
+      ],
+      "learning_outcomes": "Identify instruments used to compare how heavy objects are. Demonstrate the effect of gravity on objects. Distinguish between mass and weight."
+    },
+    {
+      "unit": "5.5.0 Materials and energy",
+      "subtopics": [
+        "Instruments for measuring volume",
+        "Measuring volume of liquids",
+        "Measuring volume of solid objects"
+      ],
+      "learning_outcomes": "Identify various instruments and apparatus used to measure volume. Measure the volume of liquids. Measure the volume of various regular and irregular solid objects."
+    },
+    {
+      "unit": "5.5.0 Materials and energy",
+      "subtopics": [
+        "Definition of simple machines",
+        "Types of simple machines",
+        "Application of simple machines"
+      ],
+      "learning_outcomes": "Explain what simple machine is. Identify six kinds of simple machines used in the home and school. Demonstrate the use of simple machines in doing work."
+    }
+  ]
+}

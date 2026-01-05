@@ -1,0 +1,59 @@
+{
+  "curriculum": "Zambia ECZ",
+  "grade": "10",
+  "subject": "Physics",
+  "topics": [
+    {
+      "unit": "3.1 LIGHT",
+      "subtopics": [
+        "3.1.1 Rectilinear Propagation of Light",
+        "3.1.2 Reflection of Light",
+        "3.1.3 Refraction of Light",
+        "3.1.4 Lenses"
+      ],
+      "learning_outcomes": "Apply the concept of rectilinear propagation of light"
+    },
+    {
+      "unit": "3.2 STATIC ELECTRICITY",
+      "subtopics": [
+        "3.2.1 Introduction to Static Electricity"
+      ],
+      "learning_outcomes": "Design experiments to investigate static electricity"
+    },
+    {
+      "unit": "3.3 CURRENT ELECTRICITY",
+      "subtopics": [
+        "3.3.1 Electric Charge, Current and Potential Difference",
+        "3.3.2 Electric Cells",
+        "3.3.3 Ohm\u2019s Law",
+        "3.3.4 Electric Energy and Power",
+        "3.3.5 Electric Safety"
+      ],
+      "learning_outcomes": "Construct a simple electric circuit"
+    },
+    {
+      "unit": "3.4 MAGNETISM",
+      "subtopics": [
+        "3.4.1 Phenomenon of Magnetism"
+      ],
+      "learning_outcomes": "Demonstrate understanding of the phenomenon of magnetism"
+    },
+    {
+      "unit": "3.5 LECTROMAGNETISM",
+      "subtopics": [
+        "3.5.1 Magnetic effect of Electric- Current"
+      ],
+      "learning_outcomes": "Apply magnetic effect of electric current to solve problems"
+    },
+    {
+      "unit": "3.6 ELECTROMAGNETIC INDUCTION",
+      "subtopics": [
+        "3.6.1 Introduction to Electromagnetic Induction",
+        "3.6.2 The Simple AC and DC Generators",
+        "3.6.3 Transformers",
+        "3.6.4 Electrical Energy Transmission"
+      ],
+      "learning_outcomes": "Create a system that applies Faraday\u2019s law of electromagnetic induction"
+    }
+  ]
+}

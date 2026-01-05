@@ -1,0 +1,98 @@
+{
+  "curriculum": "Zambia ECZ",
+  "grade": "10",
+  "subject": "Mathematics",
+  "topics": [
+    {
+      "unit": "INDEX NOTATION",
+      "subtopics": [
+        "Indices"
+      ],
+      "learning_outcomes": "Use index notation in problem solving"
+    },
+    {
+      "unit": "SHAPES",
+      "subtopics": [
+        "Two Dimensional Shapes (circle)"
+      ],
+      "learning_outcomes": "Use the concept of Two dimensional shapes in real life situations"
+    },
+    {
+      "unit": "SHAPES",
+      "subtopics": [
+        "Three Dimensional Shapes"
+      ],
+      "learning_outcomes": "Use the concept of Three dimensional shapes in real life situations"
+    },
+    {
+      "unit": "SYMMETRY",
+      "subtopics": [
+        "Symmetry of Dimensional Shapes"
+      ],
+      "learning_outcomes": "Apply the concept of Dimensional symmetry in real life context"
+    },
+    {
+      "unit": "SYMMETRY",
+      "subtopics": [
+        "Symmetry in Dimensional Shapes"
+      ],
+      "learning_outcomes": "Apply the concept of Dimensional symmetry in real life context"
+    },
+    {
+      "unit": "CONSTRUCTION",
+      "subtopics": [
+        "Geometrical Constructions"
+      ],
+      "learning_outcomes": "Apply geometric construction in real life"
+    },
+    {
+      "unit": "LOCUS",
+      "subtopics": [
+        "Loci in Two Dimensions"
+      ],
+      "learning_outcomes": "Use locus of points in a variety of real life situations"
+    },
+    {
+      "unit": "SIMILARITY AND CONGRUENCE",
+      "subtopics": [
+        "Similar Figures"
+      ],
+      "learning_outcomes": "Apply concept of similar figures in real life context"
+    },
+    {
+      "unit": "SIMILARITY AND CONGRUENCE",
+      "subtopics": [
+        "Congruent Figures"
+      ],
+      "learning_outcomes": "Apply concept of Congruent figures in real life context"
+    },
+    {
+      "unit": "STATISTICS",
+      "subtopics": [
+        "Cumulative Frequency and Measures of Dispersion"
+      ],
+      "learning_outcomes": "Use statistics in real life to make informed decisions"
+    },
+    {
+      "unit": "BEARINGS AND SCALE DRAWING",
+      "subtopics": [
+        "Compass and Three Figure Bearings"
+      ],
+      "learning_outcomes": "Use bearings in real life"
+    },
+    {
+      "unit": "VARIATIONS",
+      "subtopics": [
+        "Types of Variations"
+      ],
+      "learning_outcomes": "Apply variations to solve real world problems"
+    },
+    {
+      "unit": "MATRICES",
+      "subtopics": [
+        "Operations on Matrices"
+      ],
+      "learning_outcomes": "Apply the concept Matrices to solve a variety of real life problems"
+    }
+  ]
+}

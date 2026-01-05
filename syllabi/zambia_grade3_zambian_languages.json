@@ -1,0 +1,123 @@
+{
+  "curriculum": "Zambia ECZ",
+  "grade": "3",
+  "subject": "Zambian Languages",
+  "topics": [
+    {
+      "unit": "STORIES",
+      "subtopics": [
+        "Listening to Stories",
+        "Storytelling"
+      ],
+      "learning_outcomes": "Listen to grade level stories. Retell grade level stories. Tell grade level stories creatively."
+    },
+    {
+      "unit": "CONVERSATIONS",
+      "subtopics": [
+        "Information and Explanations",
+        "Simple Processes",
+        "Discussion",
+        "Debate"
+      ],
+      "learning_outcomes": "Listen and speak to adults and friends. Ask questions on simple processes. Take part in discussions. Participate in simple debates."
+    },
+    {
+      "unit": "DESCRIPTIONS",
+      "subtopics": [
+        "Animals",
+        "Events"
+      ],
+      "learning_outcomes": "Give physical descriptions of animals. Give descriptions of events that happen in the community."
+    },
+    {
+      "unit": "DRAMA",
+      "subtopics": [
+        "Role Play"
+      ],
+      "learning_outcomes": "Participate in role play."
+    },
+    {
+      "unit": "RIDDLES AND TONGUE TWISTERS",
+      "subtopics": [
+        "Riddles",
+        "Tongue Twisters"
+      ],
+      "learning_outcomes": "Say and respond to riddles. Recite tongue twisters."
+    },
+    {
+      "unit": "READING FLUENCY",
+      "subtopics": [
+        "Oral Reading",
+        "Analyse simple stories"
+      ],
+      "learning_outcomes": "Read grade level texts of more than seven sentences fluently. Analyse simple stories."
+    },
+    {
+      "unit": "ALPHABETICAL ORDER",
+      "subtopics": [
+        "Word Sequencing"
+      ],
+      "learning_outcomes": "Arrange words in alphabetical order."
+    },
+    {
+      "unit": "SYNONYMS AND ANTONYMS",
+      "subtopics": [
+        "Synonyms",
+        "Antonyms"
+      ],
+      "learning_outcomes": "Use synonyms. Use antonyms."
+    },
+    {
+      "unit": "NOUNS",
+      "subtopics": [
+        "Abstract Nouns"
+      ],
+      "learning_outcomes": "Identify abstract nouns."
+    },
+    {
+      "unit": "COMPREHENSION",
+      "subtopics": [
+        "Inferences",
+        "Main Idea",
+        "Summarise information",
+        "Life Experiences",
+        "Fact and Opinion",
+        "Story Facts",
+        "Locate details in a text",
+        "Identify chronological order of events in a text",
+        "Main Idea",
+        "Life Experiences",
+        "Inferences",
+        "Predictions",
+        "Word Meaning"
+      ],
+      "learning_outcomes": "Draw inferences from the information they have heard. Express the main idea of the information (fiction and non fiction) listened to. Summarise information (fiction and non fiction) using key ideas. Compare their own life experiences to what they listen to. Differentiate fact from opinion in given information. Provide explicitly stated information in a given grade level text. Locate details in a text. Identify chronological order of events in a text. Express the main idea of a grade level text. Link their own life experiences to what they have read. Draw inferences from grade level texts. Make predictions based on given information. Deduce the meaning of unfamiliar grade level words."
+    },
+    {
+      "unit": "HANDWRITING",
+      "subtopics": [
+        "Manuscript Writing",
+        "Cursive Writing"
+      ],
+      "learning_outcomes": "Write legibly in manuscript form. Write letters and words legibly in cursive form."
+    },
+    {
+      "unit": "SEQUENCE",
+      "subtopics": [
+        "Words"
+      ],
+      "learning_outcomes": "Sequence words to form a sentence."
+    },
+    {
+      "unit": "COMPOSITION",
+      "subtopics": [
+        "Punctuation Marks",
+        "Paragraph Building",
+        "Simple Letter",
+        "Fiction",
+        "Non fiction"
+      ],
+      "learning_outcomes": "Use the punctuation marks (capital letters, comma, full stop, question mark and exclamation mark). Write a paragraph. Write a simple letter to a friend on various situations. Write a simple narrative. Write a simple exposition."
+    }
+  ]
+}

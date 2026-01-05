@@ -1,0 +1,91 @@
+{
+  "curriculum": "Zambia ECZ",
+  "grade": "8",
+  "subject": "Mathematics",
+  "topics": [
+    {
+      "unit": "NUMBERS",
+      "subtopics": [
+        "Classification of Numbers"
+      ],
+      "learning_outcomes": "Apply classification of numbers in real life context"
+    },
+    {
+      "unit": "NUMBERS",
+      "subtopics": [
+        "Combined Operations on Real Numbers"
+      ],
+      "learning_outcomes": "Apply combined Operations on real numbers in real life situations"
+    },
+    {
+      "unit": "INTEGERS",
+      "subtopics": [
+        "The Four Operations on Integers"
+      ],
+      "learning_outcomes": "Use Integers in real life"
+    },
+    {
+      "unit": "APPROXIMATIONS AND ESTIMATION",
+      "subtopics": [
+        "Approximation"
+      ],
+      "learning_outcomes": "Use approximation to make informed decisions in real life"
+    },
+    {
+      "unit": "APPROXIMATIONS AND ESTIMATION",
+      "subtopics": [
+        "Estimations"
+      ],
+      "learning_outcomes": "Use Estimation to make informed decisions in real life"
+    },
+    {
+      "unit": "SETS",
+      "subtopics": [
+        "Operations on Sets"
+      ],
+      "learning_outcomes": "Apply set operations in real life context"
+    },
+    {
+      "unit": "ALGEBRA",
+      "subtopics": [
+        "Algebraic Expressions"
+      ],
+      "learning_outcomes": "Apply algebraic expressions in real life"
+    },
+    {
+      "unit": "MATRICES",
+      "subtopics": [
+        "Operations on Matrices"
+      ],
+      "learning_outcomes": "Apply Matrices to real life situations"
+    },
+    {
+      "unit": "ANGLES",
+      "subtopics": [
+        "Angles associated with straight lines"
+      ],
+      "learning_outcomes": "Use angles associated with straight lines in everyday life"
+    },
+    {
+      "unit": "ANGLES",
+      "subtopics": [
+        "Angle of Elevation and Depression"
+      ],
+      "learning_outcomes": "Use Angle of Elevation and Depression everyday life"
+    },
+    {
+      "unit": "TRIGONOMETRY",
+      "subtopics": [
+        "Pythagoras Theorem"
+      ],
+      "learning_outcomes": "Use the Pythagoras theorem to solve problems in different contexts"
+    },
+    {
+      "unit": "STATISTICS",
+      "subtopics": [
+        "Statistical Presentations and Measures of central tendency"
+      ],
+      "learning_outcomes": "Apply statistics in making informed decisions in real life"
+    }
+  ]
+}

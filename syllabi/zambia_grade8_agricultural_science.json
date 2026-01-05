@@ -1,0 +1,58 @@
+{
+  "curriculum": "Zambia ECZ",
+  "grade": "8",
+  "subject": "Agricultural Science",
+  "topics": [
+    {
+      "unit": "1.1.0 AGRICULTURE IN ZAMBIA",
+      "subtopics": [
+        "1.1.1 Importance of Agriculture",
+        "1.1.2 Agricultural Activities in Zambia",
+        "1.1.3 Factors that Influence Agricultural Development in Zambia",
+        "1.1.4 Types of Farmers"
+      ],
+      "learning_outcomes": "Demonstrate understanding of the importance of Agriculture in Zambia"
+    },
+    {
+      "unit": "1.2.0 SOIL SCIENCE",
+      "subtopics": [
+        "1.2.1 Composition of Soil",
+        "1.2.2 Properties of Soil",
+        "1.2.3 Soil Fertility",
+        "1.2.4 Soil Water"
+      ],
+      "learning_outcomes": "Examine the composition of soil"
+    },
+    {
+      "unit": "1.3.0 CLIMATE-SMART AGRICULTURE",
+      "subtopics": [
+        "1.3.1 Climate-Smart Agriculture",
+        "1.3.2 Application of Drones",
+        "1.3.3 Climate Change"
+      ],
+      "learning_outcomes": "Demonstrate understanding of Climate-Smart Agriculture"
+    },
+    {
+      "unit": "1.4.0 FARM STRUCTURES AND MACHINERY",
+      "subtopics": [
+        "1.4.1 Garden Tools and Equipment"
+      ],
+      "learning_outcomes": "Use Garden tools and equipment for better production"
+    },
+    {
+      "unit": "1.5.0 CROP PRODUCTION",
+      "subtopics": [
+        "1.5.1 Vegetable Production"
+      ],
+      "learning_outcomes": "Grow a variety of vegetables"
+    },
+    {
+      "unit": "1.6.0 LIVESTOCK PRODUCTION",
+      "subtopics": [
+        "1.6.1 Importance of Livestock",
+        "1.6.2 Nutrition and Feed Formulation in Livestock"
+      ],
+      "learning_outcomes": "Demonstrate understanding of the importance of livestock production"
+    }
+  ]
+}

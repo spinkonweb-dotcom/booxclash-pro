@@ -1,0 +1,179 @@
+{
+  "curriculum": "Zambia ECZ Chemistry Syllabus",
+  "grade": "11",
+  "subject": "Chemistry",
+  "topics": [
+    {
+      "unit": "1.0 METALLURGY",
+      "subtopics": [
+        {
+          "subtopic": "Mineral Ores",
+          "learning_outcomes": "Understanding of metallurgy correctly demonstrated"
+        },
+        {
+          "subtopic": "Identify different mineral ores in the local environment",
+          "learning_outcomes": "Different mineral ores identified in the local environment accordingly"
+        },
+        {
+          "subtopic": "Extraction of Metals",
+          "learning_outcomes": "Understanding of metal extraction demonstrated correctly"
+        },
+        {
+          "subtopic": "Uses of Metals",
+          "learning_outcomes": "Uses of metals in everyday life analysed correctly"
+        },
+        {
+          "subtopic": "Analyse the impact of toxic metals on ecosystems and human health",
+          "learning_outcomes": "The impact of toxic metals on ecosystems and human health analysed correctly"
+        },
+        {
+          "subtopic": "Alloys",
+          "learning_outcomes": "An alloy designed for a specific application accordingly"
+        },
+        {
+          "subtopic": "Corrosion and its Prevention",
+          "learning_outcomes": "Corrosion of metals prevented accordingly"
+        }
+      ]
+    },
+    {
+      "unit": "2.0 NON METALS",
+      "subtopics": [
+        {
+          "subtopic": "General Properties of Non Metals",
+          "learning_outcomes": "Physical and chemical properties of non metals investigated accordingly"
+        },
+        {
+          "subtopic": "Hydrogen",
+          "learning_outcomes": "Hydrogen gas prepared correctly"
+        },
+        {
+          "subtopic": "Investigate the industrial manufacture of hydrogen",
+          "learning_outcomes": "Industrial manufacture of hydrogen investigated correctly"
+        },
+        {
+          "subtopic": "Analyse the uses of hydrogen gas",
+          "learning_outcomes": "The uses of hydrogen gas analysed correctly"
+        },
+        {
+          "subtopic": "Oxygen",
+          "learning_outcomes": "Oxygen gas prepared correctly"
+        },
+        {
+          "subtopic": "Investigate the industrial manufacture of oxygen",
+          "learning_outcomes": "Industrial manufacture of oxygen investigated correctly"
+        },
+        {
+          "subtopic": "Investigate the properties and uses of oxygen gas",
+          "learning_outcomes": "Properties and uses of oxygen gas investigated correctly"
+        },
+        {
+          "subtopic": "Practise sustainable ways of protecting the ozone layer",
+          "learning_outcomes": "Sustainable ways of protecting the ozone layer practised accordingly"
+        },
+        {
+          "subtopic": "Nitrogen",
+          "learning_outcomes": "Ammonia gas prepared in the laboratory correctly"
+        },
+        {
+          "subtopic": "Investigate the industrial manufacture of nitrogen and its related products",
+          "learning_outcomes": "The industrial manufacture of nitrogen and its related products investigated correctly"
+        },
+        {
+          "subtopic": "Analyse the uses of nitrogen",
+          "learning_outcomes": "The uses of nitrogen analysed correctly"
+        },
+        {
+          "subtopic": "Chlorine",
+          "learning_outcomes": "Chlorine gas and its associated products prepared correctly"
+        },
+        {
+          "subtopic": "Sulphur",
+          "learning_outcomes": "Sulphur dioxide prepared correctly"
+        },
+        {
+          "subtopic": "Carbon",
+          "learning_outcomes": "The nature and uses of carbon and its products explored correctly"
+        },
+        {
+          "subtopic": "Prepare carbon dioxide",
+          "learning_outcomes": "Carbon dioxide prepared correctly"
+        },
+        {
+          "subtopic": "Explore the manufacturing of limestone",
+          "learning_outcomes": "Manufacturing of limestone explored correctly"
+        },
+        {
+          "subtopic": "Silicon",
+          "learning_outcomes": "The nature and uses of silicon and its products investigated accordingly"
+        }
+      ]
+    },
+    {
+      "unit": "3.0 ORGANIC CHEMISTRY",
+      "subtopics": [
+        {
+          "subtopic": "Introduction to Organic Chemistry",
+          "learning_outcomes": "Understanding of organic chemistry demonstrated correctly"
+        },
+        {
+          "subtopic": "Saturated and Unsaturated Hydrocarbons Non Cyclic",
+          "learning_outcomes": "The nature and uses of saturated and unsaturated hydrocarbons explored correctly"
+        },
+        {
+          "subtopic": "Carboxylic Acids and Alcohols",
+          "learning_outcomes": "Understanding of carboxylic acids demonstrated correctly"
+        },
+        {
+          "subtopic": "Explore the preparation of alcohols",
+          "learning_outcomes": "Preparation of alcohol explored correctly"
+        },
+        {
+          "subtopic": "Alkyl Alkanoates Esters",
+          "learning_outcomes": "Understanding of esters demonstrated correctly"
+        },
+        {
+          "subtopic": "Prepare Esters Alkyl Alkanoates for different uses",
+          "learning_outcomes": "Esters for different uses prepared accordingly"
+        },
+        {
+          "subtopic": "Macromolecules Polymers",
+          "learning_outcomes": "Understanding of macromolecules demonstrated correctly"
+        },
+        {
+          "subtopic": "Make plastics soaps and glycerine",
+          "learning_outcomes": "Plastics, soaps, and glycerine made correctly"
+        }
+      ]
+    },
+    {
+      "unit": "4.0 ENVIRONMENTAL CHEMISTRY",
+      "subtopics": [
+        {
+          "subtopic": "Chemistry and the Environment",
+          "learning_outcomes": "The role of chemistry in sustaining the environmental related correctly"
+        },
+        {
+          "subtopic": "Pollution and Remediation",
+          "learning_outcomes": "Pollution control and mitigation investigated accordingly"
+        },
+        {
+          "subtopic": "Role of Chemistry in Sustainable Agriculture",
+          "learning_outcomes": "The role of chemistry in sustainable agriculture investigated correctly"
+        },
+        {
+          "subtopic": "Climate Change",
+          "learning_outcomes": "Understanding of climate change demonstrated correctly"
+        },
+        {
+          "subtopic": "Investigate causes and effects of climate change",
+          "learning_outcomes": "Causes and effects of climate change investigated correctly"
+        },
+        {
+          "subtopic": "Water Management",
+          "learning_outcomes": "Understanding of water management demonstrated correctly"
+        }
+      ]
+    }
+  ]
+}

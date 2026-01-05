@@ -1,0 +1,55 @@
+{
+  "curriculum": "Zambia ECZ",
+  "grade": "8",
+  "subject": "Physics",
+  "topics": [
+    {
+      "unit": "1.1 INTRODUCTION TO PHYSICS",
+      "subtopics": [
+        "1.1.1 Safety Rules (Laboratory Safety)",
+        "1.1.2 Waste Management",
+        "1.1.3 Apparatus in Physics",
+        "1.1.4 Fundamental Concepts of Physics",
+        "1.1.5 Application of Physics"
+      ],
+      "learning_outcomes": "Practise laboratory safety rules"
+    },
+    {
+      "unit": "1.2 GENERAL PHYSICS",
+      "subtopics": [
+        "1.2.1 Basic Principles of Scientific Investigations",
+        "1.2.2 Physical Quantities",
+        "1.2.3 Precision and Accuracy",
+        "1.2.4 Equilibrium"
+      ],
+      "learning_outcomes": "Apply principles of scientific investigations"
+    },
+    {
+      "unit": "1.3 ELEMENTARY ASTRONOMY",
+      "subtopics": [
+        "1.3.1 The Universe"
+      ],
+      "learning_outcomes": "Construct astronomical models to demonstrate conceptual understanding of elementary astronomy"
+    },
+    {
+      "unit": "1.4 GEOPHYSICS",
+      "subtopics": [
+        "1.4.1 Structure and Composition of the Earth",
+        "1.4.2 Structure and Composition of the Earth\u2019s Atmosphere"
+      ],
+      "learning_outcomes": "Demonstrate an understanding of the Earth"
+    },
+    {
+      "unit": "1.5 MECHANICS 1",
+      "subtopics": [
+        "1.5.1 Scalar and Vector Quantities",
+        "1.5.2 Linear Motion",
+        "1.5.3 Forces",
+        "1.5.4 Circular Motion",
+        "1.5.5 Moment of a Force",
+        "1.5.6 Equilibrium"
+      ],
+      "learning_outcomes": "Apply the concepts of scalar and vector quantities in everyday life"
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "curriculum": "Zambia ECZ",
+  "grade": "9",
+  "subject": "Physics",
+  "topics": [
+    {
+      "unit": "2.1 MECHANICS 2",
+      "subtopics": [
+        "2.1.1 Work, Energy, and Power",
+        "2.1.2 Linear Momentum",
+        "2.1.3 Simple Machines",
+        "2.1.4 Pressure"
+      ],
+      "learning_outcomes": "Create a system that applies work, energy, and power concepts"
+    },
+    {
+      "unit": "2.2 THERMAL PHYSICS",
+      "subtopics": [
+        "2.2.1 Simple Kinetic Theory of Matter",
+        "2.2.2 Measurement of Temperature",
+        "2.2.3 Expansion of Solids, Liquids and Gases",
+        "2.2.4 The Internal Combustion Engine",
+        "2.2.5 Heat Transfer",
+        "2.2.6 Measurement of Heat"
+      ],
+      "learning_outcomes": "Analyze the impact of simple kinetic theory of matter on technological innovations"
+    },
+    {
+      "unit": "2.3 WAVE MOTION",
+      "subtopics": [
+        "2.3.1 Longitudinal and Transverse Waves",
+        "2.3.2 Electromagnetic Spectrum"
+      ],
+      "learning_outcomes": "Solve practical and numerical problems involving wave motion"
+    },
+    {
+      "unit": "2.4 SOUND",
+      "subtopics": [
+        "2.4.1 Properties and Application of Sound"
+      ],
+      "learning_outcomes": "Manipulate devices to demonstrate fundamental properties of sound"
+    }
+  ]
+}

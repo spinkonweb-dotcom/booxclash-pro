@@ -1,0 +1,120 @@
+{
+  "curriculum": "Zambia ECZ",
+  "grade": "6",
+  "subject": "Mathematics",
+  "topics": [
+    {
+      "unit": "6.1 INDEX NOTATION",
+      "subtopics": [
+        "Describe index notation.",
+        "Change a number in index form to expanded notation and vice versa.",
+        "Evaluate numbers in index notation with positive bases and indices ."
+      ],
+      "learning_outcomes": "Describing Index notation as the repetition of multiplication of numbers with the same base (2x2x2 = 23). Expanded notation with positive bases and powers ranging from 1 to 5. Evaluating numbers in index notation with positive bases and indices."
+    },
+    {
+      "unit": "6.2 SETS",
+      "subtopics": [
+        "Describe the intersection, union in a Venn diagram.",
+        "Use symbols of intersection \"\u2229\", union \"U\" (and subset \u201c\u2282\u201d as recap) .",
+        "Find number of subsets of a given set using the formula 2n.",
+        "Apply the knowledge of sets in real life situations ."
+      ],
+      "learning_outcomes": "The intersection (includes the set within a set -subset and disjoint sets ) and union set in a Venn diagrams . Intersection, union sets and subset including . Symbolisation (intersection \"\u2229\", union \"U\" (and subset \u201c\u2282\u201d as recap) . Subsets of a given set by listing and using the formula 2n. Applying the knowledge of sets in  real life situations  (i.e. intersection, union, and subset )."
+    },
+    {
+      "unit": "6.3 PRIME FACTORS",
+      "subtopics": [
+        "Describe and list prime and composite numbers.",
+        "Identify prime factors of given numbers",
+        "Express a number as a product of its prime factors"
+      ],
+      "learning_outcomes": "Prime and composite numbers Prime factors of given numbers Express a number as a product of its prime factors"
+    },
+    {
+      "unit": "6.4 FRACTIONS",
+      "subtopics": [
+        "Multiply fractions by whole numbers",
+        "Multiply a fraction by another fraction.",
+        "Divide fractions by whole numbers",
+        "Divide whole numbers by fractions",
+        "Divide a fraction by another fraction",
+        "Apply fractions to solve problems in real life"
+      ],
+      "learning_outcomes": "Understanding the concept of multiplication of fractions Multiplying fractions by whole numbers Multiply ing a fraction by another fraction. Understanding the concept of division of fractions Dividing fractions by whole numbers Dividing whole numbers by fractions Divid ing a fraction by another fraction Applying multiplication and division of fractions to solve problems in real life"
+    },
+    {
+      "unit": "6.5 DECIMALS",
+      "subtopics": [
+        "Describe decimal numbers by their names (up to 3 decimal places)",
+        "Add and subtract decimal numbers up to 3 decimal places",
+        "Multiply decimal numbers by decimal numbers",
+        "Divide decimal numbers by decimal numbers (up to 3 decimal places (INCLUDING REMAINDER)"
+      ],
+      "learning_outcomes": "Describing decimal numbers by their names (up to 3 decimal places) Adding and subtracting decimal numbers up to 3 decimal places Multiplication and division of decimals up to 3 decimal places"
+    },
+    {
+      "unit": "6.6 APPROXIMATION",
+      "subtopics": [
+        "Round off to the nearest unit.",
+        "Round off to the nearest decimal places",
+        "Solve simple problems involving rounding off quantities to required number of decimal places"
+      ],
+      "learning_outcomes": "Rounding off to the nearest ten, hundred, thousand Rounding off to the  given decimal places (1, 2 and 3 decimal places) Applying approximation in real life situations involving rounding off to required number of decimal pl aces. Relating approximation with measurements"
+    },
+    {
+      "unit": "6.7 RATIO AND PROPORTION",
+      "subtopics": [
+        "Describe ratio and direct proportion",
+        "Differentiate between ratio and direct proportion",
+        "Express a given ratio in its lowest term",
+        "Solve problems involving ratio and direct proportion."
+      ],
+      "learning_outcomes": "Describing r atio and direct proportion Relating ratio and direct proportion with number patterns, relations and mappings. Relationship between ratio and direct proportion Reduction of ratio to lowest term Unitary and proportional methods Real life p roblems involving direct proportion (e.g. exchange rates , measures )"
+    },
+    {
+      "unit": "6.8 SOCIAL AND COMMERCIAL ARITHMETIC",
+      "subtopics": [
+        "Describe cost price, selling price, profit and loss",
+        "Calculate cost price, selling price, profit and loss",
+        "Calculate simple interest, discount, and profit and loss percentage.",
+        "Carry out calculations involving transportation"
+      ],
+      "learning_outcomes": "Cost price (CP) and  Selling price Profit and loss Calculations involving cost price, selling price, profit and loss in real life situations. Time tabling in transportation, Fare chart (Bus, train, marine and air) Distance charts (ready reckoner)"
+    },
+    {
+      "unit": "6.9 STATISTICS",
+      "subtopics": [
+        "Describe averages or measures of central tendency",
+        "Solve problems involving averages"
+      ],
+      "learning_outcomes": "Averages or measures of central tendency (Mean, mode and median) Problems involving averages"
+    },
+    {
+      "unit": "6.10 LINEAR EQUATIONS IN ONE VARIABLE",
+      "subtopics": [
+        "Describe an open sentences",
+        "Solve linear equations in one variable"
+      ],
+      "learning_outcomes": "Open sentences Linear equations in one variable Applying linear equations in one variable in real life situations"
+    },
+    {
+      "unit": "6.11 PLANE SHAPES",
+      "subtopics": [
+        "Identify regular polygons up to six sides",
+        "Draw pentagon and hexagon."
+      ],
+      "learning_outcomes": "Identifying regular polygons up to six sides . Drawing pentagon and hexagon using set square, protractor and compass"
+    },
+    {
+      "unit": "6.12 MEASUREMENT",
+      "subtopics": [
+        "Find the total length of edges of cube and cuboid",
+        "Find the total surface area of cube and cuboid",
+        "Describe the meaning of speed",
+        "Calculate speed using distance and time"
+      ],
+      "learning_outcomes": "Faces, vertices and edges of solids Total length of edges of cube and cuboid Total surface area of cube and cuboid Meaning of speed (at this level avoid use of average speed) Calculating speed using distance and time Calculating distance using speed and time Calculating time using speed and distance (refer to the relationsh ip between division and multiplication i.e. sxt = d or t = d\u00f7 s or s = d\u00f7 t)"
+    }
+  ]
+}

@@ -1,0 +1,54 @@
+{
+  "curriculum": "Zambia ECZ",
+  "grade": "10",
+  "subject": "Agricultural Science",
+  "topics": [
+    {
+      "unit": "3.1.0 SOIL SCIENCE",
+      "subtopics": [
+        "3.1.1 Soil Fertility"
+      ],
+      "learning_outcomes": "Determine radicals in a sample of fertiliser"
+    },
+    {
+      "unit": "3.2.0 CLIMATE-SMART AGRICULTURE",
+      "subtopics": [
+        "3.2.1 Climate-Smart Agriculture Practices"
+      ],
+      "learning_outcomes": "Practise Climate-Smart Agriculture"
+    },
+    {
+      "unit": "3.3.0 FARM STRUCTURES AND MACHINERY",
+      "subtopics": [
+        "3.3.1 Farm Power",
+        "3.3.2 Brick Laying and Workshop Tools",
+        "3.3.3 Farm Structures"
+      ],
+      "learning_outcomes": "Use different sources of power on the farm"
+    },
+    {
+      "unit": "3.4.0 CROP PRODUCTION",
+      "subtopics": [
+        "3.4.1 Fruit and Tuber Crop Production",
+        "3.4.1.2 Grow tuber crops"
+      ],
+      "learning_outcomes": "Grow fruit crops"
+    },
+    {
+      "unit": "3.5.0 LIVESTOCK PRODUCTION",
+      "subtopics": [
+        "3.5.1 Pasture Management",
+        "3.5.2 Ruminant Animal Production",
+        "3.5.2.2 Manage ruminant animals"
+      ],
+      "learning_outcomes": "Manage different pastures for livestock"
+    },
+    {
+      "unit": "3.6.0 FARM MANAGEMENT",
+      "subtopics": [
+        "3.6.1 Agricultural Economics"
+      ],
+      "learning_outcomes": "Demonstrate understanding of agricultural economics"
+    }
+  ]
+}

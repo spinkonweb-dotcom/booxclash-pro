@@ -1,0 +1,39 @@
+{
+  "curriculum": "Zambia ECZ",
+  "grade": "11",
+  "subject": "Physics",
+  "topics": [
+    {
+      "unit": "4.1 BASIC ELECTRONICS",
+      "subtopics": [
+        "4.1.1 Introduction to Basic Electronics",
+        "4.1.2 Circuit Components",
+        "4.1.3 Digital Electronic System",
+        "4.1.4 Electronic Waste Management"
+      ],
+      "learning_outcomes": "Construct a system that applies the concept of thermionic emission"
+    },
+    {
+      "unit": "4.2 COMMUNICATION SYSTEM",
+      "subtopics": [
+        "4.2.1 Communication System"
+      ],
+      "learning_outcomes": "Create a communication system"
+    },
+    {
+      "unit": "4.3 ATOMIC PHYSICS",
+      "subtopics": [
+        "4.3.1 Nuclear Atom",
+        "4.3.2 Radioactivity"
+      ],
+      "learning_outcomes": "Demonstrate understanding of a nuclear atom"
+    },
+    {
+      "unit": "4.4 RENEWABLE ENERGY SYSTEM",
+      "subtopics": [
+        "4.2.1 Renewable Energy Systems"
+      ],
+      "learning_outcomes": "Explore renewable energy systems"
+    }
+  ]
+}

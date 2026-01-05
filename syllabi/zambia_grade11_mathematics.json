@@ -1,0 +1,70 @@
+{
+  "curriculum": "Zambia ECZ",
+  "grade": "11",
+  "subject": "Mathematics",
+  "topics": [
+    {
+      "unit": "QUADRATIC EQUATIONS AND FUNCTIONS",
+      "subtopics": [
+        "Quadratic Equations"
+      ],
+      "learning_outcomes": "Apply quadratic Equations to model and solve problems"
+    },
+    {
+      "unit": "QUADRATIC EQUATIONS AND FUNCTIONS",
+      "subtopics": [
+        "Quadratic Functions"
+      ],
+      "learning_outcomes": "Apply quadratic functions to model and solve problems"
+    },
+    {
+      "unit": "LINEAR PROGRAMMING",
+      "subtopics": [
+        "Inequations"
+      ],
+      "learning_outcomes": "Utilize Inequations in real life situations"
+    },
+    {
+      "unit": "LINEAR PROGRAMMING",
+      "subtopics": [
+        "Linear Programming"
+      ],
+      "learning_outcomes": "Utilize linear programming in real life situations"
+    },
+    {
+      "unit": "VECTORS",
+      "subtopics": [
+        "Vectors in Dimensions"
+      ],
+      "learning_outcomes": "Apply vectors in problem solving"
+    },
+    {
+      "unit": "TRIGONOMETRY",
+      "subtopics": [
+        "Introduction to Trigonometry"
+      ],
+      "learning_outcomes": "Use Trigonometry in problem solving"
+    },
+    {
+      "unit": "GEOMETRICAL TRANSFORMATIONS",
+      "subtopics": [
+        "Isometric Transformations"
+      ],
+      "learning_outcomes": "Apply Isometric Transformations to problem solving"
+    },
+    {
+      "unit": "GEOMETRICAL TRANSFORMATIONS",
+      "subtopics": [
+        "Non Isometric Transformations"
+      ],
+      "learning_outcomes": "Apply Isometric Transformations to problem solving"
+    },
+    {
+      "unit": "PROBABILITY",
+      "subtopics": [
+        "Introduction to Probability"
+      ],
+      "learning_outcomes": "Use the concept of Probability to make informed decisions in various aspects of life"
+    }
+  ]
+}

@@ -1,0 +1,84 @@
+{
+  "curriculum": "Zambia ECZ",
+  "grade": "9",
+  "subject": "Mathematics",
+  "topics": [
+    {
+      "unit": "COORDINATE GEOMETRY",
+      "subtopics": [
+        "Cartesian Plane"
+      ],
+      "learning_outcomes": "Use the concept Cartesian Plane to solve problems in real life situations"
+    },
+    {
+      "unit": "COORDINATE GEOMETRY",
+      "subtopics": [
+        "Straight lines on the Cartesian Plane"
+      ],
+      "learning_outcomes": "Use straight lines to solve problems in real life"
+    },
+    {
+      "unit": "RELATIONS AND FUNCTIONS",
+      "subtopics": [
+        "Relations"
+      ],
+      "learning_outcomes": "Apply relations to model and solve problems"
+    },
+    {
+      "unit": "RELATIONS AND FUNCTIONS",
+      "subtopics": [
+        "Functions"
+      ],
+      "learning_outcomes": "Apply functions to model and solve problems"
+    },
+    {
+      "unit": "ALGEBRA",
+      "subtopics": [
+        "Basic Processes of Algebra"
+      ],
+      "learning_outcomes": "Use algebraic expressions in problem solving"
+    },
+    {
+      "unit": "POLYGONS",
+      "subtopics": [
+        "Regular and Irregular Polygons"
+      ],
+      "learning_outcomes": "Create different objects using polygons"
+    },
+    {
+      "unit": "SYSTEMS OF EQUATIONS",
+      "subtopics": [
+        "Simultaneous Equations"
+      ],
+      "learning_outcomes": "Use simultaneous equations in real life situations"
+    },
+    {
+      "unit": "TRAVEL GRAPHS",
+      "subtopics": [
+        "Distance time Graphs"
+      ],
+      "learning_outcomes": "Apply distance time graphs in a variety of perspectives"
+    },
+    {
+      "unit": "TRAVEL GRAPHS",
+      "subtopics": [
+        "Velocity time Graphs"
+      ],
+      "learning_outcomes": "Apply velocity time graphs in a variety of perspectives"
+    },
+    {
+      "unit": "FINANCIAL ARITHMETIC",
+      "subtopics": [
+        "Financial Interest"
+      ],
+      "learning_outcomes": "Apply the Financial Interest in everyday life"
+    },
+    {
+      "unit": "FINANCIAL ARITHMETIC",
+      "subtopics": [
+        "Investment"
+      ],
+      "learning_outcomes": "Apply the concept of Investment in everyday life"
+    }
+  ]
+}

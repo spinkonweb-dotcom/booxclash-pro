@@ -1,0 +1,136 @@
+{
+  "curriculum": "Zambia ECZ",
+  "grade": "6",
+  "subject": "Integrated Science",
+  "topics": [
+    {
+      "unit": "6.1.0 The human body",
+      "subtopics": [
+        "Composition of blood",
+        "Functions of blood",
+        "Blood circulation"
+      ],
+      "learning_outcomes": "Describe the composition of blood. Describe the functions of blood in the body. Describe how blood circulates in the body."
+    },
+    {
+      "unit": "6.1.0 The human body",
+      "subtopics": [
+        "Features of pregnancy",
+        "Signs and symptoms of pregnancy"
+      ],
+      "learning_outcomes": "Describe features of pregnancy. Identify signs and symptoms of pregnancy."
+    },
+    {
+      "unit": "6.1.0 The human body",
+      "subtopics": [
+        "Consequences of teenage pregnancy",
+        "Health risks of early sexual debut"
+      ],
+      "learning_outcomes": "Identify health and social consequences of teenage pregnancy. Identify health risks associated with early sexual debut."
+    },
+    {
+      "unit": "6.2.0 Health",
+      "subtopics": [
+        "Sources of vitamins and minerals",
+        "Importance of vitamins and minerals",
+        "Importance of varied diet",
+        "Food labelling and packaging",
+        "Common deficiency diseases",
+        "Interpreting clinic cards"
+      ],
+      "learning_outcomes": "List foods which are good sources of vitamins and minerals. Explain the importance of vitamins and minerals in a diet. Explain the importance of eating a variety of foods. Explain the importance of food labelling and packaging. Identify common deficiency diseases in the communities. Interpret children\u2019s clinic cards in relation to dietary intake."
+    },
+    {
+      "unit": "6.2.0 Health",
+      "subtopics": [
+        "Impact of substance abuse",
+        "Helping substance addicts"
+      ],
+      "learning_outcomes": "Explain how substance abuse can ruin the lives of people. Explain how substance addicts can be helped."
+    },
+    {
+      "unit": "6.2.0 Health",
+      "subtopics": [
+        "Challenges of living with HIV and AIDS"
+      ],
+      "learning_outcomes": "Describe the challenges of living with HIV and AIDS."
+    },
+    {
+      "unit": "6.3.0 The Environment",
+      "subtopics": [
+        "Water cycle system",
+        "Evaporation and condensation",
+        "Effects of the water cycle"
+      ],
+      "learning_outcomes": "Describe the water cycle system. Describe the process of evaporation and condensation. State the effects of the water cycle in everyday life."
+    },
+    {
+      "unit": "6.4.0 Plants and Animals",
+      "subtopics": [
+        "Movement of water and mineral salts in plants",
+        "Process of photosynthesis",
+        "Testing for starch in leaves"
+      ],
+      "learning_outcomes": "Investigate how water and mineral salts reach the leaves. Describe the process by which plants make food. Test for the presence of starch in a leaf."
+    },
+    {
+      "unit": "6.4.0 Plants and Animals",
+      "subtopics": [
+        "Basic needs of livestock",
+        "Importance of cleanliness in livestock care",
+        "Advantages of keeping livestock together",
+        "Disadvantages of crowding livestock"
+      ],
+      "learning_outcomes": "Explain the basic needs of livestock. Explain the importance of cleanliness in the care of livestock. Find out the advantages of keeping livestock together. Find out the disadvantages of crowding livestock."
+    },
+    {
+      "unit": "6.4.0 Plants and Animals",
+      "subtopics": [
+        "Types of vertebrate animals",
+        "Adaptations of vertebrate animals",
+        "Life cycle of vertebrate animals",
+        "Conservation of vertebrate animals"
+      ],
+      "learning_outcomes": "Identify the different types of vertebrate animals. Describe adaptations shown by vertebrate animals. Describe the life cycle of vertebrate animals. State ways of conserving vertebrate animals."
+    },
+    {
+      "unit": "6.5.0 Materials and Energy",
+      "subtopics": [
+        "Composition of air",
+        "Physical properties of air",
+        "Air has weight and occupies space"
+      ],
+      "learning_outcomes": "Describe the composition of air. State the physical properties of air. Demonstrate that air has weight and occupies space."
+    },
+    {
+      "unit": "6.5.0 Materials and Energy",
+      "subtopics": [
+        "Definition of sound",
+        "Sound production",
+        "Sound transmission",
+        "Increasing sound volume"
+      ],
+      "learning_outcomes": "Explain what sound is. Demonstrate how sound is produced. Describe how sound travels from one place to another. Demonstrate how the volume of sound can be increased."
+    },
+    {
+      "unit": "6.5.0 Materials and Energy",
+      "subtopics": [
+        "Effect of pressure",
+        "Sharpness of tools and implements",
+        "Water tanks placement for pressure",
+        "Air pressure",
+        "Pumping bicycle tubes"
+      ],
+      "learning_outcomes": "Show the effect of pressure on objects. Explain why tools and implements should be sharp. Explain why water tanks are placed on a higher level. Demonstrate that air exerts pressure. Explain why pumping a bicycle tube becomes more difficult as the tube gets inflated."
+    },
+    {
+      "unit": "6.5.0 Materials and Energy",
+      "subtopics": [
+        "Methods of communication",
+        "Importance of communication",
+        "Sound waves in communication"
+      ],
+      "learning_outcomes": "State methods of communication. Explain the importance of communication. Describe how sound waves are used in communication."
+    }
+  ]
+}
