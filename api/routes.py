@@ -1,357 +1,224 @@
 import os
-import httpx
-import asyncio
 import json
-import math
-from fastapi import APIRouter, HTTPException, Body
-from pydantic import BaseModel, Field
-from typing import Optional, List, Dict, Any
+from datetime import datetime
+from fastapi import APIRouter, HTTPException, Header
+from pydantic import BaseModel
 
-# ==========================================
-# SERVICE IMPORTS
-# ==========================================
+from models.schemas import ToolRequest
+from api.teacher_routes import router as teacher_router
+from api.student_routes import router as student_router
+from services.file_manager import load_generated_scheme, save_weekly_plan, load_weekly_plan
+
 from services.llm_engine import (
-    generate_scheme_with_ai,       # <--- The new intelligent scheme generator
+    generate_weekly_plan_from_scheme,
+    generate_specific_lesson_plan,
     generate_quiz_json,
     generate_builder_json,
-    generate_fast_image,
-    generate_narrative_lesson, 
-    get_wiki_search_term,
-    analyze_quiz_remediation 
+    generate_realistic_image,
+    optimize_search_term
 )
 
-from services.syllabus_manager import load_syllabus
-from services.wiki_engine import get_wiki_content_with_images
-from services.exam_engine import generate_exam
-
 router = APIRouter()
+# router.include_router(teacher_router) 
+# router.include_router(student_router) 
 
-# ==========================================
-# MODELS
-# ==========================================
-
-class StudentProfile(BaseModel):
-    # This allows the frontend to send "name", but backend sees "student_name"
-    student_name: str = Field(alias="name") 
+# --- New Model for Plan Lookup ---
+class PlanQuery(BaseModel):
     grade: str
     subject: str
-    country: str = "Zambia"
-    
-    class Config:
-        populate_by_name = True  # Critical: Allows using 'name' or 'student_name'
-
-class StartSessionRequest(StudentProfile):
-    mode: str = "tutor"
-
-class ToolRequest(BaseModel):
-    tool_name: str
-    context_topic: str
-    arguments: dict = {}
-    student: StudentProfile 
-
-class QuizResult(BaseModel):
-    topic: str
-    grade: str = "8"
-    score: int
-    total_questions: int
-    mistakes: List[Dict[str, str]]
-
-# --- SCHEME OF WORK MODELS ---
-class SchemeRequest(BaseModel):
-    schoolName: str
     term: str
-    subject: str
-    grade: str
-    weeks: int
+    weekNumber: int
 
-class SchemeRow(BaseModel):
-    month: Optional[str] = None
-    monthSpan: Optional[int] = None
-    week: str
-    weekSpan: Optional[int] = None
-    topic: Optional[str] = None
-    topicSpan: Optional[int] = None
-    period: str
-    content: List[str] = []
-    outcomes: List[str] = []
-    references: List[str] = []
-    isSpecialRow: bool = False
-
-
-# ==========================================
-# 1. START SESSION
-# ==========================================
-@router.post("/start-session")
-async def start_session(request: StartSessionRequest):
-    print(f"🚀 Starting Session for: {request.student_name} ({request.subject})")
+# ----------------------------------
+# NEW ENDPOINT: GET WEEKLY PLAN (LOCAL)
+# ----------------------------------
+@router.post("/get-weekly-plan")
+async def get_weekly_plan(
+    query: PlanQuery, 
+    x_user_id: str = Header(None, alias="X-User-ID")
+):
+    print(f"📂 Requesting Local Weekly Plan: {query.subject} Grade {query.grade} Week {query.weekNumber}")
     
-    try:
-        api_key = os.getenv("ELEVENLABS_API_KEY", "").strip()
-        agent_id = os.getenv("ELEVENLABS_AGENT_ID", "").strip()
-        
-        if not api_key or not agent_id:
-            raise HTTPException(status_code=500, detail="Missing ElevenLabs Credentials")
+    # 1. Determine User ID (Prioritize Header, fallback to default_user)
+    uid = x_user_id if x_user_id else "default_user"
 
-        # Logic for Exam Mode vs Tutor Mode
-        clean_subject = request.subject.replace(" Exam", "").strip()
-        is_exam = request.mode == "exam" or "Exam" in request.subject
+    # 2. Try to load using the specific User ID
+    data = load_weekly_plan(
+        uid=uid,
+        subject=query.subject,
+        grade=query.grade,
+        term=query.term,
+        week=query.weekNumber
+    )
 
-        if is_exam:
-            system_prompt = (
-                f"You are a strict Exam Invigilator for {clean_subject}. "
-                f"Do not give answers. Only clarify questions. "
-                f"Student: {request.student_name}. Grade: {request.grade}."
-            )
-        else:
-            try:
-                syllabus = load_syllabus(request.country, request.grade, clean_subject)
-            except:
-                syllabus = "General Standard Curriculum"
-                
-            system_prompt = (
-                f"You are a friendly, encouraging Tutor. "
-                f"Student: {request.student_name}. Grade: {request.grade}. "
-                f"Topic: {clean_subject}. Context: {syllabus}"
-            )
-
-        # Get Signed URL
-        url = f"https://api.elevenlabs.io/v1/convai/conversation/get_signed_url?agent_id={agent_id}"
-        headers = {"xi-api-key": api_key}
-        
-        async with httpx.AsyncClient() as client:
-            response = await client.get(url, headers=headers)
-            if response.status_code != 200:
-                print(f"❌ ElevenLabs Error: {response.text}")
-                raise HTTPException(status_code=500, detail="Failed to get voice token")
-            data = response.json()
-
-        return {
-            "signed_url": data["signed_url"],
-            "system_prompt": system_prompt
-        }
-
-    except Exception as e:
-        print(f"❌ Session Start Error: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-# ==========================================
-# 2. TOOL HANDLER (VISUAL LESSON)
-# ==========================================
-
-@router.post("/api/v1/visual-lesson")
-async def visual_lesson(topic: str):
-    wiki_data = get_wiki_content_with_images(topic)
-
-    if not wiki_data:
-        raise HTTPException(status_code=404, detail="Topic not found")
-
-    return wiki_data
-
-
-# ==========================================
-# 3. EXAM ENGINE
-# ==========================================
-
-@router.post("/api/v1/take-exam")
-async def take_exam(subject: str, grade: str):
-    exam = generate_exam(subject, grade)
-
-    # Remove answers before sending to frontend
-    student_questions = []
-    for q in exam.get("questions", []):
-        safe_q = q.copy()
-        safe_q.pop("answer", None)
-        student_questions.append(safe_q)
-
-    return {
-        "exam_id": "mock_123",
-        "questions": student_questions
-    }
-
-
-# ==========================================
-# 4. SCHEME OF WORK GENERATOR (INTELLIGENT)
-# ==========================================
-
-def get_month_name(week_num: int) -> str:
-    """Helper to guess month based on week number (Standard Term 1 assumption)"""
-    if week_num <= 4: return "January"
-    if week_num <= 8: return "February"
-    return "March"
-
-@router.post("/generate-scheme", response_model=List[SchemeRow])
-async def generate_scheme(request: SchemeRequest):
-    print(f"📅 Generating Scheme (AI-Powered): {request.subject} | Grade {request.grade} | {request.term}")
-    
-    # 1. Load Syllabus File
-    clean_subject = request.subject.lower().replace(" ", "_")
-    clean_grade = request.grade.lower().replace(" ", "")
-    filename = f"zambia_grade{clean_grade}_{clean_subject}.json"
-    file_path = os.path.join("syllabi", filename)
-
-    if not os.path.exists(file_path):
-        raise HTTPException(status_code=404, detail=f"Syllabus file not found: {filename}")
-
-    with open(file_path, "r") as f:
-        syllabus_data = json.load(f)
-        topics = syllabus_data.get("topics", []) if isinstance(syllabus_data, dict) else syllabus_data
-
-    # 2. Filter Topics for the specific Term (Basic Pre-filtering)
-    total_topics = len(topics)
-    chunk_size = math.ceil(total_topics / 3)
-    start_index = 0
-    if request.term == "Term 2": start_index = chunk_size
-    elif request.term == "Term 3": start_index = chunk_size * 2
-    
-    term_topics = topics[start_index : start_index + chunk_size]
-
-    # ==========================================
-    # 🧠 TRY AI GENERATION FIRST
-    # ==========================================
-    try:
-        print("   🧠 Asking AI to structure the scheme...")
-        ai_scheme = await generate_scheme_with_ai(
-            syllabus_data=term_topics,
-            subject=request.subject,
-            grade=request.grade,
-            term=request.term,
-            num_weeks=request.weeks
+    # 3. Fallback: If not found, try loading as "default_user" 
+    # (Useful if the file was generated without being logged in)
+    if not data and uid != "default_user":
+        print("⚠️ Specific user file not found, trying 'default_user'...")
+        data = load_weekly_plan(
+            uid="default_user",
+            subject=query.subject,
+            grade=query.grade,
+            term=query.term,
+            week=query.weekNumber
         )
 
-        if ai_scheme and len(ai_scheme) > 0:
-            # Convert AI JSON to our Pydantic Model
-            structured_rows = []
-            for item in ai_scheme:
-                # Helper to extract digits from "Week 1" -> 1
-                week_str = item.get("week", "Week 1")
-                week_digits = ''.join(filter(str.isdigit, week_str))
-                week_num = int(week_digits) if week_digits else 1
-                
-                row = SchemeRow(
-                    month=get_month_name(week_num),
-                    week=week_str,
-                    topic=item.get("topic", ""),
-                    period="1-5", # Default
-                    content=item.get("content", []),
-                    outcomes=item.get("outcomes", []),
-                    references=item.get("references", ["Syllabus Ref"]),
-                    isSpecialRow=item.get("isSpecialRow", False)
-                )
-                structured_rows.append(row)
-            
-            print("   ✅ AI Generation Successful")
-            return structured_rows
+    if not data:
+        raise HTTPException(status_code=404, detail="Weekly Plan file not found locally.")
 
-    except Exception as e:
-        print(f"   ⚠️ AI Failed ({str(e)}). Reverting to manual slicing.")
-
-    # ==========================================
-    # 🚜 FALLBACK: MANUAL SLICING (Old Logic)
-    # ==========================================
-    print("   🚜 Using Fallback Logic...")
-    scheme_rows = []
-    topic_index = 0
-    
-    for week_num in range(1, request.weeks + 1):
-        if topic_index < len(term_topics):
-            t = term_topics[topic_index]
-            row = SchemeRow(
-                month=get_month_name(week_num),
-                week=f"Week {week_num}",
-                topic=t.get("title") or t.get("topic_name"),
-                period="1-5",
-                content=t.get("content", []) if isinstance(t.get("content"), list) else [t.get("content")],
-                outcomes=t.get("outcomes", []) if isinstance(t.get("outcomes"), list) else [t.get("outcomes")],
-                references=["Syllabus Ref"],
-                isSpecialRow=False
-            )
-            scheme_rows.append(row)
-            topic_index += 1
-        else:
-            row = SchemeRow(
-                month=get_month_name(week_num),
-                week=f"Week {week_num}",
-                isSpecialRow=True,
-                content=["REVISION AND ASSESSMENTS"]
-            )
-            scheme_rows.append(row)
-
-    return scheme_rows
+    return data
 
 
-# ==========================================
-# 5. TOOL HANDLER (LLM → ACTIONS)
-# ==========================================
-
-@router.post("/handle-tool")
-async def handle_tool(request: ToolRequest):
-    """
-    Handles tool calls triggered by the AI.
-    """
-    print(f"🛠️ Tool Triggered: {request.tool_name} | Student: {request.student.student_name}")
+# ----------------------------------
+# EXISTING AGENT ENDPOINT
+# ----------------------------------
+@router.post("/agent")
+async def handle_agent_tool(
+    request: ToolRequest,
+    x_user_id: str = Header(None, alias="X-User-ID")
+):
+    print(f"🛠️ Agent Triggered: {request.tool_name} | User: {request.student.student_name}")
     
     try:
         args = request.arguments or {}
-        goal = args.get("goal", request.context_topic)
+        
+        # ✅ FIX: Prioritize Header ID, then Request Body, then Default
+        uid = x_user_id or request.student.uid or "default_user"
 
-        # 1. QUIZ GENERATION
+        # ----------------------------------
+        # GENERATE WEEKLY PLAN
+        # ----------------------------------
+        if request.tool_name == "generate_weekly":
+            print(f"📂 Attempting to load saved scheme for {request.student.subject}...")
+            
+            scheme_data = load_generated_scheme(
+                uid=uid,
+                subject=request.student.subject,
+                grade=request.student.grade,
+                term=args.get("term", "Term 1")
+            )
+
+            plan_json = await generate_weekly_plan_from_scheme(
+                school=args.get("school", "Unknown School"),
+                subject=request.student.subject,
+                grade=request.student.grade,
+                term=args.get("term", "Term 1"),
+                week_number=args.get("weekNumber", 1),
+                days=args.get("days", 5),
+                start_date=args.get("startDate", datetime.now().strftime("%Y-%m-%d")),
+                scheme_data=scheme_data 
+            )
+
+            if plan_json and "days" in plan_json and len(plan_json["days"]) > 0:
+                save_weekly_plan(
+                    uid=uid, 
+                    subject=request.student.subject, 
+                    grade=request.student.grade, 
+                    term=args.get("term", "Term 1"), 
+                    week=args.get("weekNumber", 1), 
+                    data=plan_json
+                )
+
+            return {"status": "success", "type": "weekly_plan", "data": plan_json}
+
+        # ----------------------------------
+        # GENERATE LESSON PLAN
+        # ----------------------------------
+        if request.tool_name == "generate_lesson": 
+            print(f"📝 Requesting Lesson Plan...")
+
+            # 1. Defaults
+            subtopic = args.get("lessonTitle") or args.get("topic") or "General Lesson"
+            objectives = args.get("objectives", [])
+            theme = args.get("topic") or request.student.subject
+            teacher_name = args.get("name") or request.student.student_name or "Class Teacher"
+            school_name = args.get("school") or "Primary School"
+            target_date = args.get("startDate")
+
+            # 2. Attempt Load Weekly Plan (File System Fallback)
+            weekly_data = load_weekly_plan(
+                uid=uid,
+                subject=request.student.subject,
+                grade=request.student.grade,
+                term=args.get("term", "Term 1"),
+                week=args.get("weekNumber", 1)
+            )
+
+            # If not found for specific user, try default user
+            if not weekly_data and uid != "default_user":
+                 weekly_data = load_weekly_plan(
+                    uid="default_user",
+                    subject=request.student.subject,
+                    grade=request.student.grade,
+                    term=args.get("term", "Term 1"),
+                    week=args.get("weekNumber", 1)
+                )
+
+            if weekly_data:
+                # ✅ FIX 1: Get Main Topic from Weekly Plan Meta
+                if "meta" in weekly_data and "main_topic" in weekly_data["meta"]:
+                    theme = weekly_data["meta"]["main_topic"]
+                    print(f"✅ Found Main Topic: {theme}")
+
+                if "days" in weekly_data:
+                    found_day = None
+                    
+                    # ✅ FIX 2: Better Date Matching
+                    if target_date:
+                        found_day = next((d for d in weekly_data["days"] if d.get("date") == target_date), None)
+                    
+                    if found_day:
+                        print(f"✅ Found matching day: {found_day.get('day')}")
+                        # Only override if arguments are empty, otherwise trust Frontend (GenerationModal)
+                        if not subtopic or subtopic == "General Lesson":
+                            subtopic = found_day.get("subtopic", subtopic)
+                        if not objectives:
+                            objectives = found_day.get("objectives", objectives)
+                    else:
+                        print(f"⚠️ Date {target_date} not found in Weekly Plan. Using provided args.")
+
+            # 3. Generate
+            attendance = {"boys": args.get("boys", 0), "girls": args.get("girls", 0)}
+            
+            lesson_json = await generate_specific_lesson_plan(
+                grade=request.student.grade,
+                subject=request.student.subject,
+                theme=theme,
+                subtopic=subtopic,
+                objectives=objectives,
+                date=target_date or "Today",
+                time_start=args.get("startTime", "08:00"),
+                time_end=args.get("endTime", "08:40"),
+                attendance=attendance,
+                teacher_name=teacher_name, 
+                school_name=school_name    
+            )
+            return {"status": "success", "type": "lesson_plan", "data": lesson_json}
+
+        # ----------------------------------
+        # OTHER TOOLS
+        # ----------------------------------
         if request.tool_name == "trigger_quiz":
-            data = await generate_quiz_json(request.context_topic, request.student.grade)
-            return {"status": "success", "type": "quiz", "data": data}
+             topic = args.get("topic", "General Knowledge")
+             quiz_data = await generate_quiz_json(topic, request.student.grade)
+             return {"status": "success", "type": "quiz", "data": quiz_data}
 
-        # 2. SIMULATION / BUILDER
         if request.tool_name == "trigger_simulation":
-            data = await generate_builder_json(goal, request.student.grade)
-            return {"status": "success", "type": "builder", "data": data}
+             topic = args.get("topic", "Science")
+             sim_data = await generate_builder_json(topic, request.student.grade)
+             return {"status": "success", "type": "simulation", "data": sim_data}
 
-        # 3. IMAGE RETRIEVAL
         if request.tool_name == "trigger_image":
-            search_term = await get_wiki_search_term(goal)
-            image_url = await generate_fast_image(search_term)
+             raw_prompt = args.get("prompt", "")
+             optimized_prompt = await optimize_search_term(raw_prompt, request.student.grade)
+             image_url = await generate_realistic_image(optimized_prompt)
+             return { "status": "success", "type": "image", "data": {"url": image_url, "prompt": optimized_prompt} }
 
-            return {
-                "status": "success",
-                "type": "image",
-                "data": {
-                    "url": image_url,
-                    "caption": f"Diagram: {search_term}"
-                }
-            }
+        if request.tool_name not in ["generate_weekly", "generate_lesson", "trigger_quiz", "trigger_simulation", "trigger_image"]:
+             raise HTTPException(status_code=400, detail=f"Unknown tool: {request.tool_name}")
 
-        raise HTTPException(status_code=400, detail=f"Unknown tool: {request.tool_name}")
-    
+        return {"status": "error", "message": "Tool not handled"} 
+
     except Exception as e:
-        print(f"❌ Tool Error: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-# ==========================================
-# 6. QUIZ SUBMISSION & ANALYSIS
-# ==========================================
-@router.post("/submit-quiz")
-async def submit_quiz(result: QuizResult):
-    print(f"\n📨 RECEIVED QUIZ SUBMISSION:")
-    print(f"   - Topic: {result.topic}")
-    print(f"   - Score: {result.score}/{result.total_questions}")
-    
-    # LOGIC: Check for perfect score vs mistakes
-    if not result.mistakes:
-        print("   ✅ Perfect Score.")
-        return {
-            "status": "success",
-            "feedback": f"Outstanding work on {result.topic}! You got everything right.",
-            "action": "advance"
-        }
-
-    print(f"   ⚠️ Sending {len(result.mistakes)} mistakes to AI for review...")
-    
-    remediation_text = await analyze_quiz_remediation(result.topic, result.mistakes, result.grade)
-    
-    print(f"   🗣️ AI Feedback Generated: {remediation_text[:60]}...") 
-    
-    return {
-        "status": "analyzed",
-        "feedback": remediation_text,
-        "action": "review"
-    }
+        print(f"❌ Agent Tool Error: {e}")
+        return {"status": "error", "message": str(e)}

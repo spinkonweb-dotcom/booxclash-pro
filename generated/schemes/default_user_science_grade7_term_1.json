@@ -1,0 +1,212 @@
+[
+  {
+    "week": "Week 1",
+    "topic": "The Human Body: Digestion Introduction",
+    "content": [
+      "Definition of digestion",
+      "Introduction to the organs of the digestive system (mouth, oesophagus, stomach, small intestine, large intestine, anus)"
+    ],
+    "outcomes": [
+      "Describe digestion.",
+      "Identify the organs of the digestive system."
+    ],
+    "references": [
+      "Syllabus Unit 7.1.0",
+      "Online Resources"
+    ]
+  },
+  {
+    "week": "Week 2",
+    "topic": "The Human Body: Digestive Process and Fate of Food",
+    "content": [
+      "Detailed study of the functions of the organs of the digestive system",
+      "Absorption in the alimentary canal (focus on small intestine)",
+      "Fate of undigested food (e.g., formation and egestion of faeces)"
+    ],
+    "outcomes": [
+      "Identify the organs of the digestive system.",
+      "Identify parts of the alimentary canal where digested food is absorbed.",
+      "Explain what happens to undigested food."
+    ],
+    "references": [
+      "Syllabus Unit 7.1.0",
+      "Online Resources"
+    ]
+  },
+  {
+    "week": "Week 3",
+    "topic": "Health: Microorganisms and Their Effects",
+    "content": [
+      "Distinction between a virus and a bacterium (size, structure, reproduction)",
+      "Effect of viruses and bacteria on health (e.g., common cold, flu, cholera, tuberculosis)"
+    ],
+    "outcomes": [
+      "Distinguish between a virus and a bacterium.",
+      "Explain how viruses and bacteria can affect health."
+    ],
+    "references": [
+      "Syllabus Unit 7.2.0",
+      "Online Resources"
+    ]
+  },
+  {
+    "week": "Week 4",
+    "topic": "Health: Common Diseases and Health Services",
+    "content": [
+      "Identification of common diseases of the skin (e.g., ringworm, scabies, rashes, boils)",
+      "Discussion on disease prevalence in relation to the provision of health services in Zambia (e.g., access to clinics, clean water, sanitation)"
+    ],
+    "outcomes": [
+      "Identify common diseases of the skin.",
+      "Explain the prevalence of diseases in relation to the provision of health services."
+    ],
+    "references": [
+      "Syllabus Unit 7.2.0",
+      "Online Resources"
+    ]
+  },
+  {
+    "week": "Week 5",
+    "topic": "Health: Nutritional Value of Fruits and Seeds (Part 1)",
+    "content": [
+      "Identification of various fruits used as food (local Zambian fruits and common international fruits)",
+      "Identification of various seeds used as food (e.g., maize, groundnuts, beans, sunflower seeds)"
+    ],
+    "outcomes": [
+      "Identify fruits used as food.",
+      "Identify seeds used as food."
+    ],
+    "references": [
+      "Syllabus Unit 7.2.0",
+      "Online Resources"
+    ]
+  },
+  {
+    "week": "Week 6",
+    "topic": "Health: Nutritional Value of Fruits and Seeds (Part 2)",
+    "content": [
+      "State the importance of fruits in improving health (e.g., rich in vitamins, minerals, fibre, boosting immunity)",
+      "State the importance of seeds in improving health (e.g., source of proteins, healthy fats, energy)"
+    ],
+    "outcomes": [
+      "State the importance of fruits in improving health.",
+      "State the importance of seeds in improving health."
+    ],
+    "references": [
+      "Syllabus Unit 7.2.0",
+      "Online Resources"
+    ]
+  },
+  {
+    "week": "Week 7",
+    "topic": "The Environment: Separation Techniques (Part 1)",
+    "content": [
+      "Demonstration and practical activity: Separation of an insoluble solid from water (e.g., sand/soil from water using decantation and filtration)",
+      "Demonstration and practical activity: Separation of a soluble substance from water (e.g., salt/sugar solution by evaporation)"
+    ],
+    "outcomes": [
+      "Demonstrate the separation of an insoluble solid from water.",
+      "Demonstrate the separation of a soluble substance from water."
+    ],
+    "references": [
+      "Syllabus Unit 7.3.0",
+      "Online Resources"
+    ]
+  },
+  {
+    "week": "Week 8",
+    "topic": "The Environment: Separation Techniques (Part 2) and Water Sources",
+    "content": [
+      "Demonstration and practical activity: Separation of iron filings from sand (using a magnet)",
+      "Identification of various sources of water in villages and towns (e.g., rivers, lakes, wells, boreholes, communal taps, piped water)"
+    ],
+    "outcomes": [
+      "Demonstrate the separation of iron fillings from sand.",
+      "Identify sources of water in the village and towns."
+    ],
+    "references": [
+      "Syllabus Unit 7.3.0",
+      "Online Resources"
+    ]
+  },
+  {
+    "week": "Week 9",
+    "topic": "The Environment: Water Treatment and Importance",
+    "content": [
+      "Identification of different types of water treatment systems (e.g., boiling, chlorination, filtration, sedimentation, community water treatment plants)",
+      "State the importance of water treatment for public health and preventing waterborne diseases (e.g., cholera, dysentery)"
+    ],
+    "outcomes": [
+      "Identify different types of water treatment systems.",
+      "State the importance of water treatment."
+    ],
+    "references": [
+      "Syllabus Unit 7.3.0",
+      "Online Resources"
+    ]
+  },
+  {
+    "week": "Week 10",
+    "topic": "The Environment: Water Conservation",
+    "content": [
+      "Description of various ways of conserving water in homes, schools, and communities (e.g., rainwater harvesting, fixing leaky taps, using water sparingly, drip irrigation)"
+    ],
+    "outcomes": [
+      "Describe ways of conserving water."
+    ],
+    "references": [
+      "Syllabus Unit 7.3.0",
+      "Online Resources"
+    ]
+  },
+  {
+    "week": "Week 11",
+    "topic": "Plants and Animals: Parts of a Flower",
+    "content": [
+      "Identification of the main parts of a typical flower (e.g., sepals, petals, stamens (anther and filament), carpel/pistil (stigma, style, ovary))",
+      "Practical observation and drawing of a suitable local flower specimen"
+    ],
+    "outcomes": [
+      "Identify the parts of a flower."
+    ],
+    "references": [
+      "Syllabus Unit 7.4.0",
+      "Online Resources"
+    ]
+  },
+  {
+    "week": "Week 12",
+    "topic": "Plants and Animals: Functions of Flower Parts",
+    "content": [
+      "Explanation of the specific functions of each part of the flower (e.g., petals for attraction, stamens for pollen production, carpel for ovule protection and seed development)",
+      "Discussion on the role of flowers in plant reproduction"
+    ],
+    "outcomes": [
+      "Explain the functions of the parts of the flower."
+    ],
+    "references": [
+      "Syllabus Unit 7.4.0",
+      "Online Resources"
+    ]
+  },
+  {
+    "week": "Week 13",
+    "topic": "Revision and Assessments",
+    "content": [
+      "Comprehensive review of all topics covered in Term 1: The Human Body, Health, The Environment, and Plants and Animals.",
+      "Practice exercises and past questions to prepare for termly examinations.",
+      "Formal written assessments and practical assessments where applicable."
+    ],
+    "outcomes": [
+      "Consolidate understanding of all Term 1 Science topics.",
+      "Demonstrate knowledge and skills acquired through various assessment methods."
+    ],
+    "references": [
+      "Syllabus Unit 7.1.0",
+      "Syllabus Unit 7.2.0",
+      "Syllabus Unit 7.3.0",
+      "Syllabus Unit 7.4.0",
+      "Online Resources"
+    ]
+  }
+]

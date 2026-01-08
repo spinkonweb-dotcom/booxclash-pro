@@ -1,0 +1,262 @@
+[
+  {
+    "week": "Week 1 (13.01.2025 - 17.01.2025)",
+    "topic": "FRACTIONS - Addition and Subtraction",
+    "content": [
+      "Recap of common fractions and their equivalent forms, for example, 1/2 is equivalent to 2/4.",
+      "Adding fractions with different denominators, such as 1/3 + 1/4.",
+      "Subtracting fractions with different denominators, for example, 5/6 - 1/2."
+    ],
+    "outcomes": [
+      "Learners should be able to add and subtract fractions with different denominators.",
+      "Learners should be able to solve simple real-life problems involving addition and subtraction of fractions."
+    ],
+    "references": [
+      "Zambian Syllabus Grade 7",
+      "Pupil's Book"
+    ],
+    "week_number": 1,
+    "date_start": "2025-01-13",
+    "date_end": "2025-01-17"
+  },
+  {
+    "week": "Week 2 (20.01.2025 - 24.01.2025)",
+    "topic": "FRACTIONS - Multiplication and Division",
+    "content": [
+      "Multiplying fractions including proper, improper, and mixed numbers, for example, 2/3 multiplied by 3/4.",
+      "Dividing fractions using the reciprocal method, such as 1/2 divided by 1/4.",
+      "Solving combined problems involving the four basic operations on fractions, for instance, (1/2 + 1/4) multiplied by 2/3."
+    ],
+    "outcomes": [
+      "Learners should be able to multiply and divide fractions confidently.",
+      "Learners should be able to apply the four rules of fractions to solve practical problems."
+    ],
+    "references": [
+      "Zambian Syllabus Grade 7",
+      "Pupil's Book"
+    ],
+    "week_number": 2,
+    "date_start": "2025-01-20",
+    "date_end": "2025-01-24"
+  },
+  {
+    "week": "Week 3 (27.01.2025 - 31.01.2025)",
+    "topic": "DECIMALS - Basic Operations",
+    "content": [
+      "Recap of decimal place values up to four decimal places, for example, in 3.1234, 1 is in the tenths place.",
+      "Adding and subtracting decimals with varying decimal places, such as 2.34 plus 0.125.",
+      "Multiplying decimals by whole numbers and other decimals, for instance, 1.5 multiplied by 0.2."
+    ],
+    "outcomes": [
+      "Learners should be able to perform addition and subtraction of decimals up to four decimal places.",
+      "Learners should be able to multiply decimals by whole numbers and other decimals."
+    ],
+    "references": [
+      "Zambian Syllabus Grade 7",
+      "Pupil's Book"
+    ],
+    "week_number": 3,
+    "date_start": "2025-01-27",
+    "date_end": "2025-01-31"
+  },
+  {
+    "week": "Week 4 (03.02.2025 - 07.02.2025)",
+    "topic": "DECIMALS - Division and Conversions",
+    "content": [
+      "Dividing decimals by whole numbers and other decimals, for example, 4.8 divided by 0.6.",
+      "Converting common fractions to decimals, such as 1/4 expressed as 0.25.",
+      "Converting decimals to common fractions, for instance, 0.75 expressed as 3/4."
+    ],
+    "outcomes": [
+      "Learners should be able to perform division of decimals up to four decimal places.",
+      "Learners should be able to convert between common fractions and decimals accurately."
+    ],
+    "references": [
+      "Zambian Syllabus Grade 7",
+      "Pupil's Book"
+    ],
+    "week_number": 4,
+    "date_start": "2025-02-03",
+    "date_end": "2025-02-07"
+  },
+  {
+    "week": "Week 5 (10.02.2025 - 14.02.2025)",
+    "topic": "DECIMALS - Ordering and Comparing",
+    "content": [
+      "Ordering lists of fractions and decimals in ascending order, for example, 0.5, 1/4, 0.75.",
+      "Ordering lists of fractions and decimals in descending order, such as 3/5, 0.65, 0.59.",
+      "Comparing fractions and decimals using the symbols greater than, less than, or equal to, for instance, 0.8 is greater than 3/4."
+    ],
+    "outcomes": [
+      "Learners should be able to order a mixed set of fractions and decimals in ascending or descending order.",
+      "Learners should be able to use comparison symbols correctly when evaluating fractions and decimals."
+    ],
+    "references": [
+      "Zambian Syllabus Grade 7",
+      "Pupil's Book"
+    ],
+    "week_number": 5,
+    "date_start": "2025-02-10",
+    "date_end": "2025-02-14"
+  },
+  {
+    "week": "Week 6 (17.02.2025 - 21.02.2025)",
+    "topic": "PERCENTAGES - Introduction and Conversions",
+    "content": [
+      "Defining percentage as a fraction out of one hundred, for example, 25% means 25/100.",
+      "Converting decimals to percentages, such as 0.45 into 45%.",
+      "Converting percentages to decimals, for instance, 75% into 0.75."
+    ],
+    "outcomes": [
+      "Learners should be able to describe a percentage as a fraction of one hundred.",
+      "Learners should be able to convert between decimals and percentages."
+    ],
+    "references": [
+      "Zambian Syllabus Grade 7",
+      "Pupil's Book"
+    ],
+    "week_number": 6,
+    "date_start": "2025-02-17",
+    "date_end": "2025-02-21"
+  },
+  {
+    "week": "Week 7 (24.02.2025 - 28.02.2025)",
+    "topic": "PERCENTAGES - Fraction Conversions and Simple Problems",
+    "content": [
+      "Converting common fractions to percentages, for example, 1/2 as 50%.",
+      "Converting percentages to common fractions in simplest form, such as 20% as 1/5.",
+      "Solving simple problems involving finding a percentage of a quantity, for instance, 10% of K500."
+    ],
+    "outcomes": [
+      "Learners should be able to convert between common fractions and percentages.",
+      "Learners should be able to calculate a percentage of a given number."
+    ],
+    "references": [
+      "Zambian Syllabus Grade 7",
+      "Pupil's Book"
+    ],
+    "week_number": 7,
+    "date_start": "2025-02-24",
+    "date_end": "2025-02-28"
+  },
+  {
+    "week": "Week 8 (03.03.2025 - 07.03.2025)",
+    "topic": "PERCENTAGES - Complex Problems and Real-Life",
+    "content": [
+      "Solving problems involving percentage increase or decrease, for example, finding new price after a 15% discount.",
+      "Solving problems to find the original quantity given a percentage, such as if 20% is 40, what is the whole.",
+      "Relating fractions, decimals, and percentages to real-life situations like discounts, interest rates, or grades."
+    ],
+    "outcomes": [
+      "Learners should be able to solve multi-step problems involving percentages including increase and decrease.",
+      "Learners should be able to identify and apply fractions, decimals, and percentages in everyday contexts."
+    ],
+    "references": [
+      "Zambian Syllabus Grade 7",
+      "Pupil's Book"
+    ],
+    "week_number": 8,
+    "date_start": "2025-03-03",
+    "date_end": "2025-03-07"
+  },
+  {
+    "week": "Week 9 (10.03.2025 - 14.03.2025)",
+    "topic": "RATIO AND PROPORTION - Direct Proportion",
+    "content": [
+      "Recapping the concept of ratio and simplifying ratios, for example, 6:9 simplifies to 2:3.",
+      "Solving problems involving direct proportion where one quantity increases as the other increases, such as if 2 apples cost K10, how much do 5 apples cost.",
+      "Identifying relationships that show direct proportionality, for instance, distance and time at a constant speed."
+    ],
+    "outcomes": [
+      "Learners should be able to solve problems involving direct proportion.",
+      "Learners should be able to identify situations that demonstrate direct proportionality."
+    ],
+    "references": [
+      "Zambian Syllabus Grade 7",
+      "Pupil's Book"
+    ],
+    "week_number": 9,
+    "date_start": "2025-03-10",
+    "date_end": "2025-03-14"
+  },
+  {
+    "week": "Week 10 (17.03.2025 - 21.03.2025)",
+    "topic": "RATIO AND PROPORTION - Indirect Proportion",
+    "content": [
+      "Describing indirect proportion where one quantity increases as the other decreases, for example, more workers mean less time to complete a task.",
+      "Solving problems involving indirect proportion using the fraction method, such as if 3 men finish a job in 4 days, how long will 6 men take.",
+      "Solving problems involving indirect proportion using the proportional method, for instance, if a car travels at 60 km/h and takes 2 hours, how long will it take at 80 km/h."
+    ],
+    "outcomes": [
+      "Learners should be able to describe indirect proportion and distinguish it from direct proportion.",
+      "Learners should be able to solve problems involving indirect proportion using suitable methods."
+    ],
+    "references": [
+      "Zambian Syllabus Grade 7",
+      "Pupil's Book"
+    ],
+    "week_number": 10,
+    "date_start": "2025-03-17",
+    "date_end": "2025-03-21"
+  },
+  {
+    "week": "Week 11 (24.03.2025 - 28.03.2025)",
+    "topic": "RATIO AND PROPORTION - Graphs and Real-Life",
+    "content": [
+      "Drawing graphs to illustrate quantities in direct proportion, for example, plotting cost versus number of items.",
+      "Drawing graphs to illustrate quantities in indirect proportion, such as plotting speed versus time for a fixed distance.",
+      "Solving real-life problems involving both direct and indirect ratio and proportion, for instance, sharing profits or calculating work rates."
+    ],
+    "outcomes": [
+      "Learners should be able to construct and interpret graphs for direct and indirect proportion.",
+      "Learners should be able to solve practical problems using concepts of ratio and proportion."
+    ],
+    "references": [
+      "Zambian Syllabus Grade 7",
+      "Pupil's Book"
+    ],
+    "week_number": 11,
+    "date_start": "2025-03-24",
+    "date_end": "2025-03-28"
+  },
+  {
+    "week": "Week 12 (31.03.2025 - 04.04.2025)",
+    "topic": "SOCIAL & COMMERCIAL ARITHMETIC - Currency Exchange",
+    "content": [
+      "Understanding the concept of exchange rates between different currencies, for example, 1 US Dollar equals K25.00 Zambian Kwacha.",
+      "Converting local currency to foreign currency, such as changing K1000 into US Dollars.",
+      "Converting foreign currency to local currency, for instance, changing 50 Euros into Zambian Kwacha."
+    ],
+    "outcomes": [
+      "Learners should be able to convert local currency to foreign currency and vice versa using given exchange rates.",
+      "Learners should be able to calculate the cost of goods priced in foreign currency."
+    ],
+    "references": [
+      "Zambian Syllabus Grade 7",
+      "Pupil's Book"
+    ],
+    "week_number": 12,
+    "date_start": "2025-03-31",
+    "date_end": "2025-04-04"
+  },
+  {
+    "week": "Week 13 (07.04.2025 - 11.04.2025)",
+    "topic": "Revision and Assessments",
+    "content": [
+      "Comprehensive review of fractions, decimals, and percentages.",
+      "Review of ratio, proportion, and social and commercial arithmetic.",
+      "Practice problem-solving across all topics covered in Term 1."
+    ],
+    "outcomes": [
+      "Learners should be able to demonstrate mastery of all Term 1 mathematical concepts.",
+      "Learners should be able to apply problem-solving strategies to diverse mathematical challenges."
+    ],
+    "references": [
+      "Zambian Syllabus Grade 7",
+      "Pupil's Book"
+    ],
+    "week_number": 13,
+    "date_start": "2025-04-07",
+    "date_end": "2025-04-11"
+  }
+]

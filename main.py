@@ -66,6 +66,6 @@ def health_check():
 # 8. Local Development Entry Point
 if __name__ == "__main__":
     import uvicorn
-    port = int(os.environ.get("PORT", 8000))
+    port = int(os.environ.get("PORT", 8002))
     # 'main:app' assumes this file is named main.py
     uvicorn.run("main:app", host="0.0.0.0", port=port, reload=True)

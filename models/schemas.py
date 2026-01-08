@@ -1,31 +1,44 @@
 from pydantic import BaseModel, Field
-from typing import Optional, List, Dict, Any
+from typing import Optional, List, Dict
 
-# --- Request Models (What comes IN) ---
+class StudentProfile(BaseModel):
+    student_name: str = Field(alias="name") 
+    grade: str
+    subject: str
+    country: str = "Zambia"
+    
+    class Config:
+        populate_by_name = True 
 
-class SimulationRequest(BaseModel):
-    grade: str = Field(..., example="7")
-    subject: str = Field(..., example="Science")
-    topic: str = Field(..., example="Density")
-    action: str = Field(..., example="create_lab_density")
+class StartSessionRequest(StudentProfile):
+    mode: str = "tutor"
 
-class VoiceToolCall(BaseModel):
-    """
-    Structure of the data sent BY the ElevenLabs Agent
-    when it wants to trigger an action on your server.
-    """
+class ToolRequest(BaseModel):
     tool_name: str
-    parameters: Dict[str, Any]
+    context_topic: Optional[str] = ""
+    arguments: dict = {}
+    student: StudentProfile 
 
-# --- Response Models (What goes OUT) ---
-
-class SyllabusContext(BaseModel):
+class QuizResult(BaseModel):
     topic: str
-    learning_objective: str
-    key_concepts: List[str]
-    context_text: str
+    grade: str = "8"
+    score: int
+    total_questions: int
+    mistakes: List[Dict[str, str]]
 
-class SimulationResponse(BaseModel):
-    topic: str
-    ui_code: str  # The generated React code
-    context: SyllabusContext
+class SchemeRequest(BaseModel):
+    schoolName: str
+    term: str
+    subject: str
+    grade: str
+    weeks: int
+
+class SchemeRow(BaseModel):
+    month: Optional[str] = None
+    week: str
+    topic: Optional[str] = None
+    period: str
+    content: List[str] = []
+    outcomes: List[str] = []
+    references: List[str] = []
+    isSpecialRow: bool = False

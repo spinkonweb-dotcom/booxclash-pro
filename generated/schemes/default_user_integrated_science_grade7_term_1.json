@@ -1,0 +1,223 @@
+[
+  {
+    "week": "Week 1 (13.01.2025 - 17.01.2025)",
+    "topic": "The Human Digestive System: Introduction to Digestion",
+    "content": [
+      "The definition of digestion as the breakdown of large insoluble food molecules into small soluble molecules.",
+      "An overview of the main organs that form the human digestive system, starting from the mouth.",
+      "The role of the mouth, oesophagus, and stomach in the initial stages of food breakdown."
+    ],
+    "outcomes": [
+      "Learners should be able to define digestion and explain its importance for nutrient absorption.",
+      "Learners should be able to identify and describe the primary organs of the upper digestive tract."
+    ],
+    "references": [
+      "Zambian Syllabus Grade 7",
+      "Pupil's Book"
+    ]
+  },
+  {
+    "week": "Week 2 (20.01.2025 - 24.01.2025)",
+    "topic": "The Human Digestive System: Absorption and Fate of Food",
+    "content": [
+      "The structure and function of the small intestine in absorbing digested food, including the role of villi.",
+      "The process of absorption in the alimentary canal and how nutrients enter the bloodstream.",
+      "What happens to undigested food in the large intestine, including formation and elimination of faeces."
+    ],
+    "outcomes": [
+      "Learners should be able to identify parts of the alimentary canal where digested food is absorbed.",
+      "Learners should be able to explain the journey and eventual fate of undigested food in the body."
+    ],
+    "references": [
+      "Zambian Syllabus Grade 7",
+      "Pupil's Book"
+    ]
+  },
+  {
+    "week": "Week 3 (27.01.2025 - 31.01.2025)",
+    "topic": "Health: Viruses and Bacteria",
+    "content": [
+      "Key differences between viruses and bacteria, including their structure, size, and how they reproduce.",
+      "How viruses can affect human health, causing diseases such as the common cold or influenza.",
+      "How bacteria can affect human health, causing diseases like cholera or tuberculosis."
+    ],
+    "outcomes": [
+      "Learners should be able to distinguish clearly between a virus and a bacterium using specific characteristics.",
+      "Learners should be able to explain how both viruses and bacteria can negatively impact human health."
+    ],
+    "references": [
+      "Zambian Syllabus Grade 7",
+      "Pupil's Book"
+    ]
+  },
+  {
+    "week": "Week 4 (03.02.2025 - 07.02.2025)",
+    "topic": "Health: Common Diseases and Health Provision",
+    "content": [
+      "Identification of common diseases of the skin, such as scabies, ringworm, and impetigo, and their causes.",
+      "Understanding how factors like hygiene and sanitation contribute to the prevalence of certain diseases.",
+      "The relationship between the provision of health services, like clinics and hospitals, and disease prevention and control."
+    ],
+    "outcomes": [
+      "Learners should be able to identify at least three common diseases affecting the human skin.",
+      "Learners should be able to explain how the availability of health services influences disease prevalence in communities."
+    ],
+    "references": [
+      "Zambian Syllabus Grade 7",
+      "Pupil's Book"
+    ]
+  },
+  {
+    "week": "Week 5 (10.02.2025 - 14.02.2025)",
+    "topic": "Health: Fruits as Essential Food",
+    "content": [
+      "Identification of various fruits commonly used as food, such as mangoes, bananas, and oranges.",
+      "The specific vitamins and minerals provided by fruits, vital for maintaining good health.",
+      "The overall importance of incorporating a variety of fruits into one's diet for disease prevention and energy."
+    ],
+    "outcomes": [
+      "Learners should be able to identify at least five different fruits that are consumed as food in Zambia.",
+      "Learners should be able to state the importance of fruits in improving overall health and well-being."
+    ],
+    "references": [
+      "Zambian Syllabus Grade 7",
+      "Pupil's Book"
+    ]
+  },
+  {
+    "week": "Week 6 (17.02.2025 - 21.02.2025)",
+    "topic": "Health: Seeds as Valuable Food Sources",
+    "content": [
+      "Identification of various seeds commonly used as food, such as groundnuts, beans, and maize.",
+      "The specific proteins, fats, and carbohydrates provided by seeds, crucial for growth and energy.",
+      "The overall importance of incorporating a variety of seeds into one's diet for balanced nutrition and sustenance."
+    ],
+    "outcomes": [
+      "Learners should be able to identify at least five different seeds that are consumed as food in Zambia.",
+      "Learners should be able to explain the importance of seeds as a source of essential nutrients for health."
+    ],
+    "references": [
+      "Zambian Syllabus Grade 7",
+      "Pupil's Book"
+    ]
+  },
+  {
+    "week": "Week 7 (24.02.2025 - 28.02.2025)",
+    "topic": "The Environment: Separating Insoluble Mixtures",
+    "content": [
+      "Methods for separating insoluble solids from liquids, such as decantation, where liquid is poured off.",
+      "The process of filtration using materials like filter paper to separate solid particles from a liquid.",
+      "Practical examples of separating sand from water or chalk powder from water using appropriate techniques."
+    ],
+    "outcomes": [
+      "Learners should be able to demonstrate the separation of an insoluble solid from water using filtration.",
+      "Learners should be able to explain the principles behind separating insoluble mixtures like sand and water."
+    ],
+    "references": [
+      "Zambian Syllabus Grade 7",
+      "Pupil's Book"
+    ]
+  },
+  {
+    "week": "Week 8 (03.03.2025 - 07.03.2025)",
+    "topic": "The Environment: Separating Soluble and Magnetic Mixtures",
+    "content": [
+      "Methods for separating soluble substances from water, such as evaporation to obtain the solid residue.",
+      "The process of distillation to obtain pure solvent from a solution, leaving dissolved solids behind.",
+      "Demonstrating the separation of iron filings from sand using a magnet, exploiting magnetic properties."
+    ],
+    "outcomes": [
+      "Learners should be able to demonstrate the separation of a soluble substance from water through evaporation.",
+      "Learners should be able to demonstrate the separation of iron fillings from sand using a magnetic method."
+    ],
+    "references": [
+      "Zambian Syllabus Grade 7",
+      "Pupil's Book"
+    ]
+  },
+  {
+    "week": "Week 9 (10.03.2025 - 14.03.2025)",
+    "topic": "The Environment: Water Sources and Initial Treatment",
+    "content": [
+      "Identification of various sources of water in rural villages, such as boreholes, rivers, and wells.",
+      "Identification of various sources of water in urban towns, such as piped water from dams and treatment plants.",
+      "An introduction to basic water treatment systems, including boiling water for purification."
+    ],
+    "outcomes": [
+      "Learners should be able to identify at least three sources of water found in both villages and towns.",
+      "Learners should be able to describe simple methods of making water safe for drinking at home."
+    ],
+    "references": [
+      "Zambian Syllabus Grade 7",
+      "Pupil's Book"
+    ]
+  },
+  {
+    "week": "Week 10 (17.03.2025 - 21.03.2025)",
+    "topic": "The Environment: Advanced Water Treatment and Conservation",
+    "content": [
+      "Different types of water treatment systems used on a larger scale, including sedimentation, filtration, and chlorination.",
+      "The importance of water treatment in preventing waterborne diseases and ensuring public health.",
+      "Various ways of conserving water in homes, schools, and communities to ensure sustainable supply."
+    ],
+    "outcomes": [
+      "Learners should be able to identify and explain at least two types of water treatment systems.",
+      "Learners should be able to state the importance of water treatment and describe ways of conserving water effectively."
+    ],
+    "references": [
+      "Zambian Syllabus Grade 7",
+      "Pupil's Book"
+    ]
+  },
+  {
+    "week": "Week 11 (24.03.2025 - 28.03.2025)",
+    "topic": "Plants and Animals: Anatomy of a Flower",
+    "content": [
+      "Identification of the main parts of a typical flower, including the sepals, petals, stamens, and carpel (pistil).",
+      "The distinct visual characteristics and arrangement of each flower part, such as colourful petals for attraction.",
+      "Understanding the concept of reproductive organs (stamens and carpel) versus non-reproductive organs (sepals and petals)."
+    ],
+    "outcomes": [
+      "Learners should be able to accurately identify and label the four main parts of a given flower specimen.",
+      "Learners should be able to describe the general appearance and position of each floral part."
+    ],
+    "references": [
+      "Zambian Syllabus Grade 7",
+      "Pupil's Book"
+    ]
+  },
+  {
+    "week": "Week 12 (31.03.2025 - 04.04.2025)",
+    "topic": "Plants and Animals: Functions of Floral Structures",
+    "content": [
+      "The specific function of sepals in protecting the developing bud before it opens.",
+      "The function of petals in attracting pollinators such as insects and birds through their colour and scent.",
+      "The distinct roles of the stamens (male reproductive part producing pollen) and the carpel/pistil (female reproductive part receiving pollen and forming seeds)."
+    ],
+    "outcomes": [
+      "Learners should be able to explain the primary function of each major part of a flower.",
+      "Learners should be able to relate the structure of a flower part to its specific role in reproduction."
+    ],
+    "references": [
+      "Zambian Syllabus Grade 7",
+      "Pupil's Book"
+    ]
+  },
+  {
+    "week": "Week 13 (07.04.2025 - 11.04.2025)",
+    "topic": "Revision and Assessments",
+    "content": [
+      "Review of all key concepts covered during Term 1, including human body systems, health, environmental aspects, and plant anatomy.",
+      "Practice with various question types to prepare for end-of-term examinations and continuous assessments.",
+      "Consolidation of understanding through discussions, quizzes, and problem-solving activities related to the term's topics."
+    ],
+    "outcomes": [
+      "Learners should be able to recall and accurately explain major scientific concepts taught throughout Term 1.",
+      "Learners should be able to apply their knowledge to answer assessment questions and demonstrate comprehensive understanding."
+    ],
+    "references": [
+      "Zambian Syllabus Grade 7",
+      "Pupil's Book"
+    ]
+  }
+]
