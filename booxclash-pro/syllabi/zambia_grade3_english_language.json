@@ -1,0 +1,196 @@
+{
+  "curriculum": "Zambia ECZ",
+  "grade": "3",
+  "subject": "English Language",
+  "topics": [
+    {
+      "unit": "CONVERSATION",
+      "subtopics": [
+        "Time",
+        "Places in the Community",
+        "Community Responsibilities",
+        "Directions",
+        "Instructions"
+      ],
+      "learning_outcomes": "Use appropriate language to discuss seasons of the year. Use appropriate language to discuss places in the community. Use appropriate language to discuss community responsibilities. Use appropriate language in asking and giving simple directions. Use appropriate language in giving and following simple instructions."
+    },
+    {
+      "unit": "ETIQUETTE",
+      "subtopics": [
+        "Manners"
+      ],
+      "learning_outcomes": "Use appropriate language to demonstrate manners and good behaviour."
+    },
+    {
+      "unit": "STORIES AND TEXTS",
+      "subtopics": [
+        "Simple Stories and Texts"
+      ],
+      "learning_outcomes": "Analyse simple stories and texts orally."
+    },
+    {
+      "unit": "SONGS",
+      "subtopics": [
+        "Simple Songs"
+      ],
+      "learning_outcomes": "Analyse simple songs."
+    },
+    {
+      "unit": "DRAMA",
+      "subtopics": [
+        "Simple Plays"
+      ],
+      "learning_outcomes": "Use appropriate language to participate in simple plays."
+    },
+    {
+      "unit": "POETRY",
+      "subtopics": [
+        "Simple Poems"
+      ],
+      "learning_outcomes": "Recite simple poems."
+    },
+    {
+      "unit": "RIDDLES",
+      "subtopics": [
+        "Riddles"
+      ],
+      "learning_outcomes": "Interpret simple riddles."
+    },
+    {
+      "unit": "DESCRIPTIONS",
+      "subtopics": [
+        "Describing People and Objects",
+        "Describing Events"
+      ],
+      "learning_outcomes": "Use appropriate language to describe people and objects. Use appropriate language to describe events."
+    },
+    {
+      "unit": "SOUNDS",
+      "subtopics": [
+        "Alternative Consonant Spelling Choices",
+        "Blend and read words using alternative consonants",
+        "Vowels Alternative Spelling Choices",
+        "Blend and read words with alternative spelling choices of vowels",
+        "Digraph Alternative Spelling Choices",
+        "Blend and read words with alternative spelling choices of digraphs",
+        "Trigraph Alternative Spelling Choices",
+        "Blend and read words with alternative trigraph spelling choices",
+        "Consonant Blends"
+      ],
+      "learning_outcomes": "Sound alternative spelling choices of consonants. Blend and read words using alternative consonants. Sound alternative spelling choices of vowels. Blend and read words with alternative spelling choices of vowels. Sound alternative spelling choices of digraphs. Blend and read words with alternative spelling choices of digraphs. Sound alternative spelling choices of trigraphs. Blend and read words with alternative trigraph spelling choices. Read words with consonant blends."
+    },
+    {
+      "unit": "SENTENCES",
+      "subtopics": [
+        "Sight Words"
+      ],
+      "learning_outcomes": "Read sight words in sentences with fluency."
+    },
+    {
+      "unit": "READING ALOUD",
+      "subtopics": [
+        "Fluency and Expression"
+      ],
+      "learning_outcomes": "Read texts aloud with fluency."
+    },
+    {
+      "unit": "SHARED READING",
+      "subtopics": [
+        "Simple Stories and Texts"
+      ],
+      "learning_outcomes": "Read simple stories and texts with understanding."
+    },
+    {
+      "unit": "INDEPENDENT READING",
+      "subtopics": [
+        "Stories and Texts"
+      ],
+      "learning_outcomes": "Read stories and texts with understanding."
+    },
+    {
+      "unit": "EXTENSIVE READING",
+      "subtopics": [
+        "Reading a Variety of Texts"
+      ],
+      "learning_outcomes": "Read a variety of stories and texts for pleasure."
+    },
+    {
+      "unit": "INTENSIVE READING",
+      "subtopics": [
+        "Silent Reading"
+      ],
+      "learning_outcomes": "Read a variety of stories and texts with understanding."
+    },
+    {
+      "unit": "HANDWRITING (Cursive)",
+      "subtopics": [
+        "Letters of the Alphabet"
+      ],
+      "learning_outcomes": "Write legibly letters of the alphabet using cursive handwriting."
+    },
+    {
+      "unit": "SPELLING",
+      "subtopics": [
+        "Word Spelling",
+        "Dictation"
+      ],
+      "learning_outcomes": "Spell words correctly. Write dictated words, phrases and sentences."
+    },
+    {
+      "unit": "WORD RELATIONSHIPS",
+      "subtopics": [
+        "Synonyms",
+        "Antonyms"
+      ],
+      "learning_outcomes": "Demonstrate knowledge of synonyms. Demonstrate knowledge of antonyms."
+    },
+    {
+      "unit": "SENTENCES",
+      "subtopics": [
+        "Sentence Construction"
+      ],
+      "learning_outcomes": "Construct simple sentences."
+    },
+    {
+      "unit": "PARTS OF SPEECH",
+      "subtopics": [
+        "Nouns",
+        "Verbs",
+        "Tenses",
+        "Adjectives",
+        "Adverbs",
+        "Reflexive Pronouns"
+      ],
+      "learning_outcomes": "Demonstrate knowledge of nouns. Demonstrate knowledge of verbs. Demonstrate knowledge of tenses. Demonstrate knowledge of adjectives. Demonstrate knowledge of adverbs of manner. Demonstrate knowledge of reflexive pronouns."
+    },
+    {
+      "unit": "PUNCTUATION",
+      "subtopics": [
+        "Sentences and short paragraphs"
+      ],
+      "learning_outcomes": "PunctuatE sentences and short paragraphs with exclamation marks and speech marks."
+    },
+    {
+      "unit": "ALPHABETICAL ORDER AND SEQUENCING",
+      "subtopics": [
+        "Arranging words and sentences",
+        "Using a dictionary"
+      ],
+      "learning_outcomes": "Sequence words and sentences in a logical order. Use a dictionary."
+    },
+    {
+      "unit": "SUMMARY",
+      "subtopics": [
+        "Summarising"
+      ],
+      "learning_outcomes": "Summarise simple paragraphs."
+    },
+    {
+      "unit": "COMPOSITION",
+      "subtopics": [
+        "Guided Composition"
+      ],
+      "learning_outcomes": "Write stories using given vocabulary."
+    }
+  ]
+}

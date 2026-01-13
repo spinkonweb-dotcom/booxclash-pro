@@ -1,0 +1,139 @@
+{
+  "meta": {
+    "curriculum": "Zambia",
+    "grade": "2",
+    "subject": "Mathematics"
+  },
+  "topics": [
+    {
+      "unit": "Algebra",
+      "topic_title": "SETS",
+      "page_number": 17,
+      "subtopics": [],
+      "learning_outcomes": [
+        "Describe sets in relation to real life situations.",
+        "State membership of a set using symbol ∈, £ and { }."
+      ]
+    },
+    {
+      "unit": "Numbers & Calculation",
+      "topic_title": "NUMBERS & NOTATION",
+      "page_number": 17,
+      "subtopics": [],
+      "learning_outcomes": [
+        "Count, read and write numbers up to 1 000.",
+        "Count in tens and hundreds up to 1 000",
+        "Identify place values of digits in given numbers.",
+        "Write numbers in expanded notation."
+      ]
+    },
+    {
+      "unit": "Numbers & Calculation",
+      "topic_title": "ADDITION",
+      "page_number": 18,
+      "subtopics": [],
+      "learning_outcomes": [
+        "Add whole numbers vertically with sums up to 100 (including carrying).",
+        "Add whole numbers with sums up to 1 000.",
+        "Carry out addition of quantities in real life situations (e.g. money, quantities)."
+      ]
+    },
+    {
+      "unit": "Numbers & Calculation",
+      "topic_title": "SUBTRACTION",
+      "page_number": 18,
+      "subtopics": [],
+      "learning_outcomes": [
+        "Subtract whole numbers vertically up to 100 (including borrowing).",
+        "Subtract whole numbers vertically up to 1 000.",
+        "Carry out subtraction and addition in real life.",
+        "Carry out practical shopping and marketing activities involving money up to K 1 000."
+      ]
+    },
+    {
+      "unit": "Numbers & Calculation",
+      "topic_title": "MULTIPLICATION",
+      "page_number": 19,
+      "subtopics": [],
+      "learning_outcomes": [
+        "Express multiplication as repeated addition.",
+        "Multiply single digit numbers.",
+        "Demonstrate an understanding of the multiplication table of single digit numbers",
+        "Use Multiplication vocabulary.",
+        "Apply Multiplication in real life situations."
+      ]
+    },
+    {
+      "unit": "Numbers & Calculation",
+      "topic_title": "DIVISION",
+      "page_number": 20,
+      "subtopics": [],
+      "learning_outcomes": [
+        "Express division as repeated subtraction or sharing.",
+        "Use division vocabulary.",
+        "Divide numbers whose divisor and quotient is a single digit.",
+        "Apply division in real life situations."
+      ]
+    },
+    {
+      "unit": "Numbers & Calculation",
+      "topic_title": "NUMBER PATTERNS",
+      "page_number": 20,
+      "subtopics": [],
+      "learning_outcomes": [
+        "Recognize and use number patterns involving the four mathematical operations.",
+        "Determine the rule in the number pattern."
+      ]
+    },
+    {
+      "unit": "Measures",
+      "topic_title": "MEASURES",
+      "page_number": 20,
+      "subtopics": [],
+      "learning_outcomes": [
+        "Read and tell time in full hours.",
+        "Measures of different objects using standard units. (cm, mm, m).",
+        "Find the perimeter of simple plane figures."
+      ]
+    },
+    {
+      "unit": "Relations",
+      "topic_title": "RELATIONS",
+      "page_number": 21,
+      "subtopics": [],
+      "learning_outcomes": [
+        "Draw arrow diagrams to illustrate matching."
+      ]
+    },
+    {
+      "unit": "Statistics",
+      "topic_title": "STATISTICS",
+      "page_number": 21,
+      "subtopics": [],
+      "learning_outcomes": [
+        "Collect and present data using pictures."
+      ]
+    },
+    {
+      "unit": "Geometry",
+      "topic_title": "PLANE SHAPES",
+      "page_number": 21,
+      "subtopics": [],
+      "learning_outcomes": [
+        "Identify right angle with squared paper or paper folding.",
+        "Draw rectangle and square on squared paper.",
+        "Identify side and vertex of rectangle and square."
+      ]
+    },
+    {
+      "unit": "Geometry",
+      "topic_title": "SOLID SHAPES",
+      "page_number": 21,
+      "subtopics": [],
+      "learning_outcomes": [
+        "Recognise cuboid, cube, cylinder and sphere.",
+        "Mould cuboid, cube, cylinder and sphere using clay plasticine."
+      ]
+    }
+  ]
+}

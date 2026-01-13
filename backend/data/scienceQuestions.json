@@ -1,0 +1,287 @@
+[
+  {
+    "id": "S1_01",
+    "level": 1,
+    "questionText": "Which of these is a living thing?",
+    "options": ["A rock", "A car", "A plant", "A toy"],
+    "correctAnswer": "A plant",
+    "hintForVisual": "Picture of a rock, a car, a plant, a toy"
+  },
+  {
+    "id": "S1_02",
+    "level": 1,
+    "questionText": "Which part helps the plant stand up?",
+    "options": ["Leaf", "Stem", "Flower", "Root"],
+    "correctAnswer": "Stem",
+    "hintForVisual": "A simple drawing of a plant with parts labeled 'Leaf', 'Stem', 'Flower', 'Root'"
+  },
+  {
+    "id": "S1_03",
+    "level": 1,
+    "questionText": "Which of these words best describes a fluffy cloud?",
+    "options": ["Hard", "Soft", "Sticky", "Wet"],
+    "correctAnswer": "Soft"
+  },
+  {
+    "id": "S1_04",
+    "level": 1,
+    "questionText": "What do we usually see in the sky during the day that gives us light and warmth?",
+    "options": ["The Moon", "Stars", "The Sun", "Clouds"],
+    "correctAnswer": "The Sun"
+  },
+  {
+    "id": "S1_05",
+    "level": 1,
+    "questionText": "Which sense do you use to hear music?",
+    "options": ["Sight", "Hearing", "Smell", "Touch"],
+    "correctAnswer": "Hearing"
+  },
+  {
+    "id": "S1_06",
+    "level": 1,
+    "questionText": "Which of these items would a magnet most likely stick to?",
+    "options": ["A wooden block", "A plastic spoon", "A paper clip", "A cotton ball"],
+    "correctAnswer": "A paper clip"
+  },
+  {
+    "id": "S1_07",
+    "level": 1,
+    "questionText": "What do plants need to grow?",
+    "options": ["Sugar, milk, toys", "Water, sunlight, soil", "Cars, shoes, books", "Rocks, sand, plastic"],
+    "correctAnswer": "Water, sunlight, soil"
+  },
+  {
+    "id": "S1_08",
+    "level": 1,
+    "questionText": "What are the two main states of water you can easily see?",
+    "options": ["Solid and gas", "Liquid and plasma", "Solid and liquid", "Gas and solid"],
+    "correctAnswer": "Solid and liquid"
+  },
+  {
+    "id": "S1_09",
+    "level": 1,
+    "questionText": "Which part of your body helps you see?",
+    "options": ["Ear", "Nose", "Eye", "Hand"],
+    "correctAnswer": "Eye"
+  },
+  {
+    "id": "S1_10",
+    "level": 1,
+    "questionText": "When does the sun usually set?",
+    "options": ["In the morning", "At noon", "In the evening", "At midnight"],
+    "correctAnswer": "In the evening"
+  },
+
+  {
+    "id": "S2_01",
+    "level": 2,
+    "questionText": "A tiny seed grows into a plant. What is the word for when a seed starts to grow?",
+    "options": ["Blooming", "Germination", "Wilting", "Harvesting"],
+    "correctAnswer": "Germination"
+  },
+  {
+    "id": "S2_02",
+    "level": 2,
+    "questionText": "Which animal would most likely live in a very cold, icy habitat?",
+    "options": ["A monkey", "A polar bear", "A camel", "A snake"],
+    "correctAnswer": "A polar bear"
+  },
+  {
+    "id": "S2_03",
+    "level": 2,
+    "questionText": "When ice melts, what state of matter does it become?",
+    "options": ["Solid", "Liquid", "Gas", "Rock"],
+    "correctAnswer": "Liquid"
+  },
+  {
+    "id": "S2_04",
+    "level": 2,
+    "questionText": "Which of these describes weather?",
+    "options": ["How tall a mountain is", "What we wear today because it's hot", "How many stars are in the sky", "How many trees are in a forest"],
+    "correctAnswer": "What we wear today because it's hot"
+  },
+  {
+    "id": "S2_05",
+    "level": 2,
+    "questionText": "Which of these helps you move a heavy object up to a higher place more easily?",
+    "options": ["A flat wall", "A rough road", "A ramp", "A soft pillow"],
+    "correctAnswer": "A ramp"
+  },
+  {
+    "id": "S2_06",
+    "level": 2,
+    "questionText": "Which group does a dog belong to?",
+    "options": ["Bird", "Fish", "Mammal", "Insect"],
+    "correctAnswer": "Mammal"
+  },
+  {
+    "id": "S2_07",
+    "level": 2,
+    "questionText": "What kind of sound does a drum make?",
+    "options": ["A quiet sound", "A high-pitched sound", "A loud sound", "A soft sound"],
+    "correctAnswer": "A loud sound"
+  },
+  {
+    "id": "S2_08",
+    "level": 2,
+    "questionText": "Which of these is a source of heat?",
+    "options": ["A cold ice cube", "A bright light bulb", "A running fan", "A warm blanket"],
+    "correctAnswer": "A bright light bulb"
+  },
+  {
+    "id": "S2_09",
+    "level": 2,
+    "questionText": "Which season is usually the coldest?",
+    "options": ["Spring", "Summer", "Autumn", "Winter"],
+    "correctAnswer": "Winter"
+  },
+  {
+    "id": "S2_10",
+    "level": 2,
+    "questionText": "Which material is best for making a rain umbrella because it stops water?",
+    "options": ["Cotton", "Paper", "Plastic", "Wood"],
+    "correctAnswer": "Plastic"
+  },
+
+  {
+    "id": "S3_01",
+    "level": 3,
+    "questionText": "In a simple food chain, grass is eaten by a rabbit, and the rabbit is eaten by a fox. What is the grass in this food chain?",
+    "options": ["A consumer", "A predator", "A producer", "A decomposer"],
+    "correctAnswer": "A producer"
+  },
+  {
+    "id": "S3_02",
+    "level": 3,
+    "questionText": "Why do some animals in the desert have thick fur?",
+    "options": ["To help them fly", "To keep them cool", "To help them hide", "To keep them warm at night"],
+    "correctAnswer": "To keep them warm at night"
+  },
+  {
+    "id": "S3_03",
+    "level": 3,
+    "questionText": "If you mix sugar into water, what happens to the sugar?",
+    "options": ["It floats", "It sinks", "It dissolves", "It explodes"],
+    "correctAnswer": "It dissolves"
+  },
+  {
+    "id": "S3_04",
+    "level": 3,
+    "questionText": "When water vapor in the air cools down and turns back into liquid water to form clouds, what is this process called?",
+    "options": ["Evaporation", "Condensation", "Precipitation", "Runoff"],
+    "correctAnswer": "Condensation"
+  },
+  {
+    "id": "S3_05",
+    "level": 3,
+    "questionText": "When you look in a mirror, you see your own image. This is because light is being:",
+    "options": ["Absorbed", "Refracted", "Reflected", "Dissolved"],
+    "correctAnswer": "Reflected"
+  },
+  {
+    "id": "S3_06",
+    "level": 3,
+    "questionText": "Which of these is a natural resource that we need to breathe?",
+    "options": ["Plastic", "Air", "Electricity", "Sugar"],
+    "correctAnswer": "Air"
+  },
+  {
+    "id": "S3_07",
+    "level": 3,
+    "questionText": "What part of a plant takes in water and nutrients from the soil?",
+    "options": ["Leaf", "Stem", "Flower", "Root"],
+    "correctAnswer": "Root"
+  },
+  {
+    "id": "S3_08",
+    "level": 3,
+    "questionText": "Which simple machine would you use to lift a very heavy rock?",
+    "options": ["Wheel", "Lever", "Screw", "Ramp"],
+    "correctAnswer": "Lever"
+  },
+  {
+    "id": "S3_09",
+    "level": 3,
+    "questionText": "Which type of material allows light to pass through it clearly, like a window?",
+    "options": ["Opaque", "Translucent", "Transparent", "Reflective"],
+    "correctAnswer": "Transparent"
+  },
+  {
+    "id": "S3_10",
+    "level": 3,
+    "questionText": "What are natural materials like granite, sandstone, and marble examples of?",
+    "options": ["Soils", "Metals", "Minerals", "Rocks"],
+    "correctAnswer": "Rocks"
+  },
+
+  {
+    "id": "S4_01",
+    "level": 4,
+    "questionText": "Which organ is responsible for pumping blood around your body?",
+    "options": ["Brain", "Lungs", "Stomach", "Heart"],
+    "correctAnswer": "Heart"
+  },
+  {
+    "id": "S4_02",
+    "level": 4,
+    "questionText": "A food web shows how different food chains are connected. Why are food webs usually more complex than single food chains?",
+    "options": ["They only show plants", "They only show animals", "They show many animals eating different things", "They only show one predator"],
+    "correctAnswer": "They show many animals eating different things"
+  },
+  {
+    "id": "S4_03",
+    "level": 4,
+    "questionText": "Which state of matter has a definite shape and a definite volume?",
+    "options": ["Solid", "Liquid", "Gas", "Plasma"],
+    "correctAnswer": "Solid"
+  },
+  {
+    "id": "S4_04",
+    "level": 4,
+    "questionText": "What causes the cycle of day and night on Earth?",
+    "options": ["The Moon going around the Earth", "The Sun going around the Earth", "The Earth spinning on its axis", "The Earth moving around the Sun"],
+    "correctAnswer": "The Earth spinning on its axis"
+  },
+  {
+    "id": "S4_05",
+    "level": 4,
+    "questionText": "If you put a metal spoon in a hot cup of tea, the spoon quickly gets hot. This is an example of heat transfer by:",
+    "options": ["Conduction", "Convection", "Radiation", "Evaporation"],
+    "correctAnswer": "Conduction"
+  },
+  {
+    "id": "S4_06",
+    "level": 4,
+    "questionText": "What is recycling?",
+    "options": ["Throwing trash away", "Burning trash", "Turning old materials into new products", "Buying new products"],
+    "correctAnswer": "Turning old materials into new products"
+  },
+  {
+    "id": "S4_07",
+    "level": 4,
+    "questionText": "What is the primary function of the lungs in the human body?",
+    "options": ["Pump blood", "Digest food", "Help us breathe", "Think and learn"],
+    "correctAnswer": "Help us breathe"
+  },
+  {
+    "id": "S4_08",
+    "level": 4,
+    "questionText": "When you boil water, it turns into steam (water vapor). What is this process called?",
+    "options": ["Melting", "Freezing", "Condensation", "Evaporation"],
+    "correctAnswer": "Evaporation"
+  },
+  {
+    "id": "S4_09",
+    "level": 4,
+    "questionText": "Which term describes a resource that can be replaced naturally over a relatively short period of time (like sunlight or trees)?",
+    "options": ["Non-renewable", "Limited", "Exhaustible", "Renewable"],
+    "correctAnswer": "Renewable"
+  },
+  {
+    "id": "S4_10",
+    "level": 4,
+    "questionText": "Why do we have different phases of the Moon (like crescent, half, full)?",
+    "options": ["The Moon changes shape", "Clouds cover the Moon", "The Sun lights up different parts of the Moon as it orbits Earth", "The Earth casts a shadow on the Moon"],
+    "correctAnswer": "The Sun lights up different parts of the Moon as it orbits Earth"
+  }
+]

@@ -1,0 +1,622 @@
+{
+ "math": {
+  "1": [
+    {
+      "prompt": "What is the value of 7 + 5?",
+      "options": ["10", "11", "12", "13"],
+      "answer": "12"
+    },
+    {
+      "prompt": "What is 6 times 3?",
+      "options": ["18", "21", "15", "12"],
+      "answer": "18"
+    },
+    {
+      "prompt": "What shape has three sides?",
+      "options": ["Square", "Circle", "Triangle", "Rectangle"],
+      "answer": "Triangle"
+    },
+    {
+      "prompt": "Which number is even?",
+      "options": ["3", "7", "8", "9"],
+      "answer": "8"
+    },
+    {
+      "prompt": "What is the next number after 19?",
+      "options": ["18", "20", "21", "22"],
+      "answer": "20"
+    },
+    {
+      "prompt": "What is half of 10?",
+      "options": ["4", "5", "6", "7"],
+      "answer": "5"
+    },
+    {
+      "prompt": "How many sides does a square have?",
+      "options": ["3", "4", "5", "6"],
+      "answer": "4"
+    },
+    {
+      "prompt": "What is 10 minus 4?",
+      "options": ["6", "5", "4", "3"],
+      "answer": "6"
+    },
+    {
+      "prompt": "What is 2 + 9?",
+      "options": ["10", "11", "12", "13"],
+      "answer": "11"
+    },
+    {
+      "prompt": "What is 5 more than 7?",
+      "options": ["11", "12", "13", "14"],
+      "answer": "12"
+    }
+  ],
+  "2": [
+    {
+      "prompt": "What is the median of 3, 5, 7, 9, 11?",
+      "options": ["5", "7", "9", "3"],
+      "answer": "7"
+    },
+    {
+      "prompt": "What is the probability of rolling a 4 on a fair die?",
+      "options": ["1/4", "1/5", "1/6", "1/3"],
+      "answer": "1/6"
+    },
+    {
+      "prompt": "What is the area of a rectangle with length 5 and width 3?",
+      "options": ["8", "15", "12", "10"],
+      "answer": "15"
+    },
+    {
+      "prompt": "Solve: 4x = 20. What is x?",
+      "options": ["4", "5", "6", "7"],
+      "answer": "5"
+    },
+    {
+      "prompt": "What is the mean of 2, 4, 6, 8?",
+      "options": ["4", "5", "6", "7"],
+      "answer": "5"
+    },
+    {
+      "prompt": "A triangle has angles 60°, 60°, and ____. What is the missing angle?",
+      "options": ["60°", "30°", "90°", "45°"],
+      "answer": "60°"
+    },
+    {
+      "prompt": "What is the mode of: 3, 4, 4, 5, 6?",
+      "options": ["3", "4", "5", "6"],
+      "answer": "4"
+    },
+    {
+      "prompt": "What is the value of 5²?",
+      "options": ["10", "20", "25", "30"],
+      "answer": "25"
+    },
+    {
+      "prompt": "How many degrees are in a right angle?",
+      "options": ["45", "60", "90", "180"],
+      "answer": "90"
+    },
+    {
+      "prompt": "What is the perimeter of a square with side length 6?",
+      "options": ["24", "18", "12", "36"],
+      "answer": "24"
+    }
+  ],
+  "3": [
+    {
+      "prompt": "Find the standard deviation of 2, 4, 4, 4, 5, 5, 7, 9.",
+      "options": ["2", "2.5", "3", "1.87"],
+      "answer": "2"
+    },
+    {
+      "prompt": "What is the derivative of f(x) = x² + 3x?",
+      "options": ["2x + 3", "2x - 3", "x + 3", "x² + 3"],
+      "answer": "2x + 3"
+    },
+    {
+      "prompt": "What is the area of a circle with radius 3? (Use π = 3.14)",
+      "options": ["28.26", "27", "29", "30"],
+      "answer": "28.26"
+    },
+    {
+      "prompt": "If P(A) = 0.3 and P(B) = 0.4, what is P(A or B) assuming A and B are independent?",
+      "options": ["0.12", "0.7", "0.58", "0.1"],
+      "answer": "0.58"
+    },
+    {
+      "prompt": "Integrate f(x) = 6x",
+      "options": ["6x²", "3x²", "6x + C", "3x² + C"],
+      "answer": "3x² + C"
+    },
+    {
+      "prompt": "Find the volume of a cylinder with radius 2 and height 5. (π = 3.14)",
+      "options": ["62.8", "31.4", "20", "50"],
+      "answer": "62.8"
+    },
+    {
+      "prompt": "Find the slope of the line passing through (2,3) and (4,7)",
+      "options": ["2", "3", "1", "4"],
+      "answer": "2"
+    },
+    {
+      "prompt": "What is the variance of 1, 2, 3, 4, 5?",
+      "options": ["2", "1", "3", "4"],
+      "answer": "2"
+    },
+    {
+      "prompt": "Differentiate f(x) = 3x³",
+      "options": ["9x²", "6x", "3x²", "9x"],
+      "answer": "9x²"
+    },
+    {
+      "prompt": "Solve: ∫ x dx",
+      "options": ["x²", "x²/2", "2x", "x"],
+      "answer": "x²/2"
+    }
+  ],
+  "4": [
+    {
+      "prompt": "Find the second derivative of f(x) = x³ - 3x² + 2x",
+      "options": ["6x - 6", "6x", "3x² - 6x", "3x²"],
+      "answer": "6x - 6"
+    },
+    {
+      "prompt": "Evaluate: lim(x→0) (sin(x)/x)",
+      "options": ["1", "0", "Infinity", "Undefined"],
+      "answer": "1"
+    },
+    {
+      "prompt": "Solve: ∫ (3x² + 2x + 1) dx",
+      "options": ["x³ + x² + x + C", "x³ + x² + C", "3x + 2x + 1", "x³ + x + C"],
+      "answer": "x³ + x² + x + C"
+    },
+    {
+      "prompt": "A normal distribution has μ = 100 and σ = 15. What is the z-score of 115?",
+      "options": ["1", "2", "0", "-1"],
+      "answer": "1"
+    },
+    {
+      "prompt": "Find the derivative of f(x) = e^(2x)",
+      "options": ["2e^(2x)", "e^(2x)", "e^x", "2x"],
+      "answer": "2e^(2x)"
+    },
+    {
+      "prompt": "If events A and B are mutually exclusive, what is P(A and B)?",
+      "options": ["0", "1", "P(A)", "P(B)"],
+      "answer": "0"
+    },
+    {
+      "prompt": "What is the determinant of the matrix [[2, 3], [1, 4]]?",
+      "options": ["5", "11", "7", "8"],
+      "answer": "5"
+    },
+    {
+      "prompt": "Find the volume of a cone with radius 3 and height 4 (π = 3.14)",
+      "options": ["37.68", "50.24", "25.12", "18.84"],
+      "answer": "37.68"
+    },
+    {
+      "prompt": "Solve: d/dx (ln(x²))",
+      "options": ["2/x", "1/x", "2ln(x)", "ln(x²)"],
+      "answer": "2/x"
+    },
+    {
+      "prompt": "Find the inverse of the function f(x) = 3x + 2",
+      "options": ["(x - 2)/3", "(x + 2)/3", "3x - 2", "x/3 + 2"],
+      "answer": "(x - 2)/3"
+    }
+  ]
+},
+  "science": {
+  "1": [
+      {
+        "prompt": "What organ pumps blood throughout the human body?",
+        "options": [
+          "Liver",
+          "Heart",
+          "Lungs",
+          "Kidney"
+        ],
+        "answer": "Heart"
+      },
+      {
+        "prompt": "What is the chemical symbol for water?",
+        "options": [
+          "O2",
+          "H2O",
+          "CO2",
+          "HO"
+        ],
+        "answer": "H2O"
+      },
+      {
+        "prompt": "Which part of a plant conducts photosynthesis?",
+        "options": [
+          "Roots",
+          "Stem",
+          "Leaves",
+          "Flowers"
+        ],
+        "answer": "Leaves"
+      },
+      {
+        "prompt": "What gas do humans breathe in to survive?",
+        "options": [
+          "Oxygen",
+          "Nitrogen",
+          "Carbon dioxide",
+          "Helium"
+        ],
+        "answer": "Oxygen"
+      },
+      {
+        "prompt": "Which of these is a state of matter?",
+        "options": [
+          "Energy",
+          "Solid",
+          "Heat",
+          "Light"
+        ],
+        "answer": "Solid"
+      },
+      {
+        "prompt": "Which organ helps in breathing?",
+        "options": [
+          "Heart",
+          "Liver",
+          "Lungs",
+          "Stomach"
+        ],
+        "answer": "Lungs"
+      },
+      {
+        "prompt": "What is the boiling point of water at sea level?",
+        "options": [
+          "90\u00b0C",
+          "100\u00b0C",
+          "80\u00b0C",
+          "120\u00b0C"
+        ],
+        "answer": "100\u00b0C"
+      },
+      {
+        "prompt": "What planet do we live on?",
+        "options": [
+          "Mars",
+          "Earth",
+          "Venus",
+          "Jupiter"
+        ],
+        "answer": "Earth"
+      },
+      {
+        "prompt": "What is the center of an atom called?",
+        "options": [
+          "Electron",
+          "Proton",
+          "Nucleus",
+          "Molecule"
+        ],
+        "answer": "Nucleus"
+      },
+      {
+        "prompt": "Which of these is a source of light?",
+        "options": [
+          "Moon",
+          "Mirror",
+          "Sun",
+          "Earth"
+        ],
+        "answer": "Sun"
+      }
+    ],
+    "2": [
+      {
+        "prompt": "What is the function of white blood cells?",
+        "options": [
+          "Carry oxygen",
+          "Clot blood",
+          "Fight infections",
+          "Produce insulin"
+        ],
+        "answer": "Fight infections"
+      },
+      {
+        "prompt": "What happens during evaporation?",
+        "options": [
+          "Liquid turns to gas",
+          "Gas turns to solid",
+          "Solid turns to liquid",
+          "Liquid turns to solid"
+        ],
+        "answer": "Liquid turns to gas"
+      },
+      {
+        "prompt": "Which organelle is known as the powerhouse of the cell?",
+        "options": [
+          "Nucleus",
+          "Mitochondria",
+          "Ribosome",
+          "Chloroplast"
+        ],
+        "answer": "Mitochondria"
+      },
+      {
+        "prompt": "Which element is used in pencils?",
+        "options": [
+          "Graphite",
+          "Lead",
+          "Iron",
+          "Zinc"
+        ],
+        "answer": "Graphite"
+      },
+      {
+        "prompt": "What type of energy is stored in food?",
+        "options": [
+          "Kinetic",
+          "Potential",
+          "Chemical",
+          "Thermal"
+        ],
+        "answer": "Chemical"
+      },
+      {
+        "prompt": "Which body system controls reflex actions?",
+        "options": [
+          "Circulatory",
+          "Digestive",
+          "Nervous",
+          "Respiratory"
+        ],
+        "answer": "Nervous"
+      },
+      {
+        "prompt": "What does litmus paper test?",
+        "options": [
+          "Water",
+          "Air",
+          "pH level",
+          "Temperature"
+        ],
+        "answer": "pH level"
+      },
+      {
+        "prompt": "Which force pulls objects toward the Earth?",
+        "options": [
+          "Friction",
+          "Electricity",
+          "Gravity",
+          "Magnetism"
+        ],
+        "answer": "Gravity"
+      },
+      {
+        "prompt": "Which part of the eye controls how much light enters?",
+        "options": [
+          "Lens",
+          "Iris",
+          "Retina",
+          "Cornea"
+        ],
+        "answer": "Iris"
+      },
+      {
+        "prompt": "Which blood vessels carry blood away from the heart?",
+        "options": [
+          "Veins",
+          "Capillaries",
+          "Arteries",
+          "Nerves"
+        ],
+        "answer": "Arteries"
+      }
+    ],
+    "3": [
+      {
+        "prompt": "What happens to enzymes when exposed to high temperatures?",
+        "options": [
+          "They become faster",
+          "They denature",
+          "They multiply",
+          "They solidify"
+        ],
+        "answer": "They denature"
+      },
+      {
+        "prompt": "What would happen if a red blood cell is placed in pure water?",
+        "options": [
+          "It shrinks",
+          "It bursts",
+          "It stays the same",
+          "It hardens"
+        ],
+        "answer": "It bursts"
+      },
+      {
+        "prompt": "Why is copper used in electrical wires?",
+        "options": [
+          "It's lightweight",
+          "It's magnetic",
+          "It's a good conductor",
+          "It's reactive"
+        ],
+        "answer": "It's a good conductor"
+      },
+      {
+        "prompt": "Which change represents a chemical change?",
+        "options": [
+          "Melting ice",
+          "Boiling water",
+          "Rusting iron",
+          "Breaking glass"
+        ],
+        "answer": "Rusting iron"
+      },
+      {
+        "prompt": "What does a voltmeter measure when connected across a bulb?",
+        "options": [
+          "Current",
+          "Voltage",
+          "Power",
+          "Resistance"
+        ],
+        "answer": "Voltage"
+      },
+      {
+        "prompt": "If a pendulum swings wider, what happens to its time period?",
+        "options": [
+          "It increases",
+          "It decreases",
+          "It stays the same",
+          "It stops"
+        ],
+        "answer": "It stays the same"
+      },
+      {
+        "prompt": "In photosynthesis, what is the role of chlorophyll?",
+        "options": [
+          "Absorbs sunlight",
+          "Produces oxygen",
+          "Stores glucose",
+          "Absorbs carbon dioxide"
+        ],
+        "answer": "Absorbs sunlight"
+      },
+      {
+        "prompt": "Why is it dangerous to use wet hands with electrical devices?",
+        "options": [
+          "Water is magnetic",
+          "Water increases resistance",
+          "Water is a good conductor",
+          "Water has oxygen"
+        ],
+        "answer": "Water is a good conductor"
+      },
+      {
+        "prompt": "Which process converts glucose into energy in cells?",
+        "options": [
+          "Photosynthesis",
+          "Fermentation",
+          "Respiration",
+          "Transpiration"
+        ],
+        "answer": "Respiration"
+      },
+      {
+        "prompt": "What will happen to the rate of reaction if the concentration of reactants increases?",
+        "options": [
+          "It slows down",
+          "It stops",
+          "It increases",
+          "No change"
+        ],
+        "answer": "It increases"
+      }
+    ],
+    "4": [
+      {
+        "prompt": "Which part of the nephron is primarily responsible for filtering blood?",
+        "options": [
+          "Loop of Henle",
+          "Glomerulus",
+          "Collecting duct",
+          "Ureter"
+        ],
+        "answer": "Glomerulus"
+      },
+      {
+        "prompt": "How does increasing temperature affect the rate of a chemical reaction?",
+        "options": [
+          "Slows it down",
+          "Has no effect",
+          "Speeds it up",
+          "Prevents it"
+        ],
+        "answer": "Speeds it up"
+      },
+      {
+        "prompt": "Why does a metal expand when heated?",
+        "options": [
+          "Electrons escape",
+          "Atoms vibrate more",
+          "Neutrons increase",
+          "It oxidizes"
+        ],
+        "answer": "Atoms vibrate more"
+      },
+      {
+        "prompt": "What is the molar mass of calcium carbonate (CaCO\u2083)?",
+        "options": [
+          "40 g/mol",
+          "60 g/mol",
+          "100 g/mol",
+          "120 g/mol"
+        ],
+        "answer": "100 g/mol"
+      },
+      {
+        "prompt": "A 5 kg object is moving at 10 m/s. What is its kinetic energy?",
+        "options": [
+          "50 J",
+          "100 J",
+          "250 J",
+          "500 J"
+        ],
+        "answer": "250 J"
+      },
+      {
+        "prompt": "What is the function of ribosomes in a cell?",
+        "options": [
+          "DNA replication",
+          "Photosynthesis",
+          "Protein synthesis",
+          "Energy production"
+        ],
+        "answer": "Protein synthesis"
+      },
+      {
+        "prompt": "Which compound will turn red litmus paper blue?",
+        "options": [
+          "Hydrochloric acid",
+          "Sodium hydroxide",
+          "Vinegar",
+          "Carbonic acid"
+        ],
+        "answer": "Sodium hydroxide"
+      },
+      {
+        "prompt": "What is the role of the retina in the eye?",
+        "options": [
+          "Focuses light",
+          "Detects light",
+          "Controls eye movement",
+          "Protects the eye"
+        ],
+        "answer": "Detects light"
+      },
+      {
+        "prompt": "Which principle explains why planes lift off the ground?",
+        "options": [
+          "Newton\u2019s Third Law",
+          "Archimedes\u2019 Principle",
+          "Bernoulli\u2019s Principle",
+          "Boyle\u2019s Law"
+        ],
+        "answer": "Bernoulli\u2019s Principle"
+      },
+      {
+        "prompt": "How many protons are in an atom of Magnesium (Mg)?",
+        "options": [
+          "12",
+          "14",
+          "16",
+          "24"
+        ],
+        "answer": "12"
+      }
+    ]
+  }
+}

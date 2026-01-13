@@ -1,0 +1,39 @@
+{
+  "name": "booxclash-backend",
+  "version": "1.0.0",
+  "description": "This is booxclash backend code",
+  "license": "ISC",
+  "author": "Chilongo Kondwani",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "@elevenlabs/elevenlabs-js": "^2.26.0",
+    "@google-cloud/text-to-speech": "^6.2.0",
+    "@google/generative-ai": "^0.24.1",
+    "bcrypt": "^5.1.1",
+    "bcryptjs": "^3.0.2",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.6.1",
+    "express": "^5.1.0",
+    "framer-motion": "^12.9.2",
+    "jsonwebtoken": "^9.0.2",
+    "lucide-react": "^0.503.0",
+    "mongoose": "^8.13.2",
+    "multer": "^1.4.5-lts.2",
+    "node-fetch": "^3.3.2",
+    "nodemailer": "^7.0.11",
+    "socket.io": "^4.8.1",
+    "socket.io-client": "^4.8.1",
+    "twilio": "^5.10.3",
+    "url": "^0.11.4",
+    "zod": "^3.24.3"
+  },
+  "devDependencies": {
+    "@types/socket.io": "^3.0.1"
+  }
+}

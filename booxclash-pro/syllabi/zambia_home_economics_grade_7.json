@@ -1,0 +1,199 @@
+{
+  "meta": {
+    "curriculum": "Zambia",
+    "grade": "7",
+    "subject": "Home Economics"
+  },
+  "topics": [
+    {
+      "topic_title": "FOOD AND NUTRITION",
+      "page_number": 32,
+      "subtopics": [
+        {
+          "subtopic_title": "THE KITCHEN",
+          "learning_outcomes": [
+            "Make improvised kitchen utensils"
+          ]
+        },
+        {
+          "subtopic_title": "COOKING METHODS",
+          "learning_outcomes": [
+            "Describe steaming",
+            "Identify suitable foods for steaming",
+            "Steam different dishes"
+          ]
+        },
+        {
+          "subtopic_title": "RAISING AGENTS",
+          "learning_outcomes": [
+            "Describe raising agents",
+            "Identify types of raising agents"
+          ]
+        },
+        {
+          "subtopic_title": "MEAL AND FLOUR MIXTURES",
+          "learning_outcomes": [
+            "Prepare flour mixtures using baking powder and yeast",
+            "use air and baking powder as raising agents in dishes",
+            "Decorate simple dishes"
+          ]
+        }
+      ]
+    },
+    {
+      "topic_title": "HOME MANAGEMENT",
+      "page_number": 33,
+      "subtopics": [
+        {
+          "subtopic_title": "SANITATION",
+          "learning_outcomes": [
+            "Describe a kitchen sink Identify parts of a kitchen sink and their functions.",
+            "Unblock the kitchen sink"
+          ]
+        },
+        {
+          "subtopic_title": "HOME",
+          "learning_outcomes": [
+            "Identify types of flooring",
+            "Identify floor coverings",
+            "Clean and care for different floor coverings"
+          ]
+        },
+        {
+          "subtopic_title": "HOSPITALITY",
+          "learning_outcomes": [
+            "Describe the colour scheme",
+            "Explain the effect of colour in a room",
+            "Arrange decorations according to the background"
+          ]
+        }
+      ]
+    },
+    {
+      "topic_title": "TIME MANAGEMENT",
+      "page_number": 34,
+      "subtopics": [
+        {
+          "subtopic_title": "Time plan",
+          "learning_outcomes": [
+            "Explain what a time plan is",
+            "Make a simple time plan"
+          ]
+        }
+      ]
+    },
+    {
+      "topic_title": "LAUNDRY",
+      "page_number": 34,
+      "subtopics": [
+        {
+          "subtopic_title": "Laundering, Starching and bluing white garments",
+          "learning_outcomes": [
+            "Launder, starch and blue white garments",
+            "Demonstrate how to make starch and blue"
+          ]
+        }
+      ]
+    },
+    {
+      "topic_title": "GARDENING",
+      "page_number": 34,
+      "subtopics": [
+        {
+          "subtopic_title": "Maintenance of the Kitchen garden",
+          "learning_outcomes": [
+            "Maintain kitchen garden by practicing effective control of pests and diseases."
+          ]
+        }
+      ]
+    },
+    {
+      "topic_title": "HEALTH EDUCATION",
+      "page_number": 35,
+      "subtopics": [
+        {
+          "subtopic_title": "PERSONAL HYGIENE",
+          "learning_outcomes": [
+            "Identify parts of the skin",
+            "Explain the importance of the skin",
+            "Describe the functions of the skin",
+            "Explain how to care for the skin"
+          ]
+        }
+      ]
+    },
+    {
+      "topic_title": "HEALTH EDUCATION (continued)",
+      "page_number": 36,
+      "subtopics": [
+        {
+          "subtopic_title": "PUBERTY",
+          "learning_outcomes": [
+            "Describe the changes at puberty",
+            "Explain what menstruation is",
+            "Describe the menstrual cycle",
+            "Explain the required personal hygiene during menstruation",
+            "Identify the materials for making reusable/homemade sanitary towels",
+            "Outline ways of maintaining personal hygiene during puberty and menstruation",
+            "Make a home-made/reusable sanitary towel"
+          ]
+        },
+        {
+          "subtopic_title": "HUMAN DEVELOPMENT",
+          "learning_outcomes": [
+            "Identify ways of promoting privacy and bodily integrity for both boys and girls"
+          ]
+        }
+      ]
+    },
+    {
+      "topic_title": "NEEDLEWORK AND CRAFT",
+      "page_number": 37,
+      "subtopics": [
+        {
+          "subtopic_title": "NEEDLEWORK",
+          "learning_outcomes": [
+            "Describe ways of arrangement of fullness",
+            "Arrange fullness.",
+            "Mend damaged clothes.",
+            "Sew simple shirts and dress"
+          ]
+        },
+        {
+          "subtopic_title": "CRAFTWORK",
+          "learning_outcomes": [
+            "Describe knitting and knitting stitches",
+            "Describe tools and materials required in knitting",
+            "Knit various articles"
+          ]
+        },
+        {
+          "subtopic_title": "Crocheting",
+          "learning_outcomes": [
+            "Describe crocheting and crocheting stitches",
+            "Describe tools and materials required in crocheting",
+            "Crochet various articles"
+          ]
+        }
+      ]
+    },
+    {
+      "topic_title": "NEEDLEWORK AND CRAFT (continued)",
+      "page_number": 38,
+      "subtopics": [
+        {
+          "subtopic_title": "Tie and Dye",
+          "learning_outcomes": [
+            "Dye materials using various dyes"
+          ]
+        },
+        {
+          "subtopic_title": "ENTREPRENEURSHIP",
+          "learning_outcomes": [
+            "Identify entrepreneurial opportunities in, Home Economics"
+          ]
+        }
+      ]
+    }
+  ]
+}

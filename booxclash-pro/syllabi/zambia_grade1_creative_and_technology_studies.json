@@ -1,0 +1,158 @@
+{
+  "curriculum": "Zambia ECZ",
+  "grade": "1",
+  "subject": "Creative and Technology Studies",
+  "topics": [
+    {
+      "unit": "SAFETY",
+      "subtopics": [
+        "Safety in the immediate environment",
+        "Body Posture"
+      ],
+      "learning_outcomes": "Apply safety in the immediate environment. Demonstrate correct postural habits."
+    },
+    {
+      "unit": "DRAWING & COLOURING",
+      "subtopics": [
+        "Free Hand Sketching",
+        "Free Drawing",
+        "Colouring"
+      ],
+      "learning_outcomes": "Sketch simple objects. Draw pictures of objects. Draw pictures showing activities. Paint pictures based on given themes."
+    },
+    {
+      "unit": "TOOLS AND EQUIPMENT",
+      "subtopics": [
+        "Hand Tools",
+        "Kitchen Utensils"
+      ],
+      "learning_outcomes": "Use hand tools. Use kitchen utensils."
+    },
+    {
+      "unit": "MATERIALS",
+      "subtopics": [
+        "Sources of Materials",
+        "Material Conservation",
+        "Use of Materials"
+      ],
+      "learning_outcomes": "Identify sources of materials used to make things. Practise 3 ways of conserving materials. Use locally available materials to make products."
+    },
+    {
+      "unit": "PATTERNS",
+      "subtopics": [
+        "Simple Patterns"
+      ],
+      "learning_outcomes": "Make simple patterns."
+    },
+    {
+      "unit": "SOUNDS",
+      "subtopics": [
+        "Exploration of Sounds"
+      ],
+      "learning_outcomes": "Produce different sounds."
+    },
+    {
+      "unit": "DRAMA",
+      "subtopics": [
+        "Drama"
+      ],
+      "learning_outcomes": "Practise simple plays."
+    },
+    {
+      "unit": "HOSPITALITY IN EVERYDAY LIFE",
+      "subtopics": [
+        "Customer Service",
+        "Cleaning"
+      ],
+      "learning_outcomes": "Perform customer service skills. Clean rooms using different items."
+    },
+    {
+      "unit": "ICT DEVICES",
+      "subtopics": [
+        "ICT Devices"
+      ],
+      "learning_outcomes": "Use ICT devices."
+    },
+    {
+      "unit": "COMPUTER SOFTWARE",
+      "subtopics": [
+        "Computer Educational Games"
+      ],
+      "learning_outcomes": "Play computer educational games."
+    },
+    {
+      "unit": "HEALTH AND FITNESS MANAGEMENT",
+      "subtopics": [
+        "Fitness and health",
+        "Educational Gymnastics",
+        "Perform stunt activities"
+      ],
+      "learning_outcomes": "Perform fitness and health activities. Perform tumbling activities. Perform stunt activities."
+    },
+    {
+      "unit": "TOURISM",
+      "subtopics": [
+        "Cultures and Landmarks"
+      ],
+      "learning_outcomes": "Explore different cultures in the community. Locate landmarks using cardinal points."
+    },
+    {
+      "unit": "SPORTS SKILLS DEVELOPMENT",
+      "subtopics": [
+        "Games",
+        "Field and Track Events"
+      ],
+      "learning_outcomes": "Perform games. Perform Field and Track Events."
+    },
+    {
+      "unit": "NEEDLEWORK",
+      "subtopics": [
+        "Needlework Tools"
+      ],
+      "learning_outcomes": "Use small needlework tools."
+    },
+    {
+      "unit": "GRAPHIC COMMUNICATION",
+      "subtopics": [
+        "Lines"
+      ],
+      "learning_outcomes": "Draw different types of lines."
+    },
+    {
+      "unit": "CRAFTS",
+      "subtopics": [
+        "Paper Crafts",
+        "Modelling"
+      ],
+      "learning_outcomes": "Make items using paper. Make different pictures using collage technique. Model objects using clay, plasticine."
+    },
+    {
+      "unit": "PRINTING",
+      "subtopics": [
+        "Letters of the Alphabet"
+      ],
+      "learning_outcomes": "Design letters of the alphabet."
+    },
+    {
+      "unit": "SWIMMING",
+      "subtopics": [
+        "Pool Hygiene"
+      ],
+      "learning_outcomes": "Apply rules on pool hygiene."
+    },
+    {
+      "unit": "STRUCTURES",
+      "subtopics": [
+        "Types of Structures"
+      ],
+      "learning_outcomes": "Identify types of structures."
+    },
+    {
+      "unit": "ENTREPRENEURSHIP",
+      "subtopics": [
+        "Entrepreneur"
+      ],
+      "learning_outcomes": "Demonstrate knowledge on the roles of an entrepreneur."
+    }
+  ]
+}

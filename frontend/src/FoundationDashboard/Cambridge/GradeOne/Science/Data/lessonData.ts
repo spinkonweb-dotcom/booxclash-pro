@@ -1,0 +1,91 @@
+// src/data/lessonData.ts
+
+export interface Lesson {
+  id: string;
+  title: string;
+  type: 'lesson' | 'topic'; // Lesson or topic review
+  contentComponent?: React.ComponentType<{ lesson: Lesson; onComplete: () => void }>; // Optional dynamic content
+  cardImageUrl?: string; // Optional lesson card image
+}
+
+export const lessons: Lesson[] = [
+  // 🌿 Topic 1.1.1: Grouping Things (Expanded Interactive Lessons)
+  { id: 'g1_1', title: "Sorting by Color", type: 'lesson', cardImageUrl: '/images/lessons/color.webp' },
+  { id: 'g1_2', title: "Sorting by Shape", type: 'lesson', cardImageUrl: '/images/lessons/shape.webp' },
+  { id: 'g1_3', title: "Sorting by Size", type: 'lesson', cardImageUrl: '/images/lessons/size.webp' },
+  { id: 'g1_4', title: "Grouping 1-5", type: 'lesson', cardImageUrl: '/images/lessons/group.webp' },
+  { id: 'g1_5', title: "Collect & Classify", type: 'lesson', cardImageUrl: '/images/lessons/classify.webp' },
+  { id: 'g1_6', title: "Describe My Set", type: 'lesson', cardImageUrl: '/images/lessons/set.webp' },
+  { id: 'g1_7', title: "Match It! One-to-One", type: 'lesson', cardImageUrl: '/images/lessons/one-to-one.webp' },
+  { id: 'g1_8', title: "Ordering Groups", type: 'lesson', cardImageUrl: '/images/lessons/ordering.webp' },
+  { id: 'g1_9', title: "1st, 2nd, 3rd!", type: 'lesson', cardImageUrl: '/images/lessons/position.webp' },
+  { id: 'g1_10', title: "Assign Numerals 0–10", type: 'lesson', cardImageUrl: '/images/lessons/assign.webp' },
+  { id: 'g1_11', title: "Everyday Numbers", type: 'lesson', cardImageUrl: '/images/lessons/everyday.webp' },
+  { id: 'g1_12', title: "Grouping & Numbers Review", type: 'topic', cardImageUrl: '/images/lessons/review1.webp' },
+
+  { id: 'g2_1', title: "Matching Numerals", type: 'lesson', cardImageUrl: '/images/lessons/match-numerals.webp' },
+  { id: 'g2_2', title: "More or Less?", type: 'lesson', cardImageUrl: '/images/lessons/moreorless.webp' },
+  { id: 'g2_3', title: "Caring for Our World", type: 'lesson', cardImageUrl: '/images/lessons/g2_3.webp' },
+  { id: 'g2_4', title: "Natural or Man-Made?", type: 'lesson', cardImageUrl: '/images/lessons/g2_4.webp' },
+  { id: 'g2_5', title: "Let's Count (1-100)", type: 'lesson', cardImageUrl: '/images/lessons/g2_5.webp' },
+  { id: 'g2_6', title: "Skip Counting Fun (2s, 5s, 10s)", type: 'lesson', cardImageUrl: '/images/lessons/g2_10.webp' },
+  { id: 'g2_7', title: "Reading & Writing Numbers", type: 'lesson', cardImageUrl: '/images/lessons/g2_6.webp' },
+  { id: 'g2_8', title: "All About Zero", type: 'lesson', cardImageUrl: '/images/lessons/g2_7.webp' },
+  { id: 'g2_9', title: "Tens and Ones", type: 'lesson', cardImageUrl: '/images/lessons/g2_8.webp' },
+  { id: 'g2_10', title: "Using Ten Frames", type: 'lesson', cardImageUrl: '/images/lessons/g2_9.webp' },
+  { id: 'g2_11', title: "Number Patterns", type: 'lesson', cardImageUrl: '/images/lessons/g2_11.webp' },
+  { id: 'g2_12', title: "Numbers & World Review", type: 'topic', cardImageUrl: '/images/lessons/g2_12.webp' },
+  { id: 'g3_1', title: "Label the Body Parts", type: 'lesson', cardImageUrl: '/images/lessons/body-parts.webp' },
+  { id: 'g3_2', title: "Body Part Functions Match", type: 'lesson', cardImageUrl: '/images/lessons/g3_1.webp' },
+  { id: 'g3_3', title: "Measure with My Body", type: 'lesson', cardImageUrl: '/images/lessons/g3_2.webp' },
+  { id: 'g3_4', title: "Short or Long?", type: 'lesson', cardImageUrl: '/images/lessons/g3_3.webp' },
+  { id: 'g3_5', title: "The Five Senses Adventure", type: 'lesson', cardImageUrl: '/images/lessons/g3_4.webp' },
+  { id: 'g3_6', title: "Sense & Count", type: 'lesson', cardImageUrl: '/images/lessons/g3_5.webp' },
+  { id: 'g3_7', title: "Body Sorting Challenge", type: 'lesson', cardImageUrl: '/images/lessons/g3_6.webp' },
+  { id: 'g3_8', title: "Measure It!", type: 'lesson', cardImageUrl: '/images/lessons/g3_8.webp' },
+  { id: 'g3_9', title: "Estimate & Check", type: 'lesson', cardImageUrl: '/images/lessons/g3_9.webp' },
+  { id: 'g3_10', title: "Order by Length", type: 'lesson', cardImageUrl: '/images/lessons/g3_10.webp' },
+  { id: 'g3_11', title: "Hygiene Heroes", type: 'lesson', cardImageUrl: '/images/lessons/g3_11.webp' },
+  { id: 'g3_12', title: "Clean Hands, Happy Tummy", type: 'lesson', cardImageUrl: '/images/lessons/g3_12.webp' },
+  { id: 'g3_13', title: "Hygiene Sort Game", type: 'lesson', cardImageUrl: '/images/lessons/g3_13.webp' },
+  { id: 'g3_14', title: "Daily Routine Tracker", type: 'lesson', cardImageUrl: '/images/lessons/g3_14.webp' },
+  { id: 'g3_15', title: "Find the Germs!", type: 'lesson', cardImageUrl: '/images/lessons/g3_15.webp' },
+  { id: 'g3_16', title: "What Makes Us Sick?", type: 'lesson', cardImageUrl: '/images/lessons/g3_16.webp' },
+  { id: 'g3_17', title: "Safe or Unsafe?", type: 'lesson', cardImageUrl: '/images/lessons/g3_17.webp' },
+  { id: 'g3_18', title: "Health Defender", type: 'lesson', cardImageUrl: '/images/lessons/g3_18.webp' },
+  { id: 'g3_19', title: "Stay Healthy Quiz", type: 'lesson', cardImageUrl: '/images/lessons/g3_19.webp' },
+  { id: 'g3_20', title: "My Body & Health Review", type: 'topic', cardImageUrl: '/images/lessons/g3_20.webp' },
+
+  { id: 'g4_1', title: "Day or Night?", type: 'lesson', cardImageUrl: '/images/lessons/g4_1.webp' },
+  { id: 'g4_2', title: "My Day Planner", type: 'lesson', cardImageUrl: '/images/lessons/g4_2.webp' },
+  { id: 'g4_3', title: "Days of the Week", type: 'lesson', cardImageUrl: '/images/lessons/g4_3.webp' },
+  { id: 'g4_4', title: "Months of the Year", type: 'lesson', cardImageUrl: '/images/lessons/g4_4.webp' },
+  { id: 'g4_5', title: "What's the Weather?", type: 'lesson', cardImageUrl: '/images/lessons/g4_5.webp' },
+  { id: 'g4_6', title: "Hot or Cold?", type: 'lesson', cardImageUrl: '/images/lessons/g4_6.webp' },
+  { id: 'g4_7', title: "Dress for the Weather", type: 'lesson', cardImageUrl: '/images/lessons/g4_7.webp' },
+  { id: 'g4_8', title: "Climate Detective", type: 'lesson', cardImageUrl: '/images/lessons/g4_8.webp' },
+  { id: 'g4_9', title: "Green Hero", type: 'lesson', cardImageUrl: '/images/lessons/g4_9.webp' },
+  { id: 'g4_10', title: "Time & Weather Review", type: 'topic', cardImageUrl: '/images/lessons/g4_10.webp' },
+  { id: 'g5_1', title: "Material Finder", type: 'lesson', cardImageUrl: '/images/lessons/g5_1.webp' },
+  { id: 'g5_2', title: "Material Sort & Match", type: 'lesson', cardImageUrl: '/images/lessons/g5_2.webp' },
+  { id: 'g5_3', title: "Build It!", type: 'lesson', cardImageUrl: '/images/lessons/g5_3.webp' },
+  { id: 'g5_4', title: "Energy Source Match-Up", type: 'lesson', cardImageUrl: '/images/lessons/g5_4.webp' },
+  { id: 'g5_5', title: "Power the World", type: 'lesson', cardImageUrl: '/images/lessons/g5_5.webp' },
+  { id: 'g5_6', title: "Shape Finder", type: 'lesson', cardImageUrl: '/images/lessons/g5_6.webp' },
+  { id: 'g5_7', title: "Shape Builder", type: 'lesson', cardImageUrl: '/images/lessons/g5_7.webp' },
+  { id: 'g5_8', title: "Clean or Dirty Water?", type: 'lesson', cardImageUrl: '/images/lessons/g5_8.webp' },
+  { id: 'g5_9', title: "Make Water Safe", type: 'lesson', cardImageUrl: '/images/lessons/g5_9.webp' },
+  { id: 'g5_10', title: "Eco Guardian", type: 'lesson', cardImageUrl: '/images/lessons/g5_10.webp' },
+  { id: 'g5_11', title: "Materials & World Review", type: 'topic', cardImageUrl: '/images/lessons/g5_11.webp' },
+
+  { id: 'g6_1', title: "Mix It Up!", type: 'lesson', cardImageUrl: '/images/lessons/g6_1.webp' },
+  { id: 'g6_2', title: "Mixture Sorter", type: 'lesson', cardImageUrl: '/images/lessons/g6_2.webp' },
+  { id: 'g6_3', title: "Add It Together", type: 'lesson', cardImageUrl: '/images/lessons/g6_3.webp' },
+  { id: 'g6_4', title: "Ten Frame Builder", type: 'lesson', cardImageUrl: '/images/lessons/g6_4.webp' },
+  { id: 'g6_5', title: "Shopping Cart Add-Up", type: 'lesson', cardImageUrl: '/images/lessons/g6_5.webp' },
+  { id: 'g6_6', title: "Banana Take-Away", type: 'lesson', cardImageUrl: '/images/lessons/g6_6.webp' },
+  { id: 'g6_7', title: "Find the Missing Number", type: 'lesson', cardImageUrl: '/images/lessons/g6_7.webp' },
+  { id: 'g6_8', title: "Waste Sorter", type: 'lesson', cardImageUrl: '/images/lessons/g6_8.webp' },
+  { id: 'g6_9', title: "Pollution Defender", type: 'lesson', cardImageUrl: '/images/lessons/g6_9.webp' },
+  { id: 'g6_10', title: "Mixtures & Numbers Review", type: 'topic', cardImageUrl: '/images/lessons/g6_10.webp' }
+];

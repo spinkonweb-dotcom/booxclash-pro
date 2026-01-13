@@ -1,0 +1,65 @@
+{
+  "curriculum": "Zambia ECZ",
+  "grade": "2",
+  "subject": "Mathematics and Science",
+  "topics": [
+    {
+      "unit": "EXPLORING MY WORLD",
+      "subtopics": [
+        "Grouping Things",
+        "Investigate the structure of a plant",
+        "Demonstrate care for plants",
+        "Interpret chemical labels",
+        "Analyse data",
+        "Prevent common diseases",
+        "Exhibit care for the environment"
+      ],
+      "learning_outcomes": "Use set notation to show membership of things. Express whole numbers in a variety of ways. Investigate the structure of a plant. Demonstrate care for plants. Interpret chemical labels. Analyse data. Prevent common diseases. Exhibit care for the environment."
+    },
+    {
+      "unit": "UNDERSTANDING MY BODY",
+      "subtopics": [
+        "The Human Body",
+        "Use relations in life context",
+        "Practise food hygiene",
+        "Apply good eating habits"
+      ],
+      "learning_outcomes": "Demonstrate understanding of parts of the human body and their functions. Use relations in life context. Practise food hygiene. Apply good eating habits."
+    },
+    {
+      "unit": "EXPLORING THE SKY AND SEASONS",
+      "subtopics": [
+        "Time and length",
+        "Weather and Climate change"
+      ],
+      "learning_outcomes": "Use standard units of measures in everyday life. Recognise the significance of weather changes."
+    },
+    {
+      "unit": "EXPLORING MATERIALS",
+      "subtopics": [
+        "Materials",
+        "Energy",
+        "Plane and Solid Shapes",
+        "Sound",
+        "Light",
+        "Soluble and Insoluble materials"
+      ],
+      "learning_outcomes": "Explore the existence of matter. Use energy sustainably. Make three dimensional regular shapes. Make different sounds. Classify sources of light in the environment. Analyse the solubility of materials in water."
+    },
+    {
+      "unit": "EXPLORING MIXTURES",
+      "subtopics": [
+        "Mixtures",
+        "Addition, Subtraction, Multiplication and Division of Things",
+        "Interpret warning signs and labels on household chemicals",
+        "Analyse data",
+        "Classify plants and animals according to their characteristics",
+        "Use whole numbers in Subtraction in different situations",
+        "Use whole numbers in multiplication in life situation",
+        "Use whole numbers in division in different life situations",
+        "Domestic waste"
+      ],
+      "learning_outcomes": "Make mixtures. Use whole numbers in addition, in different situation. Interpret warning signs and labels on household chemicals. Analyse data. Classify plants and animals according to their characteristics. Use whole numbers in Subtraction in different situations. Use whole numbers in multiplication in life situation. Use whole numbers in division in different life situations. Manage waste."
+    }
+  ]
+}

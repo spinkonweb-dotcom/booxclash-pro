@@ -1,0 +1,137 @@
+{
+  "curriculum": "Zambia ECZ",
+  "grade": "1",
+  "subject": "Zambian Languages",
+  "topics": [
+    {
+      "unit": "STORIES",
+      "subtopics": [
+        "Listening to Stories",
+        "Story Telling"
+      ],
+      "learning_outcomes": "Listen to stories. Tell stories creatively."
+    },
+    {
+      "unit": "CONVERSATIONS",
+      "subtopics": [
+        "Information and Explanations",
+        "Ask relevant questions to get better understanding and knowledge",
+        "Discussions",
+        "Greetings",
+        "Debate",
+        "Opinions",
+        "Dialogues"
+      ],
+      "learning_outcomes": "Use complete sentences to communicate information. Ask relevant questions to get better understanding and knowledge. Use appropriate language when talking to adults and friends. Participate in discussions using complete sentences. Participate in simple debates. Express opinion using appropriate language. Participate in simple dialogues."
+    },
+    {
+      "unit": "DESCRIPTIONS",
+      "subtopics": [
+        "People",
+        "Places",
+        "Objects"
+      ],
+      "learning_outcomes": "Give physical descriptions of people. Give descriptions of places. Give descriptions of objects."
+    },
+    {
+      "unit": "DRAMA",
+      "subtopics": [
+        "Role Play"
+      ],
+      "learning_outcomes": "Participate in role play using appropriate vocabulary."
+    },
+    {
+      "unit": "RIDDLES AND TONGUE TWISTERS",
+      "subtopics": [
+        "Riddles",
+        "Tongue twisters"
+      ],
+      "learning_outcomes": "Say and respond to riddles. Recite tongue twisters."
+    },
+    {
+      "unit": "PRINT CONCEPTS",
+      "subtopics": [
+        "Book Handling",
+        "Print Identification",
+        "Interpret pictures"
+      ],
+      "learning_outcomes": "Handle books. Discriminate print. Interpret pictures."
+    },
+    {
+      "unit": "PHONOLOGICAL AWARENESS",
+      "subtopics": [
+        "Phonemic Awareness",
+        "Syllables",
+        "Word Awareness"
+      ],
+      "learning_outcomes": "Identify and manipulate phonemes. Identify and manipulate syllables. Identify words in spoken sentences."
+    },
+    {
+      "unit": "PHONICS",
+      "subtopics": [
+        "Letter Sounds",
+        "Syllables",
+        "Words"
+      ],
+      "learning_outcomes": "Sound out letters. Blend consonants and vowels to form syllables. Blend syllables to form words."
+    },
+    {
+      "unit": "READING FLUENCY",
+      "subtopics": [
+        "Oral Reading"
+      ],
+      "learning_outcomes": "Read syllables aloud. Read words aloud with correct pronunciation. Read texts aloud with correct pronunciation and expression."
+    },
+    {
+      "unit": "VOCABULARY",
+      "subtopics": [
+        "Word Recognition",
+        "Proper and Common Nouns",
+        "Singular and Plural Nouns"
+      ],
+      "learning_outcomes": "Recognise simple words. Identify proper and common nouns. Form plural and singular nouns."
+    },
+    {
+      "unit": "COMPREHENSION",
+      "subtopics": [
+        "Simple Inferences",
+        "Main Idea",
+        "Fact and Opinion",
+        "Life Experiences",
+        "Word Meaning",
+        "Story Facts",
+        "Simple Inferences",
+        "Predictions"
+      ],
+      "learning_outcomes": "Draw simple inferences from the information they have heard. Identify and express the main idea of the information they have listened to. Differentiate fact from opinion. Link their own life experiences to what they listen to. Deduce meaning of unfamiliar grade level words. Provide explicitly stated information in a given text. Make simple inferences of what they read. Make predictions based on given information."
+    },
+    {
+      "unit": "PRE-WRITING",
+      "subtopics": [
+        "Sitting Posture",
+        "Writing Tools",
+        "Drawing"
+      ],
+      "learning_outcomes": "Demonstrate correct posture when writing. Handle writing tools. Draw different objects."
+    },
+    {
+      "unit": "HANDWRITING",
+      "subtopics": [
+        "Letter Formation",
+        "Manuscript Handwriting",
+        "Word Spacing"
+      ],
+      "learning_outcomes": "Write letters. Write words legibly in manuscript form. Spacing words."
+    },
+    {
+      "unit": "COMPOSITION",
+      "subtopics": [
+        "Drawing",
+        "Punctuation Marks",
+        "Sentences",
+        "Simple Story"
+      ],
+      "learning_outcomes": "Communicate ideas through drawing. Use the main punctuation marks (capital letters and full stop). Write a complete sentence. Write a simple story of 3 to 4 sentences."
+    }
+  ]
+}

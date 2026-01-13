@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multiplayer Lobby</title>
+    <style>
+        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; background: #f0f0f0; }
+        .container { background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); margin-top: 2rem; }
+        button { padding: 0.5rem 1rem; font-size: 1rem; cursor: pointer; }
+        input { padding: 0.5rem; font-size: 1rem; }
+        #room-info { margin-top: 1rem; padding: 1rem; background: #e7f3fe; border-left: 5px solid #2196F3; }
+        #player-list { list-style: none; padding: 0; }
+        #status { color: red; margin-top: 1rem; }
+    </style>
+</head>
+<body>
+    <h1>Game Lobby 🎮</h1>
+    
+    <div class="container" id="lobby">
+        <button id="create-room-btn">Create New Room</button>
+        <hr>
+        <div>
+            <input type="text" id="room-id-input" placeholder="Enter Room ID">
+            <button id="join-room-btn">Join Room</button>
+        </div>
+    </div>
+
+    <div id="room-info" style="display: none;">
+        <h2>Room ID: <span id="room-id-display"></span></h2>
+        <h3>Players:</h3>
+        <ul id="player-list"></ul>
+    </div>
+
+    <div id="status"></div>
+
+    <script src="http://localhost:5000/socket.io/socket.io.js"></script>
+    <script src="multi-game.js"></script>
+</body>
+</html>

@@ -1,0 +1,152 @@
+{
+  "meta": {
+    "curriculum": "Zambia",
+    "grade": "4",
+    "subject": "Mathematics"
+  },
+  "topics": [
+    {
+      "unit": "Algebra",
+      "topic_title": "SETS",
+      "page_number": 28,
+      "subtopics": [],
+      "learning_outcomes": [
+        "Identify equivalent sets.",
+        "Identify subsets and use the subset symbol \"⊂\".",
+        "Apply sets to solve problems in real life situations."
+      ]
+    },
+    {
+      "unit": "Numbers & Calculation",
+      "topic_title": "NUMBERS & NOTATION",
+      "page_number": 28,
+      "subtopics": [],
+      "learning_outcomes": [
+        "Read and write numbers up to 1 000 000 000.",
+        "Express a number in expanded notation."
+      ]
+    },
+    {
+      "unit": "Numbers & Calculation",
+      "topic_title": "ADDITION",
+      "page_number": 28,
+      "subtopics": [],
+      "learning_outcomes": [
+        "Add whole numbers with sums up to 1 000,000.",
+        "Apply addition to solve problems in real life."
+      ]
+    },
+    {
+      "unit": "Numbers & Calculation",
+      "topic_title": "SUBTRACTION",
+      "page_number": 29,
+      "subtopics": [],
+      "learning_outcomes": [
+        "Subtract whole numbers up to 1 000 000",
+        "Apply subtraction and addition to solve problems in real life."
+      ]
+    },
+    {
+      "unit": "Numbers & Calculation",
+      "topic_title": "MULTIPLICATION",
+      "page_number": 29,
+      "subtopics": [],
+      "learning_outcomes": [
+        "Multiply numbers by 10, 100 and 1000 using short multiplication.",
+        "Multiply two and three by two digit numbers using vertical multiplication.",
+        "Apply the properties of zero (0) and one (1) in multiplication.",
+        "Apply multiplication to solve problems in real life."
+      ]
+    },
+    {
+      "unit": "Numbers & Calculation",
+      "topic_title": "DIVISION",
+      "page_number": 29,
+      "subtopics": [],
+      "learning_outcomes": [
+        "Divide numbers by 10, 100 and 1000 using short division.",
+        "Divide two and three digit by two digit numbers using long division (with remainders).",
+        "Apply division to solve problems in real life."
+      ]
+    },
+    {
+      "unit": "Numbers & Calculation",
+      "topic_title": "NUMBER PATTERNS",
+      "page_number": 30,
+      "subtopics": [],
+      "learning_outcomes": [
+        "Identify patterns and complete number sequences."
+      ]
+    },
+    {
+      "unit": "Numbers & Calculation",
+      "topic_title": "FRACTIONS",
+      "page_number": 30,
+      "subtopics": [],
+      "learning_outcomes": [
+        "Describe equivalent fractions.",
+        "Arrange the common fractions either in ascending or descending order using proportion line.",
+        "Identify and represent improper and mixed fractions.",
+        "Convert mixed fractions to improper fractions and vice versa.",
+        "Add and subtract proper, improper and mixed fractions with common denominators.",
+        "Apply improper fractions to solve problems in real life."
+      ]
+    },
+    {
+      "unit": "Geometry",
+      "topic_title": "ANGLES",
+      "page_number": 30,
+      "subtopics": [],
+      "learning_outcomes": [
+        "Describe an angle.",
+        "Identify types of angles.",
+        "Use a protractor to measure and draw angles up to 180°."
+      ]
+    },
+    {
+      "unit": "Geometry",
+      "topic_title": "PLANE SHAPES",
+      "page_number": 31,
+      "subtopics": [],
+      "learning_outcomes": [
+        "Draw a rectangle and square using protractor and set square.",
+        "Identify isosceles and equilateral triangles.",
+        "Draw the equilateral and isosceles triangles using protractor and set square."
+      ]
+    },
+    {
+      "unit": "Measures",
+      "topic_title": "MEASURES",
+      "page_number": 31,
+      "subtopics": [],
+      "learning_outcomes": [
+        "Determine duration of time elapsed between events.",
+        "Relate seconds, minutes, hours and day.",
+        "Illustrate the meaning of area.",
+        "Describe standard units to measure area. (cm², mm², m²).",
+        "Derive the formulae for finding area of rectangle and square.",
+        "Find the area of a rectangle and square."
+      ]
+    },
+    {
+      "unit": "Relations",
+      "topic_title": "RELATIONS & MAPPINGS",
+      "page_number": 31,
+      "subtopics": [],
+      "learning_outcomes": [
+        "Illustrate one-to-many relation using arrow.",
+        "Apply relations in real life situations."
+      ]
+    },
+    {
+      "unit": "Statistics",
+      "topic_title": "STATISTICS",
+      "page_number": 31,
+      "subtopics": [],
+      "learning_outcomes": [
+        "Read and interpret line graphs.",
+        "Collect and present data on a line graph."
+      ]
+    }
+  ]
+}
