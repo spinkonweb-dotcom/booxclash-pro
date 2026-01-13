@@ -11,3 +11,4 @@ google-genai
 # Vector database:
 pinecone
 httpx
+firebase_admin
