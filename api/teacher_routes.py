@@ -1,12 +1,13 @@
-# FILE: api/teacher_routes.py
 import os
 import json
 from datetime import datetime
 from fastapi import APIRouter, HTTPException, Header
 from pydantic import BaseModel
-from firebase_admin import firestore # ✅ Required for DB checks
+from firebase_admin import firestore 
 
-# ✅ Ensure you have these imports available
+# ✅ ADDED MISSING IMPORT HERE
+from models.schemas import ToolRequest 
+
 from services.file_manager import (
     load_generated_scheme, 
     save_generated_scheme, 
@@ -27,7 +28,7 @@ from services.llm_engine import (
 )
 
 router = APIRouter()
-db = firestore.client() # ✅ Initialize DB client
+db = firestore.client() 
 
 class PlanQuery(BaseModel):
     grade: str
