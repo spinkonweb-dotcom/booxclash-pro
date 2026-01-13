@@ -1,3 +1,4 @@
+# FILE: models/schemas.py
 from pydantic import BaseModel, Field
 from typing import Optional, List, Dict
 
@@ -7,6 +8,7 @@ class StudentProfile(BaseModel):
     grade: str
     subject: str
     country: str = "Zambia"
+    credits: Optional[int] = 5  # ✅ ADDED: Defaults to 5 if missing
     
     class Config:
         populate_by_name = True 
@@ -33,14 +35,13 @@ class SchemeRequest(BaseModel):
     subject: str
     grade: str
     weeks: int
-    startDate: Optional[str] = None  # ✅ ADDED THIS FIELD
+    startDate: Optional[str] = None
     uid: Optional[str] = None
 
 class SchemeRow(BaseModel):
     month: Optional[str] = None
     week: str
     topic: Optional[str] = None
-    # period: str  # You can keep this if you use it, or make it Optional
     content: List[str] = []
     outcomes: List[str] = []
     references: List[str] = []
