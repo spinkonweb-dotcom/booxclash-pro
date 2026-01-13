@@ -41,7 +41,7 @@ def calculate_week_dates(start_date_str: str, week_num: int) -> Dict[str, str]:
         return {"range_display": "", "start_iso": "", "end_iso": ""}
 
 # =====================================================
-# 1. SCHEME OF WORK GENERATOR
+# 1. SCHEME OF WORK GENERATOR (FIXED OUTCOMES)
 # =====================================================
 async def generate_scheme_with_ai(
     syllabus_data: List[dict],
@@ -66,7 +66,7 @@ async def generate_scheme_with_ai(
     if not term_syllabus_data:
         term_syllabus_data = syllabus_data
 
-    # PROMPT
+    # ✅ UPDATED PROMPT: STRICT OUTCOME ENFORCEMENT
     prompt = f"""
     Act as a Senior Curriculum Specialist. Generate a professional Scheme of Work.
     Subject: {subject}, Grade: {grade}, Term: {term}, Total Weeks: {num_weeks}
@@ -74,14 +74,20 @@ async def generate_scheme_with_ai(
     SYLLABUS DATA: 
     {json.dumps(term_syllabus_data)}
 
-    STRICT RULES:
+    STRICT JSON OUTPUT RULES:
     1. Output a list of exactly {num_weeks} objects.
-    2. Outcomes must start with 'Learners should be able to...'.
-    3. Content must be 3 concise bullet points.
-    4. Last week is 'Revision and Assessments'.
     
-    5. **REFERENCES (CRITICAL):** - You MUST combine the 'unit' and 'page_number' from the SYLLABUS DATA.
-       - Format: ["Unit [insert_unit_code], Page [insert_page_number]", "Approved Textbook"]
+    2. **OUTCOMES (VERY IMPORTANT):** - Must be a list of strings.
+       - **EVERY outcome MUST start with the exact phrase: "Learners should be able to..."**
+       - Do NOT output single words like "Algebra". Write full sentences.
+       - If the syllabus data is vague, you MUST INFER actionable outcomes based on the topic.
+    
+    3. **CONTENT:** Must be 3 concise bullet points.
+    
+    4. **REFERENCES:** - Extract 'unit' and 'page_number' from SYLLABUS DATA.
+       - Format: ["Unit [code], Page [num]", "Approved Textbook"].
+    
+    5. Week {num_weeks} MUST be "Revision and Assessments".
     """
 
     try:
@@ -101,6 +107,10 @@ async def generate_scheme_with_ai(
         for i, item in enumerate(scheme_list[:num_weeks]):
             week_num = i + 1
             date_info = calculate_week_dates(start_date, week_num)
+            
+            # 🛡️ Fallback: Force outcomes if AI failed (Double check)
+            if "outcomes" not in item or not item["outcomes"]:
+                item["outcomes"] = ["Learners should be able to demonstrate understanding of the core concepts."]
             
             item['week'] = f"Week {week_num} {date_info['range_display']}"
             item['week_number'] = week_num
@@ -126,7 +136,6 @@ async def generate_weekly_plan_from_scheme(
 
     context = {}
     if scheme_data:
-        # Robust Finder
         target_exact = f"Week {week_number}"
         target_prefix = f"Week {week_number} " 
 
@@ -177,7 +186,7 @@ async def generate_weekly_plan_from_scheme(
         return {"days": []}
 
 # =====================================================
-# 3. DETAILED LESSON PLANNER (FIXED & RESTORED)
+# 3. DETAILED LESSON PLANNER (UNCHANGED)
 # =====================================================
 async def generate_specific_lesson_plan(
     grade: str,
@@ -194,11 +203,9 @@ async def generate_specific_lesson_plan(
 ) -> Dict[str, Any]:
     print(f"\n📝 [Lesson Generator] Preparing Learner-Centered Plan for '{subtopic}'...")
     
-    # 🛡️ SAFEGUARD: Handle Empty Inputs
     final_subtopic = subtopic if subtopic and subtopic.strip() else f"Generate a relevant subtopic for {theme}"
     final_objectives = objectives if objectives and len(objectives) > 0 else ["Generate 2-3 SMART objectives for this lesson"]
 
-    # ✅ THIS IS THE "WORKING NICELY" PROMPT YOU WANTED
     prompt = f"""
     Act as a professional modern teacher in Zambia. Create a Lesson Plan.
     
@@ -263,7 +270,6 @@ async def generate_specific_lesson_plan(
     """
 
     try:
-        # ✅ FIXED: Use 'client' instead of 'get_model()'
         response = client.models.generate_content(
             model=MODEL_ID,
             contents=prompt,
@@ -282,7 +288,6 @@ async def generate_specific_lesson_plan(
 # =====================================================
 async def generate_quiz_json(topic: str, grade: str) -> Dict[str, Any]:
     try:
-        # ✅ FIXED: Use 'client'
         response = client.models.generate_content(
             model=MODEL_ID,
             contents=f"Generate 5 multiple choice questions for {topic} Grade {grade}.",
@@ -294,7 +299,6 @@ async def generate_quiz_json(topic: str, grade: str) -> Dict[str, Any]:
 
 async def optimize_search_term(user_query: str, subject: str) -> str:
     try:
-        # ✅ FIXED: Use 'client'
         response = client.models.generate_content(
             model=MODEL_ID,
             contents=f"Convert this to a single searchable noun for educational images: '{user_query}' in {subject}.",
