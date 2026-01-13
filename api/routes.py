@@ -8,6 +8,7 @@ from models.schemas import ToolRequest
 from api.teacher_routes import router as teacher_router
 from api.student_routes import router as student_router
 from services.file_manager import load_generated_scheme, save_weekly_plan, load_weekly_plan
+from services.credit_manager import check_and_deduct_credit # ✅ IMPORTED NEW SERVICE
 
 from services.llm_engine import (
     generate_weekly_plan_from_scheme,
@@ -22,7 +23,6 @@ router = APIRouter()
 # router.include_router(teacher_router) 
 # router.include_router(student_router) 
 
-# --- New Model for Plan Lookup ---
 class PlanQuery(BaseModel):
     grade: str
     subject: str
@@ -30,7 +30,7 @@ class PlanQuery(BaseModel):
     weekNumber: int
 
 # ----------------------------------
-# NEW ENDPOINT: GET WEEKLY PLAN (LOCAL)
+# GET WEEKLY PLAN (No Credit Cost)
 # ----------------------------------
 @router.post("/get-weekly-plan")
 async def get_weekly_plan(
@@ -38,30 +38,12 @@ async def get_weekly_plan(
     x_user_id: str = Header(None, alias="X-User-ID")
 ):
     print(f"📂 Requesting Local Weekly Plan: {query.subject} Grade {query.grade} Week {query.weekNumber}")
-    
-    # 1. Determine User ID (Prioritize Header, fallback to default_user)
     uid = x_user_id if x_user_id else "default_user"
+    
+    data = load_weekly_plan(uid=uid, subject=query.subject, grade=query.grade, term=query.term, week=query.weekNumber)
 
-    # 2. Try to load using the specific User ID
-    data = load_weekly_plan(
-        uid=uid,
-        subject=query.subject,
-        grade=query.grade,
-        term=query.term,
-        week=query.weekNumber
-    )
-
-    # 3. Fallback: If not found, try loading as "default_user" 
-    # (Useful if the file was generated without being logged in)
     if not data and uid != "default_user":
-        print("⚠️ Specific user file not found, trying 'default_user'...")
-        data = load_weekly_plan(
-            uid="default_user",
-            subject=query.subject,
-            grade=query.grade,
-            term=query.term,
-            week=query.weekNumber
-        )
+        data = load_weekly_plan(uid="default_user", subject=query.subject, grade=query.grade, term=query.term, week=query.weekNumber)
 
     if not data:
         raise HTTPException(status_code=404, detail="Weekly Plan file not found locally.")
@@ -70,7 +52,7 @@ async def get_weekly_plan(
 
 
 # ----------------------------------
-# EXISTING AGENT ENDPOINT
+# AGENT ENDPOINT (Enforced Credits)
 # ----------------------------------
 @router.post("/agent")
 async def handle_agent_tool(
@@ -81,14 +63,19 @@ async def handle_agent_tool(
     
     try:
         args = request.arguments or {}
-        
-        # ✅ FIX: Prioritize Header ID, then Request Body, then Default
         uid = x_user_id or request.student.uid or "default_user"
 
         # ----------------------------------
-        # GENERATE WEEKLY PLAN
+        # GENERATE WEEKLY PLAN (COSTS 1 CREDIT)
         # ----------------------------------
         if request.tool_name == "generate_weekly":
+            
+            # 💰 CHECK CREDITS
+            try:
+                check_and_deduct_credit(uid)
+            except Exception as e:
+                raise HTTPException(status_code=403, detail=str(e))
+
             print(f"📂 Attempting to load saved scheme for {request.student.subject}...")
             
             scheme_data = load_generated_scheme(
@@ -122,9 +109,16 @@ async def handle_agent_tool(
             return {"status": "success", "type": "weekly_plan", "data": plan_json}
 
         # ----------------------------------
-        # GENERATE LESSON PLAN
+        # GENERATE LESSON PLAN (COSTS 1 CREDIT)
         # ----------------------------------
         if request.tool_name == "generate_lesson": 
+            
+            # 💰 CHECK CREDITS
+            try:
+                check_and_deduct_credit(uid)
+            except Exception as e:
+                raise HTTPException(status_code=403, detail=str(e))
+
             print(f"📝 Requesting Lesson Plan...")
 
             # 1. Defaults
@@ -135,7 +129,7 @@ async def handle_agent_tool(
             school_name = args.get("school") or "Primary School"
             target_date = args.get("startDate")
 
-            # 2. Attempt Load Weekly Plan (File System Fallback)
+            # 2. Attempt Load Weekly Plan
             weekly_data = load_weekly_plan(
                 uid=uid,
                 subject=request.student.subject,
@@ -144,38 +138,20 @@ async def handle_agent_tool(
                 week=args.get("weekNumber", 1)
             )
 
-            # If not found for specific user, try default user
             if not weekly_data and uid != "default_user":
-                 weekly_data = load_weekly_plan(
-                    uid="default_user",
-                    subject=request.student.subject,
-                    grade=request.student.grade,
-                    term=args.get("term", "Term 1"),
-                    week=args.get("weekNumber", 1)
-                )
+                 weekly_data = load_weekly_plan(uid="default_user", subject=request.student.subject, grade=request.student.grade, term=args.get("term", "Term 1"), week=args.get("weekNumber", 1))
 
             if weekly_data:
-                # ✅ FIX 1: Get Main Topic from Weekly Plan Meta
                 if "meta" in weekly_data and "main_topic" in weekly_data["meta"]:
                     theme = weekly_data["meta"]["main_topic"]
-                    print(f"✅ Found Main Topic: {theme}")
 
                 if "days" in weekly_data:
-                    found_day = None
-                    
-                    # ✅ FIX 2: Better Date Matching
-                    if target_date:
-                        found_day = next((d for d in weekly_data["days"] if d.get("date") == target_date), None)
-                    
+                    found_day = next((d for d in weekly_data["days"] if d.get("date") == target_date), None)
                     if found_day:
-                        print(f"✅ Found matching day: {found_day.get('day')}")
-                        # Only override if arguments are empty, otherwise trust Frontend (GenerationModal)
                         if not subtopic or subtopic == "General Lesson":
                             subtopic = found_day.get("subtopic", subtopic)
                         if not objectives:
                             objectives = found_day.get("objectives", objectives)
-                    else:
-                        print(f"⚠️ Date {target_date} not found in Weekly Plan. Using provided args.")
 
             # 3. Generate
             attendance = {"boys": args.get("boys", 0), "girls": args.get("girls", 0)}
@@ -196,7 +172,7 @@ async def handle_agent_tool(
             return {"status": "success", "type": "lesson_plan", "data": lesson_json}
 
         # ----------------------------------
-        # OTHER TOOLS
+        # OTHER TOOLS (FREE)
         # ----------------------------------
         if request.tool_name == "trigger_quiz":
              topic = args.get("topic", "General Knowledge")
@@ -219,6 +195,8 @@ async def handle_agent_tool(
 
         return {"status": "error", "message": "Tool not handled"} 
 
+    except HTTPException as he:
+        raise he
     except Exception as e:
         print(f"❌ Agent Tool Error: {e}")
         return {"status": "error", "message": str(e)}

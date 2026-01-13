@@ -1,0 +1,297 @@
+{
+  "meta": {
+    "curriculum": "Zambia",
+    "grade": "6",
+    "subject": "Home Economics"
+  },
+  "topics": [
+    {
+      "topic_title": "FOOD AND NUTRITION",
+      "page_number": 22,
+      "subtopics": [
+        {
+          "subtopic_title": "THE KITCHEN",
+          "learning_outcomes": [
+            "Identify modern kitchen Equipment and their use."
+          ]
+        },
+        {
+          "subtopic_title": "Deficiency diseases",
+          "learning_outcomes": [
+            "Identify causes of Scurvy, kwashiorkor, marasmus, beri beri, night blindness"
+          ]
+        },
+        {
+          "subtopic_title": "Mixed diet",
+          "learning_outcomes": [
+            "Describe a mixed diet",
+            "Plan and prepare a mixed diet"
+          ]
+        },
+        {
+          "subtopic_title": "Food presentation",
+          "learning_outcomes": [
+            "Garnish different dishes"
+          ]
+        },
+        {
+          "subtopic_title": "Food Budgeting",
+          "learning_outcomes": [
+            "Explain what food budgeting is",
+            "Identify foods suitable for short and long term budgeting",
+            "Plan and prepare a simple budget"
+          ]
+        }
+      ]
+    },
+    {
+      "topic_title": "COOKING METHODS",
+      "page_number": 22,
+      "subtopics": [
+        {
+          "subtopic_title": "Frying",
+          "learning_outcomes": [
+            "Describe frying",
+            "Identify suitable foods for frying",
+            "Fry different foods."
+          ]
+        },
+        {
+          "subtopic_title": "Stewing",
+          "learning_outcomes": [
+            "Describe stewing",
+            "Identify suitable foods for stewing",
+            "Stew different foods"
+          ]
+        }
+      ]
+    },
+    {
+      "topic_title": "MEAL PLANNING",
+      "page_number": 23,
+      "subtopics": [
+        {
+          "subtopic_title": "Meal Patterns",
+          "learning_outcomes": [
+            "Describe meal Patterns"
+          ]
+        },
+        {
+          "subtopic_title": "Meal planning",
+          "learning_outcomes": [
+            "Prepare full breakfast",
+            "Describe meal planning",
+            "Prepare meals for different needs."
+          ]
+        }
+      ]
+    },
+    {
+      "topic_title": "LEFTOVER FOODS",
+      "page_number": 23,
+      "subtopics": [
+        {
+          "subtopic_title": "Left over foods.",
+          "learning_outcomes": [
+            "Explain what leftover foods are.",
+            "Describe the rules for leftovers.",
+            "Identify suitable dishes that can be made from leftovers.",
+            "Prepare different dishes from left over foods."
+          ]
+        }
+      ]
+    },
+    {
+      "topic_title": "PRESERVATION",
+      "page_number": 24,
+      "subtopics": [
+        {
+          "subtopic_title": "Food Preservation",
+          "learning_outcomes": [
+            "Describe food preservation",
+            "Explain reasons for food preservation",
+            "Identify suitable foods for preservation",
+            "Preserve different foods"
+          ]
+        }
+      ]
+    },
+    {
+      "topic_title": "HOSPITALITY BUSINESS",
+      "page_number": 24,
+      "subtopics": [
+        {
+          "subtopic_title": "Facilities and services in Hospitality business",
+          "learning_outcomes": [
+            "Describe facilities in hospitality business.",
+            "Identify services in hospitality business"
+          ]
+        }
+      ]
+    },
+    {
+      "topic_title": "HOME MANAGEMENT",
+      "page_number": 25,
+      "subtopics": [
+        {
+          "subtopic_title": "PESTS",
+          "learning_outcomes": [
+            "Explain dangers of Household pests.",
+            "Explain prevention and control of household pests"
+          ]
+        },
+        {
+          "subtopic_title": "Walls",
+          "learning_outcomes": [
+            "Clean different types of walls"
+          ]
+        },
+        {
+          "subtopic_title": "Rooms in the house",
+          "learning_outcomes": [
+            "Clean different rooms in a house."
+          ]
+        }
+      ]
+    },
+    {
+      "topic_title": "TABLE SETTING",
+      "page_number": 26,
+      "subtopics": [
+        {
+          "subtopic_title": "Table laying",
+          "learning_outcomes": [
+            "Describe table laying",
+            "Identify the utensils and materials used for basic table laying",
+            "Demonstrate table laying",
+            "Lay a table for lunch"
+          ]
+        },
+        {
+          "subtopic_title": "Flower arrangement",
+          "learning_outcomes": [
+            "Describe flower arrangement",
+            "Identify materials used in simple flower arrangement",
+            "Explain the simple rules in flower arrangements for a dining table",
+            "Arrange flowers for a dining table"
+          ]
+        }
+      ]
+    },
+    {
+      "topic_title": "LAUNDRY",
+      "page_number": 26,
+      "subtopics": [
+        {
+          "subtopic_title": "Laundry Methods",
+          "learning_outcomes": [
+            "Explain what laundry is",
+            "Describe laundry methods"
+          ]
+        },
+        {
+          "subtopic_title": "The Family Wash",
+          "learning_outcomes": [
+            "Explain the procedure for family wash"
+          ]
+        },
+        {
+          "subtopic_title": "Laundering coloured cotton fabrics",
+          "learning_outcomes": [
+            "Explain the procedure for laundering coloured cotton articles",
+            "launder different coloured cotton fabrics using appropriate methods"
+          ]
+        }
+      ]
+    },
+    {
+      "topic_title": "GARDENING",
+      "page_number": 27,
+      "subtopics": [
+        {
+          "subtopic_title": "Kitchen Garden",
+          "learning_outcomes": [
+            "Describe a kitchen garden",
+            "Identify suitable crops for a kitchen garden",
+            "Explain the reasons for growing vegetables in the kitchen garden",
+            "Grow different types of vegetables."
+          ]
+        }
+      ]
+    },
+    {
+      "topic_title": "HEALTH EDUCATION",
+      "page_number": 28,
+      "subtopics": [
+        {
+          "subtopic_title": "HUMAN DEVELOPMENT",
+          "learning_outcomes": [
+            "Identify factors influencing physical appearance.",
+            "Describe the effect of physical appearance on others."
+          ]
+        },
+        {
+          "subtopic_title": "SAFETY IN THE HOME/SCHOOL",
+          "learning_outcomes": [
+            "Describe accidents in the home",
+            "Explain the causes of falls, cuts, and sprains at home and school",
+            "Apply First Aid on various accidents."
+          ]
+        },
+        {
+          "subtopic_title": "SANITATION",
+          "learning_outcomes": [
+            "Identify types of toilets",
+            "Identify cleaning materials for the two types of toilets",
+            "Clean toilets and latrines"
+          ]
+        }
+      ]
+    },
+    {
+      "topic_title": "NEEDLEWORK AND CRAFTS",
+      "page_number": 29,
+      "subtopics": [
+        {
+          "subtopic_title": "PROCESSES IN NEEDLE WORK",
+          "learning_outcomes": [
+            "Explain what edge finishes are",
+            "Identify different edge finishes",
+            "Explain the reasons for edge finishes",
+            "Cut and sew crossway strips to a raw edge.",
+            "Sew Samples of different Edge finishes."
+          ]
+        },
+        {
+          "subtopic_title": "Fasteners",
+          "learning_outcomes": [
+            "Explain what fasteners are",
+            "Identify different types of fasteners",
+            "Sew button and buttonhole on a child's dress fasteners"
+          ]
+        },
+        {
+          "subtopic_title": "Openings",
+          "learning_outcomes": [
+            "Explain what openings are",
+            "Identify different types of openings",
+            "Sew the faced opening on a child's dress"
+          ]
+        }
+      ]
+    },
+    {
+      "topic_title": "CRAFTS WORK",
+      "page_number": 29,
+      "subtopics": [
+        {
+          "subtopic_title": "Weaving",
+          "learning_outcomes": [
+            "Identify types of weave",
+            "Weave simple items"
+          ]
+        }
+      ]
+    }
+  ]
+}

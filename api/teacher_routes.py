@@ -1,89 +1,199 @@
-from fastapi import APIRouter
-from typing import List
-from models.schemas import SchemeRequest, SchemeRow
+# FILE: api/teacher_routes.py
+import os
+import json
+from datetime import datetime
+from fastapi import APIRouter, HTTPException, Header
+from pydantic import BaseModel
 
-# Import Services
-from services.llm_teacher_engine import generate_scheme_with_ai
-from services.syllabus_manager import load_syllabus 
-# ✅ Import the new File Manager
-from services.file_manager import save_generated_scheme
+from models.schemas import ToolRequest
+from services.file_manager import load_generated_scheme, save_weekly_plan, load_weekly_plan
+from services.credit_manager import check_and_deduct_credit
+
+from services.llm_engine import (
+    generate_weekly_plan_from_scheme,
+    generate_specific_lesson_plan,
+    generate_quiz_json,
+    generate_builder_json,
+    generate_realistic_image,
+    optimize_search_term
+)
 
 router = APIRouter()
 
-def get_month_name(week_num: int) -> str:
-    if week_num <= 4: return "January"
-    if week_num <= 8: return "February"
-    return "March"
+class PlanQuery(BaseModel):
+    grade: str
+    subject: str
+    term: str
+    weekNumber: int
 
-# api/teacher_routes.py
-
-@router.post("/generate-scheme", response_model=List[SchemeRow])
-async def generate_scheme(request: SchemeRequest):
-    print(f"📅 Generating Scheme Request: {request.subject} | Grade {request.grade}")
+# ----------------------------------
+# GET WEEKLY PLAN (No Credit Cost)
+# ----------------------------------
+@router.post("/get-weekly-plan")
+async def get_weekly_plan(
+    query: PlanQuery, 
+    x_user_id: str = Header(None, alias="X-User-ID")
+):
+    print(f"📂 Requesting Local Weekly Plan: {query.subject} Grade {query.grade} Week {query.weekNumber}")
+    uid = x_user_id if x_user_id else "default_user"
     
-    # 1. LOAD SYLLABUS
-    real_syllabus_data = load_syllabus("Zambia", request.grade, request.subject)
+    data = load_weekly_plan(uid=uid, subject=query.subject, grade=query.grade, term=query.term, week=query.weekNumber)
 
-    # 2. GENERATE AI SCHEME
+    if not data and uid != "default_user":
+        data = load_weekly_plan(uid="default_user", subject=query.subject, grade=query.grade, term=query.term, week=query.weekNumber)
+
+    if not data:
+        raise HTTPException(status_code=404, detail="Weekly Plan file not found locally.")
+
+    return data
+
+
+# ----------------------------------
+# AGENT ENDPOINT (Enforced Credits)
+# ----------------------------------
+@router.post("/agent")
+async def handle_agent_tool(
+    request: ToolRequest,
+    x_user_id: str = Header(None, alias="X-User-ID")
+):
+    print(f"🛠️ Agent Triggered: {request.tool_name} | User: {request.student.student_name}")
+    
     try:
-        ai_scheme = await generate_scheme_with_ai(
-            syllabus_data=real_syllabus_data, 
-            subject=request.subject,
-            grade=request.grade,
-            term=request.term,
-            num_weeks=request.weeks
-        )
+        args = request.arguments or {}
+        uid = x_user_id or request.student.uid or "default_user"
 
-        # 🛑 SECURITY CHECK: Ensure ai_scheme is actually a list
-        if not isinstance(ai_scheme, list):
-            # If AI returned a dict like {"scheme": [...]}, try to extract it
-            if isinstance(ai_scheme, dict) and "scheme" in ai_scheme:
-                ai_scheme = ai_scheme["scheme"]
-            else:
-                ai_scheme = [] # Fallback
+        # ----------------------------------
+        # GENERATE WEEKLY PLAN (COSTS 1 CREDIT)
+        # ----------------------------------
+        if request.tool_name == "generate_weekly":
+            print(f"📂 Attempting to load saved scheme for {request.student.subject}...")
+            # 💰 CHECK CREDITS
+            try:
+                check_and_deduct_credit(uid)
+            except Exception as e:
+                raise HTTPException(status_code=403, detail=str(e))
 
-        if ai_scheme:
-            # 3. SAVE TO FILE SYSTEM
-            user_id = "default_user" 
-            save_generated_scheme(
-                uid=user_id,
-                subject=request.subject,
-                grade=request.grade,
-                term=request.term,
-                data=ai_scheme
-            )
-            print("💾 Scheme successfully persisted to storage.")
-
-            # 4. FORMAT FOR FRONTEND
-            structured_rows = []
-            for item in ai_scheme:
-                # ✅ THE FIX IS HERE: Force str() conversion
-                # This handles cases where AI returns 1 instead of "Week 1"
-                week_raw = item.get("week", "Week 1")
-                week_str = str(week_raw) 
-
-                # Now this is safe because week_str is definitely a string
-                week_digits = ''.join(filter(str.isdigit, week_str))
-                week_num = int(week_digits) if week_digits else 1
-                
-                row = SchemeRow(
-                    month=get_month_name(week_num),
-                    week=week_str, # Use the string version for display
-                    topic=item.get("topic", ""),
-                    period="1-5",
-                    content=item.get("content", []),
-                    outcomes=item.get("outcomes", []),
-                    references=item.get("references", ["Syllabus Ref"]),
-                    isSpecialRow=item.get("isSpecialRow", False)
-                )
-                structured_rows.append(row)
+            print(f"📂 Attempting to load saved scheme for {request.student.subject}...")
             
-            return structured_rows
+            scheme_data = load_generated_scheme(
+                uid=uid,
+                subject=request.student.subject,
+                grade=request.student.grade,
+                term=args.get("term", "Term 1")
+            )
 
+            plan_json = await generate_weekly_plan_from_scheme(
+                school=args.get("school", "Unknown School"),
+                subject=request.student.subject,
+                grade=request.student.grade,
+                term=args.get("term", "Term 1"),
+                week_number=args.get("weekNumber", 1),
+                days=args.get("days", 5),
+                start_date=args.get("startDate", datetime.now().strftime("%Y-%m-%d")),
+                scheme_data=scheme_data 
+            )
+
+            if plan_json and "days" in plan_json and len(plan_json["days"]) > 0:
+                save_weekly_plan(
+                    uid=uid, 
+                    subject=request.student.subject, 
+                    grade=request.student.grade, 
+                    term=args.get("term", "Term 1"), 
+                    week=args.get("weekNumber", 1), 
+                    data=plan_json
+                )
+
+            return {"status": "success", "type": "weekly_plan", "data": plan_json}
+
+        # ----------------------------------
+        # GENERATE LESSON PLAN (COSTS 1 CREDIT)
+        # ----------------------------------
+        if request.tool_name == "generate_lesson": 
+            
+            # 💰 CHECK CREDITS
+            try:
+                check_and_deduct_credit(uid)
+            except Exception as e:
+                raise HTTPException(status_code=403, detail=str(e))
+
+            print(f"📝 Requesting Lesson Plan...")
+
+            # 1. Defaults
+            subtopic = args.get("lessonTitle") or args.get("topic") or "General Lesson"
+            objectives = args.get("objectives", [])
+            theme = args.get("topic") or request.student.subject
+            teacher_name = args.get("name") or request.student.student_name or "Class Teacher"
+            school_name = args.get("school") or "Primary School"
+            target_date = args.get("startDate")
+
+            # 2. Attempt Load Weekly Plan
+            weekly_data = load_weekly_plan(
+                uid=uid,
+                subject=request.student.subject,
+                grade=request.student.grade,
+                term=args.get("term", "Term 1"),
+                week=args.get("weekNumber", 1)
+            )
+
+            if not weekly_data and uid != "default_user":
+                 weekly_data = load_weekly_plan(uid="default_user", subject=request.student.subject, grade=request.student.grade, term=args.get("term", "Term 1"), week=args.get("weekNumber", 1))
+
+            if weekly_data:
+                if "meta" in weekly_data and "main_topic" in weekly_data["meta"]:
+                    theme = weekly_data["meta"]["main_topic"]
+
+                if "days" in weekly_data:
+                    found_day = next((d for d in weekly_data["days"] if d.get("date") == target_date), None)
+                    if found_day:
+                        if not subtopic or subtopic == "General Lesson":
+                            subtopic = found_day.get("subtopic", subtopic)
+                        if not objectives:
+                            objectives = found_day.get("objectives", objectives)
+
+            # 3. Generate
+            attendance = {"boys": args.get("boys", 0), "girls": args.get("girls", 0)}
+            
+            lesson_json = await generate_specific_lesson_plan(
+                grade=request.student.grade,
+                subject=request.student.subject,
+                theme=theme,
+                subtopic=subtopic,
+                objectives=objectives,
+                date=target_date or "Today",
+                time_start=args.get("startTime", "08:00"),
+                time_end=args.get("endTime", "08:40"),
+                attendance=attendance,
+                teacher_name=teacher_name, 
+                school_name=school_name    
+            )
+            return {"status": "success", "type": "lesson_plan", "data": lesson_json}
+
+        # ----------------------------------
+        # OTHER TOOLS (FREE)
+        # ----------------------------------
+        if request.tool_name == "trigger_quiz":
+             topic = args.get("topic", "General Knowledge")
+             quiz_data = await generate_quiz_json(topic, request.student.grade)
+             return {"status": "success", "type": "quiz", "data": quiz_data}
+
+        if request.tool_name == "trigger_simulation":
+             topic = args.get("topic", "Science")
+             sim_data = await generate_builder_json(topic, request.student.grade)
+             return {"status": "success", "type": "simulation", "data": sim_data}
+
+        if request.tool_name == "trigger_image":
+             raw_prompt = args.get("prompt", "")
+             optimized_prompt = await optimize_search_term(raw_prompt, request.student.grade)
+             image_url = await generate_realistic_image(optimized_prompt)
+             return { "status": "success", "type": "image", "data": {"url": image_url, "prompt": optimized_prompt} }
+
+        if request.tool_name not in ["generate_weekly", "generate_lesson", "trigger_quiz", "trigger_simulation", "trigger_image"]:
+             raise HTTPException(status_code=400, detail=f"Unknown tool: {request.tool_name}")
+
+        return {"status": "error", "message": "Tool not handled"} 
+
+    except HTTPException as he:
+        raise he
     except Exception as e:
-        import traceback
-        traceback.print_exc() # This will help us see exactly where lines fail in future
-        print(f"⚠️ AI Scheme Failed: {e}")
-        return []
-
-    return []
+        print(f"❌ Agent Tool Error: {e}")
+        return {"status": "error", "message": str(e)}

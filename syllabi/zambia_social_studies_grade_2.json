@@ -1,0 +1,96 @@
+{
+  "meta": {
+    "curriculum": "Zambia",
+    "grade": "2",
+    "subject": "Social Studies"
+  },
+  "topics": [
+    {
+      "unit": "2.1",
+      "topic_title": "LIVING TOGETHER IN THE COMMUNITY",
+      "page_number": 15,
+      "subtopics": [
+        "2.1.1 Neighbourhood"
+      ],
+      "learning_outcomes": [
+        "State the importance of living together"
+      ]
+    },
+    {
+      "unit": "2.2",
+      "topic_title": "DIRECTION AND LOCATION",
+      "page_number": 15,
+      "subtopics": [
+        "2.2.1 Direction"
+      ],
+      "learning_outcomes": [
+        "Mention the direction of prominent features in your community"
+      ]
+    },
+    {
+      "unit": "2.3",
+      "topic_title": "GOVERNANCE",
+      "page_number": 15,
+      "subtopics": [
+        "2.3.1 Defence and Security",
+        "2.3.2 The National Flag",
+        "2.3.3 Children's Rights"
+      ],
+      "learning_outcomes": [
+        "Identify institutions that provide security in the community",
+        "Explain the meaning of the National Flag",
+        "Mention children's basic rights at home and school"
+      ]
+    },
+    {
+      "unit": "2.4",
+      "topic_title": "RELIGION",
+      "page_number": 15,
+      "subtopics": [
+        "2.4.1 Praise and Worship"
+      ],
+      "learning_outcomes": [
+        "Mention different ways of praising God"
+      ]
+    },
+    {
+      "unit": "2.5",
+      "topic_title": "CHRISTIAN LIVING",
+      "page_number": 15,
+      "subtopics": [
+        "2.5.1 Happiness"
+      ],
+      "learning_outcomes": [
+        "List basic things that make people happy"
+      ]
+    },
+    {
+      "unit": "2.6",
+      "topic_title": "LEARNING ABOUT MONEY",
+      "page_number": 16,
+      "subtopics": [
+        "2.6.1 Using Money"
+      ],
+      "learning_outcomes": [
+        "Identify different coins and notes used in Zambia",
+        "Describe some ways people use to earn their money",
+        "Identify methods of keeping money safe",
+        "State the difference between a 'need' and a 'want'"
+      ]
+    },
+    {
+      "unit": "2.7",
+      "topic_title": "TRANSPORT AND COMMUNICATION",
+      "page_number": 16,
+      "subtopics": [
+        "2.7.1 Different Road Users",
+        "2.7.2 Basic Road Signs and Signals"
+      ],
+      "learning_outcomes": [
+        "Identify different road users",
+        "Mention basic road signs",
+        "Identify different road signals"
+      ]
+    }
+  ]
+}

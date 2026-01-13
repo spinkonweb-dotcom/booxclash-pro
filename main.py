@@ -7,10 +7,16 @@ from dotenv import load_dotenv
 # 1. Load Environment Variables
 load_dotenv()
 
-# 2. Import your router
-# Ensure you have the file 'api/routes.py' created
+# --- IMPORTS ---
 from api.routes import router as api_router
+from api.teacher_routes import router as teacher_router
+from api.student_routes import router as student_router
 
+# ✅ FIX: Import the missing Schemes Router
+# (Assuming your file is in 'routers/schemes.py' based on your previous snippets)
+# If it is in 'api/schemes.py', change this line accordingly.
+from api.teacher_routes import router as schemes_router 
+from api.schemes import router as schemes_router
 # 3. Setup Logging
 logging.basicConfig(
     level=logging.INFO,
@@ -21,12 +27,12 @@ logger = logging.getLogger("uvicorn")
 # 4. Initialize App
 app = FastAPI(title="BooxClash Tutor API")
 
-# 5. CORS - Allow Vercel and Localhost
+# 5. CORS
 origins = [
-    "http://localhost:5173", # Vite (Standard)
-    "http://localhost:3000", # Next.js / Create React App
-    "http://127.0.0.1:5173",
-    "*"  # DEBUG MODE: Allow everything for now
+    "http://localhost:5173", 
+    "http://localhost:3000",
+    "https://booxclash-pro.onrender.com", # Always good to add your production URL
+    "*"
 ]
 
 app.add_middleware(
@@ -37,12 +43,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# === 🔎 REQUEST LOGGER MIDDLEWARE (Add This!) ===
+# === 🔎 REQUEST LOGGER ===
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
-    """
-    Logs the Method and URL of every single request hitting the server.
-    """
     logger.info(f"🔔 INCOMING REQUEST: {request.method} {request.url}")
     try:
         response = await call_next(request)
@@ -51,21 +54,24 @@ async def log_requests(request: Request, call_next):
     except Exception as e:
         logger.error(f"❌ REQUEST FAILED: {str(e)}")
         raise e
-# =================================================
 
 # 6. Register Routes
-# IMPORTANT: This means your URL is http://localhost:8000/api/start-session
 app.include_router(api_router, prefix="/api/v1")
-
+app.include_router(teacher_router, prefix="/api/v1") 
+app.include_router(student_router, prefix="/api/v1")
+app.include_router(schemes_router, prefix="/api/v1", tags=["Schemes"])
 # 7. Health Check
 @app.get("/")
 def health_check():
     logger.info("Health check endpoint hit!")
-    return {"status": "running", "service": "BooxClash Backend"}
+    return {
+        "status": "running", 
+        "service": "BooxClash Backend",
+        "registered_routes": ["/api/v1/generate-scheme", "/api/v1/agent"] # Debug helper
+    }
 
 # 8. Local Development Entry Point
 if __name__ == "__main__":
     import uvicorn
-    port = int(os.environ.get("PORT", 8002))
-    # 'main:app' assumes this file is named main.py
+    port = int(os.environ.get("PORT", 8000)) # Changed to 8000 to match frontend default
     uvicorn.run("main:app", host="0.0.0.0", port=port, reload=True)

@@ -2,6 +2,7 @@ from pydantic import BaseModel, Field
 from typing import Optional, List, Dict
 
 class StudentProfile(BaseModel):
+    uid: Optional[str] = None
     student_name: str = Field(alias="name") 
     grade: str
     subject: str
@@ -32,12 +33,14 @@ class SchemeRequest(BaseModel):
     subject: str
     grade: str
     weeks: int
+    startDate: Optional[str] = None  # ✅ ADDED THIS FIELD
+    uid: Optional[str] = None
 
 class SchemeRow(BaseModel):
     month: Optional[str] = None
     week: str
     topic: Optional[str] = None
-    period: str
+    # period: str  # You can keep this if you use it, or make it Optional
     content: List[str] = []
     outcomes: List[str] = []
     references: List[str] = []

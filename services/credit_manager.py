@@ -1,49 +1,62 @@
-# services/credit_manager.py
-import json
-import os
+from datetime import datetime
+from google.cloud.firestore import Increment
+from services.firebase_setup import db
 
-CREDITS_FILE = "user_credits.json"
-FREE_TRIAL_CREDITS = 2
-COST_PER_GENERATION = 1
 
-def load_credits_db():
-    if not os.path.exists(CREDITS_FILE):
-        return {}
-    with open(CREDITS_FILE, "r") as f:
-        return json.load(f)
+def check_and_deduct_credit(uid: str):
+    """
+    Checks user credits and deducts 1 credit atomically.
+    - Initializes new users with 5 credits
+    - Approved users have unlimited access
+    - Prevents stale UID / deleted-user issues
+    """
 
-def save_credits_db(data):
-    with open(CREDITS_FILE, "w") as f:
-        json.dump(data, f, indent=4)
+    # 🔧 Dev fallback
+    if not uid or uid == "default_user":
+        print("⚠️ Dev mode credit bypass")
+        return True
 
-def get_user_balance(user_id: str) -> int:
-    db = load_credits_db()
-    
-    # If user is new, give them the Free Trial credits automatically
-    if user_id not in db:
-        db[user_id] = FREE_TRIAL_CREDITS
-        save_credits_db(db)
-        return FREE_TRIAL_CREDITS
-    
-    return db[user_id]
+    print(f"🔑 Credit Check UID: {uid}")
 
-def deduct_credit(user_id: str) -> bool:
-    db = load_credits_db()
-    
-    current_balance = db.get(user_id, FREE_TRIAL_CREDITS)
-    
-    if current_balance < COST_PER_GENERATION:
-        return False # Not enough credits
-    
-    # Deduct credit
-    db[user_id] = current_balance - COST_PER_GENERATION
-    save_credits_db(db)
+    user_ref = db.collection("users").document(uid)
+    doc = user_ref.get()
+
+    # 🆕 FIRST-TIME USER (or Firestore doc deleted)
+    if not doc.exists:
+        user_ref.set({
+            "credits": 5,
+            "is_approved": False,
+            "joined_at": datetime.utcnow(),
+        })
+        print(f"🆕 User initialized with 5 credits: {uid}")
+        return True
+
+    user_data = doc.to_dict()
+
+    # ✅ APPROVED USERS → UNLIMITED
+    if user_data.get("is_approved", False):
+        print(f"✅ Approved user detected: {uid}")
+        return True
+
+    # 🛡️ SAFETY: Missing credits field
+    if "credits" not in user_data:
+        user_ref.update({"credits": 5})
+        print(f"♻️ Credits field missing — reset to 5 for {uid}")
+        return True
+
+    current_credits = int(user_data.get("credits", 0))
+
+    # ⛔ NO CREDITS LEFT
+    if current_credits <= 0:
+        print(f"⛔ Credit exhausted for {uid}")
+        raise Exception(
+            "Free trial limit reached (2 Documents). Please upgrade to Premium."
+        )
+
+    # 💰 ATOMIC CREDIT DEDUCTION
+    user_ref.update({
+        "credits": Increment(-1)
+    })
+
+    print(f"💰 Credit deducted for {uid}. Remaining: {current_credits - 1}")
     return True
-
-def add_credits(user_id: str, amount: int):
-    """ Call this function when they pay K50 or K120 """
-    db = load_credits_db()
-    current = db.get(user_id, 0) # If they pay, they might be new or existing
-    db[user_id] = current + amount
-    save_credits_db(db)
-    return db[user_id]

@@ -1,0 +1,175 @@
+{
+  "meta": {
+    "curriculum": "Zambia",
+    "grade": "6",
+    "subject": "Technology Studies"
+  },
+  "topics": [
+    {
+      "unit": "6.1 FORMATTING",
+      "topic_title": "6.1.1 Text Formatting",
+      "page_number": 8,
+      "subtopics": [
+        "Identify different Text formats",
+        "Demonstrate formatting text"
+      ],
+      "learning_outcomes": [
+        "Knowledge: Normal, bold and Italic; Underline text, remove under line, font size, font type and font colour.",
+        "Skills: Formatting text; Identification of formatting drop down menu.",
+        "Values: Application of formatting buttons and keys."
+      ]
+    },
+    {
+      "unit": "6.1 FORMATTING",
+      "topic_title": "6.1.2 Text Alignment",
+      "page_number": 8,
+      "subtopics": [
+        "Identify different text alignments",
+        "Demonstrate alignment of text"
+      ],
+      "learning_outcomes": [
+        "Knowledge: Left, right and centre; Left, right, centre icons and the tab key for text alignment.",
+        "Skills: Demonstration of underlining, sizing of font and Colour; Aligning text according to requirements and needs.",
+        "Values: Inquisitiveness on how to format text and align it; Awareness that different buttons do different functions."
+      ]
+    },
+    {
+      "unit": "6.2 MATERIALS",
+      "topic_title": "6.2.1 Joining Materials",
+      "page_number": 8,
+      "subtopics": [
+        "Make mortice and tenon joints"
+      ],
+      "learning_outcomes": [
+        "Knowledge: Methods of joining wood: Common Mortice and Tenon, bridle joints",
+        "Skills: Cutting bridle and mortice and tenon joints",
+        "Values: Awareness of cutting wood joints"
+      ]
+    },
+    {
+      "unit": "6.2 MATERIALS",
+      "topic_title": "6.2.2 Gluing",
+      "page_number": 8,
+      "subtopics": [
+        "Join materials with glue"
+      ],
+      "learning_outcomes": [
+        "Knowledge: Gluing procedure when using PVA and contact adhesives on wood, metal and plastics (laminating)",
+        "Skills: Joining materials (wood, metal and plastic) using glue",
+        "Values: Awareness of methods of gluing wood"
+      ]
+    },
+    {
+      "unit": "6.2 MATERIALS",
+      "topic_title": "6.2.3 Finishes",
+      "page_number": 8,
+      "subtopics": [
+        "Apply finishes to artifacts"
+      ],
+      "learning_outcomes": [
+        "Knowledge: Applying finishes: varnish and paint.",
+        "Skills: Application of finishes",
+        "Values: Appreciation of beauty of finished products."
+      ]
+    },
+    {
+      "unit": "6.2 MATERIALS",
+      "topic_title": "6.2.4 Building Construction.",
+      "page_number": 8,
+      "subtopics": [
+        "Mould clay bricks.",
+        "Explain the basic stages in preparing land to construct a structure",
+        "Construct simple structures."
+      ],
+      "learning_outcomes": [
+        "Knowledge: Moulding of clay bricks; Methods of drying clay bricks",
+        "Skills: Moulding of clay bricks",
+        "Values: Awareness of methods of moulding",
+        "Knowledge: Stages in preparing site: Clearing, setting, digging, construction.",
+        "Skills: Preparation and construction of simple structures",
+        "Values: Constructing simple structures.",
+        "Knowledge: Construct simple structures: chicken run, pit latrine, kennel or a barn.",
+        "Skills: Preparation and construction of simple structures",
+        "Values: Constructing simple structures."
+      ]
+    },
+    {
+      "unit": "6.3 LETTERING",
+      "topic_title": "6.3.1 Printing",
+      "page_number": 9,
+      "subtopics": [
+        "Apply printing styles using a computer"
+      ],
+      "learning_outcomes": [
+        "Knowledge: Printing styles: Normal and Tiling",
+        "Skills: Identification of printing icons; Manipulation of text for printing; Presentation of well printed documents.",
+        "Values: Creativity in creating posters; Application of word to print text; Awareness of wastage in printing"
+      ]
+    },
+    {
+      "unit": "6.4 EDITING",
+      "topic_title": "6.4.1 Text Editing",
+      "page_number": 9,
+      "subtopics": [
+        "Manipulate text."
+      ],
+      "learning_outcomes": [
+        "Knowledge: Selecting, cutting, copying, deleting and pasting.",
+        "Skills: Manipulation of text; Identification of cutting, copying deleting; Editing",
+        "Values: Creativity in creating posters; Application of word to print text; Awareness of cutting, copying, deleting and pasting text."
+      ]
+    },
+    {
+      "unit": "6.5 DRAWING",
+      "topic_title": "6.5.1 Polygons",
+      "page_number": 9,
+      "subtopics": [
+        "Construct regular polygons."
+      ],
+      "learning_outcomes": [
+        "Knowledge: Regular polygons: Hexagon and Octagon; Construction given a side (General Method only)",
+        "Skills: Constructing hexagons and octagons.",
+        "Values: Awareness of the construction polygons"
+      ]
+    },
+    {
+      "unit": "6.5 DRAWING",
+      "topic_title": "6.5.2 Isometric Drawing",
+      "page_number": 9,
+      "subtopics": [
+        "Construct simple objects in Isometric."
+      ],
+      "learning_outcomes": [
+        "Knowledge: Basic principles of isometric drawings",
+        "Skills: Isometric. drawing",
+        "Values: Awareness of isometric views"
+      ]
+    },
+    {
+      "unit": "6.6 ENERGY",
+      "topic_title": "6.6.1 Electricity",
+      "page_number": 9,
+      "subtopics": [
+        "Construction of the simple circuits"
+      ],
+      "learning_outcomes": [
+        "Knowledge: Construction of simple circuits in series and parallel; Symbols for bulbs, batteries, switch, circuit",
+        "Skills: Circuit boards and bulb holder in systems; Identification of electrical symbols",
+        "Values: Appreciation of simple circuits to design artifacts / systems."
+      ]
+    },
+    {
+      "unit": "6.7 ENTREPRENEURSHIP",
+      "topic_title": "6.7.1 Costing and Pricing",
+      "page_number": 9,
+      "subtopics": [
+        "Cost and price services"
+      ],
+      "learning_outcomes": [
+        "Knowledge: Costing Services: Doing things for other people e.g. hairdresser, barber, fixing a door or window",
+        "Skills: Costing services",
+        "Values: Awareness of costing services"
+      ]
+    }
+  ]
+}

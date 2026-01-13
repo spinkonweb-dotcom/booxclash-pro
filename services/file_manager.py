@@ -1,86 +1,115 @@
-import os
-import json
-from pathlib import Path
+from services.firebase_setup import db
+from google.cloud.firestore import Query
+from datetime import datetime
 
-# Base Directory
-GENERATED_DIR = Path("generated")
-SCHEMES_DIR = GENERATED_DIR / "schemes"
-WEEKLY_DIR = GENERATED_DIR / "weekly_plans"
-
-# Ensure directories exist
-SCHEMES_DIR.mkdir(parents=True, exist_ok=True)
-WEEKLY_DIR.mkdir(parents=True, exist_ok=True)
-
-# --- SCHEMES ---
+# ==========================================
+# ✅ NEW: Save Function (Fixes ImportError)
+# ==========================================
 def save_generated_scheme(uid: str, subject: str, grade: str, term: str, data: list):
-    safe_subject = subject.lower().replace(" ", "_")
-    safe_term = term.lower().replace(" ", "_")
-    filename = f"{uid}_{safe_subject}_grade{grade}_{safe_term}.json"
-    file_path = SCHEMES_DIR / filename
+    """
+    Saves the generated scheme to Firestore immediately after generation.
+    This ensures data is safe even if the user closes the browser.
+    """
     try:
-        with open(file_path, "w", encoding="utf-8") as f:
-            json.dump(data, f, indent=2)
-        print(f"💾 [File Manager] Scheme saved: {file_path}")
+        # Create a new document in the 'generated_schemes' collection
+        doc_ref = db.collection("generated_schemes").document()
+        
+        doc_ref.set({
+            "userId": uid,
+            "schoolName": "Unknown School", # Default, user can update later
+            "subject": subject,
+            "grade": grade,
+            "term": term,
+            "schemeData": data,
+            "createdAt": datetime.now(),
+            "type": "Scheme of Work",
+            "source": "backend_auto_save" # Tag to know it came from the API
+        })
+        print(f"💾 Scheme saved to Firestore ID: {doc_ref.id}")
         return True
     except Exception as e:
-        print(f"❌ [File Manager] Error saving scheme: {e}")
+        print(f"❌ Firestore Save Error: {e}")
         return False
 
+# ==========================================
+# LOAD FUNCTIONS (For Agents)
+# ==========================================
 def load_generated_scheme(uid: str, subject: str, grade: str, term: str):
-    safe_subject = subject.lower().replace(" ", "_")
-    safe_term = term.lower().replace(" ", "_")
-    filename = f"{uid}_{safe_subject}_grade{grade}_{safe_term}.json"
-    file_path = SCHEMES_DIR / filename
-    
-    if file_path.exists():
-        try:
-            with open(file_path, "r", encoding="utf-8") as f:
-                return json.load(f)
-        except Exception:
-            return None
-    
-    # Fallback to default user
-    default_path = SCHEMES_DIR / f"default_user_{safe_subject}_grade{grade}_{safe_term}.json"
-    if default_path.exists():
-        print(f"⚠️ User scheme not found, loading default: {default_path}")
-        with open(default_path, "r", encoding="utf-8") as f:
-            return json.load(f)
-    return None
-
-# --- WEEKLY PLANS ---
-def save_weekly_plan(uid: str, subject: str, grade: str, term: str, week: int, data: dict):
-    safe_subject = subject.lower().replace(" ", "_")
-    safe_term = term.lower().replace(" ", "_")
-    filename = f"{uid}_{safe_subject}_grade{grade}_{safe_term}_week{week}.json"
-    file_path = WEEKLY_DIR / filename
-
+    """
+    Fetches the most recent scheme from Firestore.
+    """
     try:
-        with open(file_path, "w", encoding="utf-8") as f:
-            json.dump(data, f, indent=2)
-        print(f"💾 [File Manager] Weekly Plan saved: {file_path}")
+        # If default_user (dev mode), return empty or handle differently
+        if uid == "default_user":
+             print("⚠️ Loading for default_user (might return empty if no manual file save exists)")
+
+        docs = (
+            db.collection("generated_schemes")
+            .where("userId", "==", uid)
+            .where("subject", "==", subject)
+            .where("grade", "==", grade)
+            .where("term", "==", term)
+            .order_by("createdAt", direction=Query.DESCENDING)
+            .limit(1)
+            .stream()
+        )
+        
+        for doc in docs:
+            data = doc.to_dict()
+            return data.get("schemeData", []) 
+            
+        print("⚠️ Scheme not found in Firestore.")
+        return []
+    except Exception as e:
+        print(f"❌ Firestore Read Error: {e}")
+        return []
+
+def save_weekly_plan(uid: str, subject: str, grade: str, term: str, week: int, data: dict):
+    """
+    Saves the Weekly Plan to Firestore.
+    """
+    try:
+        doc_ref = db.collection("generated_weekly_plans").document()
+        doc_ref.set({
+            "userId": uid,
+            "subject": subject,
+            "grade": grade,
+            "term": term,
+            "weekNumber": week,
+            "planData": data,
+            "createdAt": datetime.now(),
+            "type": "Weekly Forecast",
+            "source": "backend_auto_save"
+        })
+        print(f"💾 Weekly Plan saved to Firestore ID: {doc_ref.id}")
         return True
     except Exception as e:
-        print(f"❌ [File Manager] Error saving weekly plan: {e}")
+        print(f"❌ Firestore Save Error: {e}")
         return False
 
 def load_weekly_plan(uid: str, subject: str, grade: str, term: str, week: int):
     """
-    Loads a specific weekly plan from the file system.
+    Fetches the most recent weekly plan from Firestore.
     """
-    safe_subject = subject.lower().replace(" ", "_")
-    safe_term = term.lower().replace(" ", "_")
-    filename = f"{uid}_{safe_subject}_grade{grade}_{safe_term}_week{week}.json"
-    file_path = WEEKLY_DIR / filename
+    try:
+        docs = (
+            db.collection("generated_weekly_plans")
+            .where("userId", "==", uid)
+            .where("subject", "==", subject)
+            .where("grade", "==", grade)
+            .where("term", "==", term)
+            .where("weekNumber", "==", week)
+            .order_by("createdAt", direction=Query.DESCENDING)
+            .limit(1)
+            .stream()
+        )
 
-    print(f"📂 [File Manager] Looking for Weekly Plan: {file_path}")
+        for doc in docs:
+            data = doc.to_dict()
+            return data.get("planData", {})
 
-    if file_path.exists():
-        try:
-            with open(file_path, "r", encoding="utf-8") as f:
-                return json.load(f)
-        except Exception as e:
-            print(f"❌ [File Manager] Error reading weekly plan: {e}")
-            return None
-    else:
-        print(f"⚠️ [File Manager] Weekly Plan file not found.")
+        print("⚠️ Weekly Plan not found in Firestore.")
+        return None
+    except Exception as e:
+        print(f"❌ Firestore Read Error: {e}")
         return None

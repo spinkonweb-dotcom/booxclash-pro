@@ -1,0 +1,137 @@
+{
+  "meta": {
+    "curriculum": "Zambia",
+    "grade": "2",
+    "subject": "Integrated Science"
+  },
+  "topics": [
+    {
+      "unit": "UNIT1: The Human Body",
+      "topic_title": "2.1.0 The human",
+      "page_number": 26,
+      "subtopics": [
+        "2.1.1 The Internal parts of the human Body"
+      ],
+      "learning_outcomes": [
+        "2.1.1.1 Name the major internal parts"
+      ]
+    },
+    {
+      "unit": "UNIT1: The Human Body",
+      "topic_title": "2.1.0 The human",
+      "page_number": 27,
+      "subtopics": [
+        "2.1.1 The Internal parts of the human Body"
+      ],
+      "learning_outcomes": [
+        "2.1.1.2 Describe the functions of the major internal parts"
+      ]
+    },
+    {
+      "unit": "UNIT2: Health",
+      "topic_title": "2.2.0 Health",
+      "page_number": 27,
+      "subtopics": [
+        "2.2.1 Food Hygiene"
+      ],
+      "learning_outcomes": [
+        "2.2.1.1 Explain the importance of washing of food before eating it",
+        "2.2.1.2 Explain the danger of eating exposed food.",
+        "2.2.1.3 Explain the need to drink clean and safe water."
+      ]
+    },
+    {
+      "unit": "UNIT2: Health",
+      "topic_title": "2.2.0 Health",
+      "page_number": 27,
+      "subtopics": [
+        "2.2.2 HIV and AIDS"
+      ],
+      "learning_outcomes": [
+        "2.2.2.1 State what HIV and AIDS stand for.",
+        "2.2.2.2 Mention ways through which HIV can be transmitted",
+        "2.2.2.3 Explain how HIV can be prevented."
+      ]
+    },
+    {
+      "unit": "UNIT3: The Environment",
+      "topic_title": "2.3.0 Environment",
+      "page_number": 28,
+      "subtopics": [
+        "2.3.1 Our environment"
+      ],
+      "learning_outcomes": [
+        "2.3.1.1 List things that are harmful to human beings and the environment",
+        "2.3.1.2 Explain why wastes should be deposited in the right places.",
+        "2.3.1.3 Describe the effects harmful things on the environment",
+        "2.3.1.4 Explain the importance of keeping our homes and schools clean.",
+        "2.3.1.5 Explain what people in the community do to care for their surroundings."
+      ]
+    },
+    {
+      "unit": "UNIT4: Plants and Animals",
+      "topic_title": "2.4.0 Plants and Animals",
+      "page_number": 28,
+      "subtopics": [
+        "2.4.1 Parts of Plants"
+      ],
+      "learning_outcomes": [
+        "2.4.1.1 Identify the main parts of a plant",
+        "2.4.1.2 Describe the life cycle of a plant"
+      ]
+    },
+    {
+      "unit": "UNIT4: Plants and Animals",
+      "topic_title": "2.4.0 Plants and Animals",
+      "page_number": 29,
+      "subtopics": [
+        "2.4.2 Types of Animals"
+      ],
+      "learning_outcomes": [
+        "2.4.2.1 Name different types of animals in the environment.",
+        "2.4.2.2 Mention some animals which depend on others for food.",
+        "2.4.2.3 Mention some animals which feed on grass and crop plants.",
+        "2.4.2.4 Mention places where wild animals are found",
+        "2.4.2.5 Explain how animals protect themselves from their enemies",
+        "2.4.2.6 Explain the importance of conserving wild life."
+      ]
+    },
+    {
+      "unit": "UNIT5: Materials and Energy",
+      "topic_title": "2.5.0 Materials and Energy",
+      "page_number": 30,
+      "subtopics": [
+        "2.5.1 Soluble and insoluble Materials"
+      ],
+      "learning_outcomes": [
+        "2.5.1.1 Demonstrate the existence of materials in solid and liquid forms.",
+        "2.5.1.2 Demonstrate that some materials are soluble and others are insoluble",
+        "2.5.1.3 Show that some materials dissolve quicker in hot water than in cold water."
+      ]
+    },
+    {
+      "unit": "UNIT5: Materials and Energy",
+      "topic_title": "2.5.0 Materials and Energy",
+      "page_number": 30,
+      "subtopics": [
+        "2.5.2 Sources of Sound"
+      ],
+      "learning_outcomes": [
+        "2.5.2.1 Mention the Sources of Sound.",
+        "2.5.2.2 Distinguish between different sounds."
+      ]
+    },
+    {
+      "unit": "UNIT5: Materials and Energy",
+      "topic_title": "2.5.0 Materials and Energy",
+      "page_number": 30,
+      "subtopics": [
+        "2.5.3 Light"
+      ],
+      "learning_outcomes": [
+        "2.5.3.1 Mention the sources of light",
+        "2.5.3.2 Relate different positions of the source of light to shadow and shade at different times."
+      ]
+    }
+  ]
+}

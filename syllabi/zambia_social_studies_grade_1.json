@@ -1,0 +1,98 @@
+{
+  "meta": {
+    "curriculum": "Zambia",
+    "grade": "1",
+    "subject": "Social Studies"
+  },
+  "topics": [
+    {
+      "unit": "1.1",
+      "topic_title": "LIVING TOGETHER IN THE COMMUNITY",
+      "page_number": 12,
+      "subtopics": [
+        "1.1.1 Home and School"
+      ],
+      "learning_outcomes": [
+        "Identify important places around the home and school",
+        "Identify family members and relationships to each other",
+        "State the roles played in the home",
+        "Explain the need for rules at home and school",
+        "State ways in which the class can work together"
+      ]
+    },
+    {
+      "unit": "1.2",
+      "topic_title": "DIRECTION AND LOCATION",
+      "page_number": 12,
+      "subtopics": [
+        "1.2.1 Basic Cardinal Points"
+      ],
+      "learning_outcomes": [
+        "Mention the four basic cardinal points"
+      ]
+    },
+    {
+      "unit": "1.3",
+      "topic_title": "GOVERNANCE",
+      "page_number": 12,
+      "subtopics": [
+        "1.3.1 National Anthem"
+      ],
+      "learning_outcomes": [
+        "Sing the National Anthem in familiar language"
+      ]
+    },
+    {
+      "unit": "1.4",
+      "topic_title": "RELIGION",
+      "page_number": 12,
+      "subtopics": [
+        "1.4.1 Names of God",
+        "1.4.2 Importance of God",
+        "1.4.3 Prayer"
+      ],
+      "learning_outcomes": [
+        "Mention the different names of God in any language",
+        "State the importance of God in our lives",
+        "Mention the different ways people talk to God.",
+        "Explain why people pray.",
+        "Mention different types of prayers.",
+        "Recite the Lord's Prayer",
+        "Mention different times when people pray.",
+        "State the different ways in which God answers prayer."
+      ]
+    },
+    {
+      "unit": "1.5",
+      "topic_title": "CHRISTIAN LIVING",
+      "page_number": 13,
+      "subtopics": [
+        "1.5.1 Friendship and Love"
+      ],
+      "learning_outcomes": [
+        "State qualities of a good friend",
+        "Tell stories of Jesus' friendship towards children",
+        "Mention good things God gives to people",
+        "Demonstrate the story of the Good Samaritan",
+        "Mention different ways of helping others"
+      ]
+    },
+    {
+      "unit": "1.6",
+      "topic_title": "TRANSPORT AND COMMUNICATION",
+      "page_number": 13,
+      "subtopics": [
+        "1.6.1 Types of Transport and Communication",
+        "1.6.2 Importance of Transport and Communication",
+        "1.6.3 Safety"
+      ],
+      "learning_outcomes": [
+        "Mention types of transport and their role in moving people and goods move from one place to another",
+        "Explain different ways of communicating among people",
+        "Mention the importance of transport and communication",
+        "Demonstrate the correct side of the road to walk along",
+        "Demonstrate safe ways of crossing the road and rail line"
+      ]
+    }
+  ]
+}

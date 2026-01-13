@@ -1,0 +1,345 @@
+{
+  "meta": {
+    "curriculum": "Zambia",
+    "grade": "4",
+    "subject": "English Language"
+  },
+  "topics": [
+    {
+      "unit": "Listening and Speaking",
+      "topic_title": "Etiquette",
+      "page_number": 25,
+      "subtopics": [
+        "Demonstrate good manners and courteous behaviour"
+      ],
+      "learning_outcomes": [
+        "Understand responding politely to requests and situations",
+        "Apply knowledge of etiquette",
+        "Develop knowledge and awareness of etiquette"
+      ]
+    },
+    {
+      "unit": "Listening and Speaking",
+      "topic_title": "Conversation",
+      "page_number": 25,
+      "subtopics": [
+        "Take part in a dialogue on chores and responsibilities of family members",
+        "Talk about objects found in the community",
+        "Talk about characteristics of domestic and wild animals",
+        "Talk about effects of bad practices in the community"
+      ],
+      "learning_outcomes": [
+        "Understand responding appropriately in a conversation",
+        "Know examples of objects in the community e.g. shops, clinics, buses, grinding mill etc",
+        "Know characteristics of animals e.g. Fierce, friendly, harmful, harmless, carnivores, omnivores etc",
+        "Know bad practices e.g. pollution, garbage disposal, drug and alcohol abuse",
+        "Apply knowledge of conversation",
+        "Develop knowledge and awareness of conversation"
+      ]
+    },
+    {
+      "unit": "Listening and Speaking",
+      "topic_title": "Stories",
+      "page_number": 25,
+      "subtopics": [
+        "Tell modern simple stories in the right sequence"
+      ],
+      "learning_outcomes": [
+        "Understand sequencing events in a story",
+        "Apply knowledge of story telling",
+        "Develop knowledge and awareness of story telling"
+      ]
+    },
+    {
+      "unit": "Listening and Speaking",
+      "topic_title": "Puzzles",
+      "page_number": 26,
+      "subtopics": [
+        "Recognise and give meaning to puzzles"
+      ],
+      "learning_outcomes": [
+        "Solve word puzzles",
+        "Apply knowledge of puzzles",
+        "Develop knowledge and awareness of puzzles"
+      ]
+    },
+    {
+      "unit": "Listening and Speaking",
+      "topic_title": "Drama",
+      "page_number": 26,
+      "subtopics": [
+        "Perform simple plays"
+      ],
+      "learning_outcomes": [
+        "Understand acting/dramatising simple plays, voice projection, stage movement, public speaking, confidence",
+        "Apply knowledge of drama performance",
+        "Develop knowledge and awareness of drama performance"
+      ]
+    },
+    {
+      "unit": "Listening and Speaking",
+      "topic_title": "Poetry",
+      "page_number": 26,
+      "subtopics": [
+        "Recite poems and recognise basic elements of poetry"
+      ],
+      "learning_outcomes": [
+        "Know elements of poetry; e.g. rhyme, imagery, figures of speech",
+        "Apply knowledge of poetry",
+        "Develop knowledge and awareness of poetry"
+      ]
+    },
+    {
+      "unit": "Listening and Speaking",
+      "topic_title": "Oral instructions",
+      "page_number": 26,
+      "subtopics": [
+        "Respond to and follow a series of instructions",
+        "Get and respond to oral directions about locating a place"
+      ],
+      "learning_outcomes": [
+        "Understand how to follow instructions on how to make a paper boat",
+        "Understand how to follow directions e.g. go straight, turn right, turn left, opposite, behind",
+        "Apply knowledge of oral instructions",
+        "Develop knowledge and awareness of oral instructions"
+      ]
+    },
+    {
+      "unit": "Listening and Speaking",
+      "topic_title": "Processes",
+      "page_number": 26,
+      "subtopics": [
+        "Describe simple processes"
+      ],
+      "learning_outcomes": [
+        "Understand simple processes e.g. a game or how to play a simple sport",
+        "Apply knowledge of describing processes",
+        "Develop knowledge and awareness of describing processes"
+      ]
+    },
+    {
+      "unit": "Listening and Speaking",
+      "topic_title": "Time",
+      "page_number": 26,
+      "subtopics": [
+        "Tell seasons of the year and describe the activities done"
+      ],
+      "learning_outcomes": [
+        "Know seasons E.g. Rainy season- digging, planting, weeding",
+        "Apply knowledge of time and seasons",
+        "Develop knowledge and awareness of time and seasons"
+      ]
+    },
+    {
+      "unit": "Listening and Speaking",
+      "topic_title": "Antonyms and synonyms",
+      "page_number": 26,
+      "subtopics": [
+        "Use antonyms and synonyms"
+      ],
+      "learning_outcomes": [
+        "Know synonyms (words with same meaning) e.g. scared/afraid",
+        "Know antonyms (words opposite in meaning) e.g. weak/strong, poor/rich",
+        "Apply knowledge of antonyms and synonyms",
+        "Develop knowledge and awareness of antonyms and synonyms"
+      ]
+    },
+    {
+      "unit": "Listening and Speaking",
+      "topic_title": "Appropriate language in a social setting",
+      "page_number": 27,
+      "subtopics": [
+        "Use socially acceptable language to make polite requests"
+      ],
+      "learning_outcomes": [
+        "Know polite requests e.g. May I.., Could you.., Please sir/madam ...",
+        "Apply knowledge of appropriate language",
+        "Develop knowledge and awareness of appropriate language"
+      ]
+    },
+    {
+      "unit": "Reading",
+      "topic_title": "Intensive Reading",
+      "page_number": 27,
+      "subtopics": [
+        "Read silently any given passages and do follow-up activities",
+        "Identify themes of simple stories",
+        "Read a passage and answer the wh questions",
+        "Read and interpret information expressed in charts, graphs, diagrams, tables and maps"
+      ],
+      "learning_outcomes": [
+        "Practice good reading habits e.g. avoid pointing words with fingers, lip reading",
+        "Identify themes or main lesson in the story",
+        "Discuss new vocabulary i.e. What is the name of... Who Where did... When...... Why....",
+        "Interpret information illustrated in charts, graphs, diagrams, tables and maps",
+        "Apply knowledge of intensive reading",
+        "Develop knowledge and awareness of intensive reading"
+      ]
+    },
+    {
+      "unit": "Reading",
+      "topic_title": "Reading Aloud",
+      "page_number": 27,
+      "subtopics": [
+        "Read a given passage at an appropriate pace, acceptable pronunciation and with understanding"
+      ],
+      "learning_outcomes": [
+        "Read with fluency and comprehension",
+        "Apply knowledge of reading aloud",
+        "Develop knowledge and awareness of reading aloud"
+      ]
+    },
+    {
+      "unit": "Reading",
+      "topic_title": "Extensive reading",
+      "page_number": 28,
+      "subtopics": [
+        "Read a variety of materials and report on the main points"
+      ],
+      "learning_outcomes": [
+        "Report main message on the materials read",
+        "Apply knowledge of extensive reading",
+        "Develop knowledge and awareness of extensive reading"
+      ]
+    },
+    {
+      "unit": "Writing",
+      "topic_title": "Word and Sentence order",
+      "page_number": 28,
+      "subtopics": [
+        "Rearrange words and sentences in a logical order"
+      ],
+      "learning_outcomes": [
+        "Sequence words",
+        "Sequence sentences (up to five) in logical order",
+        "Apply knowledge of word and sentence order",
+        "Develop knowledge and awareness of word and sentence order"
+      ]
+    },
+    {
+      "unit": "Writing",
+      "topic_title": "Punctuation",
+      "page_number": 28,
+      "subtopics": [
+        "Use correct punctuation marks"
+      ],
+      "learning_outcomes": [
+        "Know capital letter, full stop, comma, question mark, exclamation mark and speech marks",
+        "Apply knowledge of punctuation",
+        "Develop knowledge and awareness of punctuation"
+      ]
+    },
+    {
+      "unit": "Writing",
+      "topic_title": "Informal letter",
+      "page_number": 28,
+      "subtopics": [
+        "Write informal letters"
+      ],
+      "learning_outcomes": [
+        "Know features of an informal letter e.g. a letter to a friend, one address, salutation, body, language, ending",
+        "Apply knowledge of informal letter writing",
+        "Develop knowledge and awareness of informal letter writing"
+      ]
+    },
+    {
+      "unit": "Writing",
+      "topic_title": "Handwriting",
+      "page_number": 28,
+      "subtopics": [
+        "Demonstrate and practice good handwriting through posters and notices"
+      ],
+      "learning_outcomes": [
+        "Design posters and notices in legible handwriting in Cursive and Marion Richardson",
+        "Apply knowledge of handwriting",
+        "Develop knowledge and awareness of handwriting"
+      ]
+    },
+    {
+      "unit": "Writing",
+      "topic_title": "Guided Composition",
+      "page_number": 29,
+      "subtopics": [
+        "Write stories using given vocabulary",
+        "Write stories on given picture of topical issues"
+      ],
+      "learning_outcomes": [
+        "Develop stories from given vocabulary",
+        "Develop stories from given pictures on topical issues e.g. HIV and AIDS, Child Abuse, Corruption and Substance abuse",
+        "Apply knowledge of guided composition",
+        "Develop knowledge and awareness of guided composition"
+      ]
+    },
+    {
+      "unit": "Writing",
+      "topic_title": "Sentence Construction",
+      "page_number": 29,
+      "subtopics": [
+        "Construct simple sentences"
+      ],
+      "learning_outcomes": [
+        "Understand sentence construction using S+V (Jesus wept.)",
+        "Understand Subject+Verb+ object (Mulenga kicked the ball)",
+        "Understand Subject+Verb+ Direct Object+indirect Object (I bought a dress for my mother)",
+        "Apply knowledge of sentence construction",
+        "Develop knowledge and awareness of sentence construction"
+      ]
+    },
+    {
+      "unit": "Writing",
+      "topic_title": "Dictation",
+      "page_number": 30,
+      "subtopics": [
+        "Write dictated sentences and passages"
+      ],
+      "learning_outcomes": [
+        "Understand legibility, spellings and punctuations in dictation",
+        "Apply knowledge of dictation",
+        "Develop knowledge and awareness of dictation"
+      ]
+    },
+    {
+      "unit": "Writing",
+      "topic_title": "Summary",
+      "page_number": 30,
+      "subtopics": [
+        "Recognise the main points in a given paragraph"
+      ],
+      "learning_outcomes": [
+        "Understand summary writing",
+        "Apply knowledge of summarization",
+        "Develop knowledge and awareness of summarization"
+      ]
+    },
+    {
+      "unit": "Structure",
+      "topic_title": "Tenses",
+      "page_number": 30,
+      "subtopics": [
+        "Use simple present tense",
+        "Use the simple progressive tense (Present continuous)",
+        "Use the simple past tense"
+      ],
+      "learning_outcomes": [
+        "Understand simple present tense e.g. You like bananas. She goes to school every day.",
+        "Understand simple progressive tense e.g. She is reading",
+        "Understand simple past tense e.g. I saw Mary yesterday",
+        "Apply knowledge of tenses",
+        "Develop knowledge and awareness of tenses"
+      ]
+    },
+    {
+      "unit": "Structure",
+      "topic_title": "Parts of speech: Adverbs",
+      "page_number": 30,
+      "subtopics": [
+        "Use adverbs of manner"
+      ],
+      "learning_outcomes": [
+        "Know adverbs of manner; slowly, hurriedly, hungrily",
+        "Apply knowledge of adverbs",
+        "Develop knowledge and awareness of adverbs"
+      ]
+    }
+  ]
+}
