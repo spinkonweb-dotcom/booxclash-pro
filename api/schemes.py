@@ -80,7 +80,7 @@ async def generate_scheme(
             grade=request.grade,
             term=request.term,
             num_weeks=request.weeks,
-            start_date=request.startDate or "2025-01-13"
+            start_date=request.startDate or "2026-01-13"
         )
 
         # Normalize AI output
