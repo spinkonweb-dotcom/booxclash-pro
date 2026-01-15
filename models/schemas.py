@@ -8,7 +8,7 @@ class StudentProfile(BaseModel):
     grade: str
     subject: str
     country: str = "Zambia"
-    credits: Optional[int] = 5  # ✅ ADDED: Defaults to 5 if missing
+    credits: Optional[int] = 3  # ✅ ADDED: Defaults to 5 if missing
     
     class Config:
         populate_by_name = True 
