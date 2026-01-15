@@ -84,7 +84,7 @@ async def generate_scheme_with_ai(
     grade: str,
     term: str,
     num_weeks: int,
-    start_date: str = "2025-01-13" 
+    start_date: str = "2026-01-13" 
 ) -> List[dict]:
     
     print(f"\n📘 [Scheme Generator] Processing Professional Request for {subject} Grade {grade}...")
