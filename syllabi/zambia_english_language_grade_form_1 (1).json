@@ -1,0 +1,549 @@
+{
+  "meta": {
+    "curriculum": "Zambia",
+    "grade": "Form 1",
+    "subject": "English Language"
+  },
+  "topics": [
+    {
+      "unit": "Unit 1: Listening and Speaking",
+      "topic_title": "1.1.1. Greetings: Formal and Informal Greetings",
+      "specific_outcomes": [
+        "1.1.1.1.1. Use appropriate greetings in different contexts"
+      ]
+    },
+    {
+      "unit": "Unit 1: Listening and Speaking",
+      "topic_title": "1.1.2. Requests: Polite Requests",
+      "specific_outcomes": [
+        "1.1.2.1.1. Make polite requests in different contexts"
+      ]
+    },
+    {
+      "unit": "Unit 1: Listening and Speaking",
+      "topic_title": "1.1.3. Introductions: Personal Introduction",
+      "specific_outcomes": [
+        "1.1.3.1.1. Make introductions of oneself"
+      ]
+    },
+    {
+      "unit": "Unit 1: Listening and Speaking",
+      "topic_title": "1.1.4. Invitations: Extending and Responding to Invitations",
+      "specific_outcomes": [
+        "1.1.4.1.1. Use appropriate language when extending and responding to invitations"
+      ]
+    },
+    {
+      "unit": "Unit 1: Listening and Speaking",
+      "topic_title": "1.1.5. Apologies and Compliments: Expressing Apologies and Compliments",
+      "specific_outcomes": [
+        "1.1.5.1.1. Use appropriate language when apologising and complimenting"
+      ]
+    },
+    {
+      "unit": "Unit 1: Listening and Speaking",
+      "topic_title": "1.1.6. Language in Social Settings: Language Use in Different Social Settings",
+      "specific_outcomes": [
+        "1.1.6.1.1. Use appropriate language in different social settings"
+      ]
+    },
+    {
+      "unit": "Unit 1: Listening and Speaking",
+      "topic_title": "1.1.7. Phone Conversations: Making and Receiving Phone Calls",
+      "specific_outcomes": [
+        "1.1.7.1.1. Use appropriate language when making or receiving phone calls"
+      ]
+    },
+    {
+      "unit": "Unit 1: Listening and Speaking",
+      "topic_title": "1.1.8. Making an Offer: Making and Accepting an Offer",
+      "specific_outcomes": [
+        "1.1.8.1.1. Use appropriate language when making and responding to an offer"
+      ]
+    },
+    {
+      "unit": "Unit 1: Listening and Speaking",
+      "topic_title": "1.1.9. Public Speaking: Debate",
+      "specific_outcomes": [
+        "1.1.9.1.1. Use appropriate language to debate on different cross cutting issues"
+      ]
+    },
+    {
+      "unit": "Unit 1: Listening and Speaking",
+      "topic_title": "1.1.10. Drama: Short Plays",
+      "specific_outcomes": [
+        "1.1.10.1.1. Use appropriate language to dramatise short plays"
+      ]
+    },
+    {
+      "unit": "Unit 1: Listening and Speaking",
+      "topic_title": "1.1.11. Process: Describing a Process",
+      "specific_outcomes": [
+        "1.1.11.1.1. Describe simple processes"
+      ]
+    },
+    {
+      "unit": "Unit 1: Listening and Speaking",
+      "topic_title": "1.1.12. Poetry: Reciting Poems",
+      "specific_outcomes": [
+        "1.1.12.1.1. Recite poems"
+      ]
+    },
+    {
+      "unit": "Unit 1: Listening and Speaking",
+      "topic_title": "1.1.13. Directions: Giving Directions",
+      "specific_outcomes": [
+        "1.1.13.1.1. Give directions"
+      ]
+    },
+    {
+      "unit": "Unit 1: Listening and Speaking",
+      "topic_title": "1.1.14. Figurative Language: Proverbs",
+      "specific_outcomes": [
+        "1.1.14.1.1. Use proverbs in various social contexts"
+      ]
+    },
+    {
+      "unit": "Unit 1: Listening and Speaking",
+      "topic_title": "1.1.14. Figurative Language: Riddles",
+      "specific_outcomes": [
+        "1.1.14.2.1. Use Riddles in various social contexts"
+      ]
+    },
+    {
+      "unit": "Unit 1: Listening and Speaking",
+      "topic_title": "1.1.14. Figurative Language: Idiomatic Expressions",
+      "specific_outcomes": [
+        "1.1.14.3.1. Use idiomatic expressions in speech"
+      ]
+    },
+    {
+      "unit": "Unit 2: Reading Comprehension",
+      "topic_title": "1.2.1. Comprehension: Listening Comprehension",
+      "specific_outcomes": [
+        "1.2.1.1.1. Listen and comprehend information"
+      ]
+    },
+    {
+      "unit": "Unit 2: Reading Comprehension",
+      "topic_title": "1.2.1. Comprehension: Reading Comprehension",
+      "specific_outcomes": [
+        "1.2.1.2.1. Read and comprehend information",
+        "1.2.1.2.2. Read a variety of texts extensively"
+      ]
+    },
+    {
+      "unit": "Unit 3: Composition",
+      "topic_title": "1.3.1. Basic Writing Skills: The Sentence",
+      "specific_outcomes": [
+        "1.3.1.1.1. Write correct sentences"
+      ]
+    },
+    {
+      "unit": "Unit 3: Composition",
+      "topic_title": "1.3.1. Basic Writing Skills: Spelling",
+      "specific_outcomes": [
+        "1.3.1.2.1. Apply spelling rules"
+      ]
+    },
+    {
+      "unit": "Unit 3: Composition",
+      "topic_title": "1.3.1. Basic Writing Skills: Punctuation",
+      "specific_outcomes": [
+        "1.3.1.3.1. Use appropriate punctuation marks in sentences"
+      ]
+    },
+    {
+      "unit": "Unit 3: Composition",
+      "topic_title": "1.3.1. Basic Writing Skills: Paragraphing",
+      "specific_outcomes": [
+        "1.3.1.4.1. Write paragraphs"
+      ]
+    },
+    {
+      "unit": "Unit 3: Composition",
+      "topic_title": "1.3.2. Narrative Writing: Story Writing",
+      "specific_outcomes": [
+        "1.3.2.1.1. Write stories"
+      ]
+    },
+    {
+      "unit": "Unit 3: Composition",
+      "topic_title": "1.3.3. Descriptive Writing: Describing a Person, an Animal or an Object",
+      "specific_outcomes": [
+        "1.3.3.1.1. Write a description of a person, an animal or an object"
+      ]
+    },
+    {
+      "unit": "Unit 3: Composition",
+      "topic_title": "1.3.4. Letter Writing: Informal Letter",
+      "specific_outcomes": [
+        "1.3.4.1.1. Write Informal Letters"
+      ]
+    },
+    {
+      "unit": "Unit 3: Composition",
+      "topic_title": "1.3.5. Expository Writing: Writing Expository Essays",
+      "specific_outcomes": [
+        "1.3.5.1.1. Write expository essays"
+      ]
+    },
+    {
+      "unit": "Unit 3: Composition",
+      "topic_title": "1.3.6. Persuasive Writing: An Argumentative Composition",
+      "specific_outcomes": [
+        "1.3.6.1.1. Write an argumentative composition"
+      ]
+    },
+    {
+      "unit": "Unit 3: Composition",
+      "topic_title": "1.3.6. Persuasive Writing: Discursive Composition",
+      "specific_outcomes": [
+        "1.3.6.2.1. Write a discursive composition"
+      ]
+    },
+    {
+      "unit": "Unit 3: Composition",
+      "topic_title": "1.3.7. Diary Writing: Introduction to Writing Diary Entries",
+      "specific_outcomes": [
+        "1.3.7.1.1. Write diary entries"
+      ]
+    },
+    {
+      "unit": "Unit 4: Structure",
+      "topic_title": "1.4.1. Parts of Speech: Introduction to Parts of Speech",
+      "specific_outcomes": [
+        "1.4.1.1.1. Use parts of speech in sentences"
+      ]
+    },
+    {
+      "unit": "Unit 4: Structure",
+      "topic_title": "1.4.2. Tenses: Present Simple Tense",
+      "specific_outcomes": [
+        "1.4.2.1.1. Use Present Simple Tense in sentences"
+      ]
+    },
+    {
+      "unit": "Unit 4: Structure",
+      "topic_title": "1.4.2. Tenses: Present Continuous Tense",
+      "specific_outcomes": [
+        "1.4.2.2.1. Use Present Continuous Tense in sentences"
+      ]
+    },
+    {
+      "unit": "Unit 4: Structure",
+      "topic_title": "1.4.2. Tenses: Past Simple Tense",
+      "specific_outcomes": [
+        "1.4.2.3.1. Use the Past Simple Tense in sentences"
+      ]
+    },
+    {
+      "unit": "Unit 4: Structure",
+      "topic_title": "1.4.2. Tenses: Past Continuous Tense",
+      "specific_outcomes": [
+        "1.4.2.4.1. Use the Past Continuous Tense in Sentences"
+      ]
+    },
+    {
+      "unit": "Unit 4: Structure",
+      "topic_title": "1.4.2. Tenses: The Future Simple Tense",
+      "specific_outcomes": [
+        "1.4.2.5.1. Use Future Simple Tense in sentences"
+      ]
+    },
+    {
+      "unit": "Unit 4: Structure",
+      "topic_title": "1.4.2. Tenses: Future Continuous Tenses",
+      "specific_outcomes": [
+        "1.4.2.6.1. Use Future Continuous Tense in sentences"
+      ]
+    },
+    {
+      "unit": "Unit 4: Structure",
+      "topic_title": "1.4.2. Tenses: The Present Perfect Tense",
+      "specific_outcomes": [
+        "1.4.2.7.1. Use Present Perfect Tense in sentences"
+      ]
+    },
+    {
+      "unit": "Unit 4: Structure",
+      "topic_title": "1.4.2. Tenses: The Present Perfect Continuous Tense",
+      "specific_outcomes": [
+        "1.4.2.8.1. Use Present Perfect Continuous Tense in sentences"
+      ]
+    },
+    {
+      "unit": "Unit 4: Structure",
+      "topic_title": "1.4.2. Tenses: Past Perfect Tense",
+      "specific_outcomes": [
+        "1.4.2.9.1. Use Past Perfect Tense in sentences"
+      ]
+    },
+    {
+      "unit": "Unit 4: Structure",
+      "topic_title": "1.4.2. Tenses: Past Perfect Continuous Tense",
+      "specific_outcomes": [
+        "1.4.2.10.1. Use Past Perfect Continuous Tense in sentences"
+      ]
+    },
+    {
+      "unit": "Unit 4: Structure",
+      "topic_title": "1.4.2. Tenses: Future Perfect Tense",
+      "specific_outcomes": [
+        "1.4.2.11.1. Use Future Perfect Tense in sentences"
+      ]
+    },
+    {
+      "unit": "Unit 4: Structure",
+      "topic_title": "1.4.2. Tenses: Future Perfect Continuous Tense",
+      "specific_outcomes": [
+        "1.4.2.12.1. Use Future Perfect Continuous Tense in sentences"
+      ]
+    },
+    {
+      "unit": "Unit 4: Structure",
+      "topic_title": "1.4.3. Nouns: Possessive Nouns",
+      "specific_outcomes": [
+        "1.4.3.1.1. Use possessive nouns in sentences"
+      ]
+    },
+    {
+      "unit": "Unit 4: Structure",
+      "topic_title": "1.4.3. Nouns: Irregular Nouns",
+      "specific_outcomes": [
+        "1.4.3.2.1. Change irregular nouns from singular to plural"
+      ]
+    },
+    {
+      "unit": "Unit 4: Structure",
+      "topic_title": "1.4.3. Nouns: Countable Nouns",
+      "specific_outcomes": [
+        "1.4.3.3.1. Use countable nouns in sentences"
+      ]
+    },
+    {
+      "unit": "Unit 4: Structure",
+      "topic_title": "1.4.3. Nouns: Uncountable Nouns",
+      "specific_outcomes": [
+        "1.4.3.4.1. Use uncountable nouns in sentences"
+      ]
+    },
+    {
+      "unit": "Unit 4: Structure",
+      "topic_title": "1.4.3. Nouns: Collective Nouns",
+      "specific_outcomes": [
+        "1.4.3.5.1. Construct sentences using collective nouns"
+      ]
+    },
+    {
+      "unit": "Unit 4: Structure",
+      "topic_title": "1.4.4. Articles: Definite and Indefinite Articles",
+      "specific_outcomes": [
+        "1.4.4.1.1. Use articles in sentences"
+      ]
+    },
+    {
+      "unit": "Unit 4: Structure",
+      "topic_title": "1.4.5. Intensifiers: Using Intensifiers",
+      "specific_outcomes": [
+        "1.4.5.1.1. Use intensifiers in sentences"
+      ]
+    },
+    {
+      "unit": "Unit 4: Structure",
+      "topic_title": "1.4.6. Adjectives: Order of Adjectives",
+      "specific_outcomes": [
+        "1.4.6.1.1. Use the correct order of adjectives in sentences"
+      ]
+    },
+    {
+      "unit": "Unit 4: Structure",
+      "topic_title": "1.4.7. Verbs: Linking Verbs",
+      "specific_outcomes": [
+        "1.4.7.1.1. Use linking verbs in sentences"
+      ]
+    },
+    {
+      "unit": "Unit 4: Structure",
+      "topic_title": "1.4.8. Agreement: Subject - Verb Agreement",
+      "specific_outcomes": [
+        "1.4.8.1.1. Use correct verb forms with the subject in a sentence"
+      ]
+    },
+    {
+      "unit": "Unit 4: Structure",
+      "topic_title": "1.4.9. Reason: Expressing Reason",
+      "specific_outcomes": [
+        "1.4.9.1.1. Use expressions of reason in sentences"
+      ]
+    },
+    {
+      "unit": "Unit 4: Structure",
+      "topic_title": "1.4.10. Purpose: Different Ways of Expressing Purpose",
+      "specific_outcomes": [
+        "1.4.10.1.1. Use different expressions to show purpose in sentences"
+      ]
+    },
+    {
+      "unit": "Unit 4: Structure",
+      "topic_title": "1.4.11. Result: Different Ways of Expressing Result",
+      "specific_outcomes": [
+        "1.4.11.1.1. Use different expressions of result in sentences"
+      ]
+    },
+    {
+      "unit": "Unit 4: Structure",
+      "topic_title": "1.4.12. Adverbs: Position of Adverbs",
+      "specific_outcomes": [
+        "1.4.12.1.1. Use adverbs in different positions in sentences"
+      ]
+    },
+    {
+      "unit": "Unit 4: Structure",
+      "topic_title": "1.4.13. Prepositions: Types of Prepositions",
+      "specific_outcomes": [
+        "1.4.13.1.1. Use prepositions in sentences"
+      ]
+    },
+    {
+      "unit": "Unit 4: Structure",
+      "topic_title": "1.4.14. Phrasal Verbs: Phrasal Verbs",
+      "specific_outcomes": [
+        "1.4.14.1.1. Use phrasal verbs in sentences"
+      ]
+    },
+    {
+      "unit": "Unit 4: Structure",
+      "topic_title": "1.4.15. Question Tags: Question Tags and Short Answers",
+      "specific_outcomes": [
+        "1.4.15.1.1. Add question tags to statements"
+      ]
+    },
+    {
+      "unit": "Unit 4: Structure",
+      "topic_title": "1.4.16. Contrast: Use \u2018But\u2019 and \u2018Yet\u2019 in Sentences to Show Contrast",
+      "specific_outcomes": [
+        "1.4.16.1.1. Use \u2018but\u2019 and \u2018yet\u2019 to show contrast in sentences"
+      ]
+    },
+    {
+      "unit": "Unit 4: Structure",
+      "topic_title": "1.4.17. Condition: Types of Condition",
+      "specific_outcomes": [
+        "1.4.17.1.1. Use conditional sentences"
+      ]
+    },
+    {
+      "unit": "Unit 4: Structure",
+      "topic_title": "1.4.17. Condition: Tense Changes in Conditional Clause and Main Clause",
+      "specific_outcomes": [
+        "1.4.17.2.1. Use appropriate tenses in conditional sentences"
+      ]
+    },
+    {
+      "unit": "Unit 4: Structure",
+      "topic_title": "1.4.18. Ability: Expressing Ability",
+      "specific_outcomes": [
+        "1.4.18.1.1. Express ability in sentences"
+      ]
+    },
+    {
+      "unit": "Unit 4: Structure",
+      "topic_title": "1.4.19. The Gerund and Present Participle: Difference between Gerunds and Present Participles",
+      "specific_outcomes": [
+        "1.4.19.1.1. Use gerunds and present participles in sentences"
+      ]
+    },
+    {
+      "unit": "Unit 4: Structure",
+      "topic_title": "1.4.20. Sense Relations: Antonyms",
+      "specific_outcomes": [
+        "1.4.20.1.1. Use Antonyms"
+      ]
+    },
+    {
+      "unit": "Unit 4: Structure",
+      "topic_title": "1.4.20. Sense Relations: Synonyms",
+      "specific_outcomes": [
+        "1.4.20.2.1. Use Synonyms"
+      ]
+    },
+    {
+      "unit": "Unit 4: Structure",
+      "topic_title": "1.4.20. Sense Relations: Homonyms",
+      "specific_outcomes": [
+        "1.4.20.3.1. Use Homonyms"
+      ]
+    },
+    {
+      "unit": "Unit 4: Structure",
+      "topic_title": "1.4.20. Sense Relations: Homophones",
+      "specific_outcomes": [
+        "1.4.20.4.1. Use Homophones"
+      ]
+    },
+    {
+      "unit": "Unit 5: Summary",
+      "topic_title": "1.5.1. Introduction to Summary: Types of Summaries",
+      "specific_outcomes": [
+        "1.5.1.1.1. Identify types of summaries"
+      ]
+    },
+    {
+      "unit": "Unit 5: Summary",
+      "topic_title": "1.5.1. Introduction to Summary: Title Summary",
+      "specific_outcomes": [
+        "1.5.1.2.1. Choose best title summary"
+      ]
+    },
+    {
+      "unit": "Unit 5: Summary",
+      "topic_title": "1.5.1. Introduction to Summary: Sentence Summary",
+      "specific_outcomes": [
+        "1.5.1.3.1. Choose the best sentence summary"
+      ]
+    },
+    {
+      "unit": "Unit 5: Summary",
+      "topic_title": "1.5.1. Introduction to Summary: Paragraph Summary",
+      "specific_outcomes": [
+        "1.5.1.4.1. Choose the best paragraph summary"
+      ]
+    },
+    {
+      "unit": "Unit 5: Summary",
+      "topic_title": "1.5.2. Abbreviations: Types of Abbreviations",
+      "specific_outcomes": [
+        "1.5.2.1.1. Apply abbreviations in writing"
+      ]
+    },
+    {
+      "unit": "Unit 5: Summary",
+      "topic_title": "1.5.3. Short Messages: Short Message System (SMS)",
+      "specific_outcomes": [
+        "1.5.3.1.1. Use short message system in summary"
+      ]
+    },
+    {
+      "unit": "Unit 5: Summary",
+      "topic_title": "1.5.4. Advertisements: Types of Advertisements",
+      "specific_outcomes": [
+        "1.5.4.1.1. Write advertisements"
+      ]
+    },
+    {
+      "unit": "Unit 5: Summary",
+      "topic_title": "1.5.5. Note Summary: Types of Note Summaries",
+      "specific_outcomes": [
+        "1.5.5.1.1. Write Note Summaries"
+      ]
+    },
+    {
+      "unit": "Unit 5: Summary",
+      "topic_title": "1.5.6. Tabulation: Tabulation Skills",
+      "specific_outcomes": [
+        "1.5.6.1.1. Apply tabulation skills"
+      ]
+    }
+  ]
+}

@@ -11,7 +11,7 @@ load_dotenv()
 from api.routes import router as api_router
 from api.teacher_routes import router as teacher_router
 from api.student_routes import router as student_router
-
+from api.admin_routes import router as admin_router # 👈 Import this
 # ✅ FIX: Import the missing Schemes Router
 # (Assuming your file is in 'routers/schemes.py' based on your previous snippets)
 # If it is in 'api/schemes.py', change this line accordingly.
@@ -60,6 +60,7 @@ app.include_router(api_router, prefix="/api/v1")
 app.include_router(teacher_router, prefix="/api/v1") 
 app.include_router(student_router, prefix="/api/v1")
 app.include_router(schemes_router, prefix="/api/v1", tags=["Schemes"])
+app.include_router(admin_router, prefix="/api/v1/admin", tags=["Admin"]) # 👈 Add this
 # 7. Health Check
 @app.get("/")
 def health_check():

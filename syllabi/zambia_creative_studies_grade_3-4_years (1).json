@@ -1,0 +1,178 @@
+{
+  "meta": {
+    "curriculum": "Zambia",
+    "grade": "3-4 years",
+    "subject": "Creative And Technology Studies"
+  },
+  "topics": [
+    {
+      "unit": "0.1.1 SAFETY",
+      "topic_title": "0.1.1.1 Safety in the Environment",
+      "specific_outcomes": [
+        "0.1.1.1.1 Practise safety in the environment"
+      ]
+    },
+    {
+      "unit": "0.1.2 HYGIENE",
+      "topic_title": "0.1.2.1 Food Hygiene",
+      "specific_outcomes": [
+        "0.1.2.1.1 Practise food hygiene"
+      ]
+    },
+    {
+      "unit": "0.1.2 HYGIENE",
+      "topic_title": "0.1.2.2 Personal Hygiene",
+      "specific_outcomes": [
+        "0.1.2.2.1 Practisei personal hygiene"
+      ]
+    },
+    {
+      "unit": "0.1.2 HYGIENE",
+      "topic_title": "0.1.2.3 Environmental Hygiene",
+      "specific_outcomes": [
+        "0.1.2.3.1 Care for the environment"
+      ]
+    },
+    {
+      "unit": "0.1.3 TOOLS",
+      "topic_title": "0.1.3.1 Hand Tools",
+      "specific_outcomes": [
+        "0.1.3.1.1 Use tools found in the immediate environment"
+      ]
+    },
+    {
+      "unit": "0.1.4. DRAMA",
+      "topic_title": "0.1.4.1 Role Play",
+      "specific_outcomes": [
+        "0.1.4.1.1 Perform various roles"
+      ]
+    },
+    {
+      "unit": "0.1.5. LIGHT",
+      "topic_title": "0.1.5.1 Sources of Light",
+      "specific_outcomes": [
+        "0.1.5.1.1 Utilise sources of light to solve problems"
+      ]
+    },
+    {
+      "unit": "0.1.6 INFORMATION AND COMMUNICATION TECHNOLOGY (ICT) DEVICES",
+      "topic_title": "0.1.6.1 ICT Devices",
+      "specific_outcomes": [
+        "0.1.6.1.1 Operate ICT devices in the locality"
+      ]
+    },
+    {
+      "unit": "0.1.7 FOOD",
+      "topic_title": "0.1.7.1 Types of Food",
+      "specific_outcomes": [
+        "0.1.7.1.1 Sort different types of food according to the characteristics"
+      ]
+    },
+    {
+      "unit": "0.1.8 MOTOR DEVELOPMENT",
+      "topic_title": "0.1.8.1 Gross Motor (Loco-motor)",
+      "specific_outcomes": [
+        "0.1.8.1.1 Develop loco motor skills"
+      ]
+    },
+    {
+      "unit": "0.1.9 MUSIC AND DANCE.",
+      "topic_title": "0.1.9.1 Music and Dance",
+      "specific_outcomes": [
+        "0.1.9.1.1 Explore different types of music and dance"
+      ]
+    },
+    {
+      "unit": "0.1.10 CRAFTS",
+      "topic_title": "0.1.10.1 Paper Crafts",
+      "specific_outcomes": [
+        "0.1.10.1.1 Make paper craft."
+      ]
+    },
+    {
+      "unit": "0.1.11 MOTOR DEVELOPMENT",
+      "topic_title": "0.1.11.1 Locomotor Skills",
+      "specific_outcomes": [
+        "0.1.11.1.1 Develop various locomotor kills-"
+      ]
+    },
+    {
+      "unit": "0.1.11 MOTOR DEVELOPMENT",
+      "topic_title": "0.1.11.2 Non-Locomotor",
+      "specific_outcomes": [
+        "0.1.11.2.1 Develop various non locomotor kills"
+      ]
+    },
+    {
+      "unit": "0.1.11 MOTOR DEVELOPMENT",
+      "topic_title": "0.1.11.3 Eye-hand and Eye-foot coordination",
+      "specific_outcomes": [
+        "0.1.11.3.1 Develop Eye-hand and eye-foot coordination skills"
+      ]
+    },
+    {
+      "unit": "0.1.11 MOTOR DEVELOPMENT",
+      "topic_title": "0.1.11.4 Fine motor skills development",
+      "specific_outcomes": [
+        "0.1.11.4.1 Develop Fine motor skills"
+      ]
+    },
+    {
+      "unit": "0.1.12 MUSIC AND DANCES",
+      "topic_title": "0.1.12.1 Rhythm and Movement",
+      "specific_outcomes": [
+        "0.1.12.1.1 Perform Rhythm and Movement"
+      ]
+    },
+    {
+      "unit": "0.1.13 ART",
+      "topic_title": "0.1.13.1 Drawing and Tracing",
+      "specific_outcomes": [
+        "0.1.13.1.1 Draw different lines"
+      ]
+    },
+    {
+      "unit": "0.1.14 CRAFTS",
+      "topic_title": "0.1.14.1 Colours",
+      "specific_outcomes": [
+        "0.1.14.1.1 Colour objects"
+      ]
+    },
+    {
+      "unit": "0.1.14 CRAFTS",
+      "topic_title": "0.1.14.2 Patterns",
+      "specific_outcomes": [
+        "0.1.14.2.1 Make simple patterns"
+      ]
+    },
+    {
+      "unit": "0.1.14 CRAFTS",
+      "topic_title": "0.1.14.3 Threading",
+      "specific_outcomes": [
+        "0.1.14.3.1 Thread different items"
+      ]
+    },
+    {
+      "unit": "0.1.14 CRAFTS",
+      "topic_title": "0.1.14.4 Weaving",
+      "specific_outcomes": [
+        "0.1.14.4.1 Weave different items"
+      ]
+    },
+    {
+      "unit": "0.1.14 CRAFTS",
+      "topic_title": "0.1.14.5 Modelling and Moulding",
+      "specific_outcomes": [
+        "0.1.14.5.1 Make different artifacts"
+      ]
+    },
+    {
+      "unit": "0.1.15 GAMES",
+      "topic_title": "0.1.15.1 Games",
+      "specific_outcomes": [
+        "0.1.15.1.1 Play traditional games",
+        "0.1.15.1.2 Play conventional games"
+      ]
+    }
+  ]
+}

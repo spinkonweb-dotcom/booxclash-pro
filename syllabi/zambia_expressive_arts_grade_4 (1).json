@@ -1,0 +1,120 @@
+{
+  "meta": {
+    "curriculum": "Zambia",
+    "grade": "4",
+    "subject": "Expressive Arts"
+  },
+  "topics": [
+    {
+      "unit": "4.1",
+      "topic_title": "SAFETY AND HEALTH",
+      "page_number": 2,
+      "specific_outcomes": [
+        "Use appropriate attire and tools",
+        "Compose health related songs"
+      ]
+    },
+    {
+      "unit": "4.2",
+      "topic_title": "MOVEMENT",
+      "page_number": 2,
+      "specific_outcomes": [
+        "Perform structured movements",
+        "Display balancing kills using various equipment"
+      ]
+    },
+    {
+      "unit": "4.3",
+      "topic_title": "DRAWING AND PAINTING",
+      "page_number": 2,
+      "specific_outcomes": [
+        "Draw different lines",
+        "Draw different objects",
+        "Mix two primary colours",
+        "Identify secondary colours",
+        "Paint from nature",
+        "Create imaginative composition in colour."
+      ]
+    },
+    {
+      "unit": "4.4",
+      "topic_title": "NOTATION",
+      "page_number": 3,
+      "specific_outcomes": [
+        "Perform musical notes",
+        "Compose simple rhythmic pattern",
+        "Perform tonic solfa (singing only)"
+      ]
+    },
+    {
+      "unit": "4.5",
+      "topic_title": "ZAMBIAN MUSIC",
+      "page_number": 3,
+      "specific_outcomes": [
+        "Perform Zambian authentic traditional music"
+      ]
+    },
+    {
+      "unit": "4.6",
+      "topic_title": "HEALTH AND FITNESS MANAGEMENT",
+      "page_number": 4,
+      "specific_outcomes": [
+        "Demonstrate developmental activities",
+        "Perform tumbling",
+        "Perform stunt activities"
+      ]
+    },
+    {
+      "unit": "4.7",
+      "topic_title": "SPORTS SKILLS DEVELOPMENT",
+      "page_number": 4,
+      "specific_outcomes": [
+        "Practise ball games"
+      ]
+    },
+    {
+      "unit": "4.8",
+      "topic_title": "SWIMMING",
+      "page_number": 4,
+      "specific_outcomes": [
+        "Demonstrate simple swimming skills",
+        "Perform unskilled strokes",
+        "Play group games"
+      ]
+    },
+    {
+      "unit": "4.9",
+      "topic_title": "PATTERNS",
+      "page_number": 5,
+      "specific_outcomes": [
+        "Design motifs",
+        "Make repeat patterns",
+        "Create patterns using natural motifs"
+      ]
+    },
+    {
+      "unit": "4.10",
+      "topic_title": "CRAFTS",
+      "page_number": 5,
+      "specific_outcomes": [
+        "Make various paper items",
+        "Produce items using weaving techniques",
+        "Demonstrate various plaiting techniques",
+        "Make items using knotting techniques",
+        "Make objects using clay/plasticine",
+        "Make objects using papier machè pulp",
+        "Construct objects",
+        "Make pictures using mosaic technique"
+      ]
+    },
+    {
+      "unit": "4.11",
+      "topic_title": "LETTERING AND POSTER WORK",
+      "page_number": 7,
+      "specific_outcomes": [
+        "Design letters",
+        "Design posters based on different themes"
+      ]
+    }
+  ]
+}

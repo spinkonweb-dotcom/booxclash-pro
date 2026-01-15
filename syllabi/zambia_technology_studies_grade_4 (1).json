@@ -1,0 +1,185 @@
+{
+  "meta": {
+    "curriculum": "Zambia",
+    "grade": "4",
+    "subject": "Technology Studies"
+  },
+  "topics": [
+    {
+      "unit": "4.1 INTRODUCTION TO TECHNOLOGY STUDIES",
+      "topic_title": "4.1.1 Career Prospects in Technology Studies",
+      "page_number": 14,
+      "specific_outcomes": [
+        "4.1.1.1 Explore career prospects in Technology Studies"
+      ]
+    },
+    {
+      "unit": "4.2 SAFETY",
+      "topic_title": "4.2.1 Personal Safety",
+      "page_number": 14,
+      "specific_outcomes": [
+        "4.2.1.1 Apply safety precautions in a work environment"
+      ]
+    },
+    {
+      "unit": "4.3 WORD PROCESSING",
+      "topic_title": "4.3.1 Introduction to Word Processing",
+      "page_number": 14,
+      "specific_outcomes": [
+        "4.3.1.1 Create a word document"
+      ]
+    },
+    {
+      "unit": "4.4 TOOLS AND EQUIPMENT",
+      "topic_title": "4.4.1 Work Bench",
+      "page_number": 15,
+      "specific_outcomes": [
+        "4.4.1.1 Use parts of a work bench"
+      ]
+    },
+    {
+      "unit": "4.4 TOOLS AND EQUIPMENT",
+      "topic_title": "4.4.2 Classification and Use of Tools and Equipment",
+      "page_number": 15,
+      "specific_outcomes": [
+        "4.4.2.1 Use tools and equipment to make products"
+      ]
+    },
+    {
+      "unit": "4.5 MATERIALS",
+      "topic_title": "4.5.1 Joining of Materials",
+      "page_number": 16,
+      "specific_outcomes": [
+        "4.5.1.1 Join materials"
+      ]
+    },
+    {
+      "unit": "4.5 MATERIALS",
+      "topic_title": "4.5.2 Finishing Materials",
+      "page_number": 16,
+      "specific_outcomes": [
+        "4.5.2.1 Apply finishes to materials"
+      ]
+    },
+    {
+      "unit": "4.6 PRESENTATION",
+      "topic_title": "4.6.1 Basics of Presentations",
+      "page_number": 16,
+      "specific_outcomes": [
+        "4.6.1.1 Create presentations"
+      ]
+    },
+    {
+      "unit": "4.7 ENERGY",
+      "topic_title": "4.7.1 Electricity",
+      "page_number": 16,
+      "specific_outcomes": [
+        "4.7.1.1 Make electrical Circuits"
+      ]
+    },
+    {
+      "unit": "4.8 SPREAD SHEET",
+      "topic_title": "4.8.1 Basics of Spreadsheet",
+      "page_number": 17,
+      "specific_outcomes": [
+        "4.8.1.1 Use spreadsheet applications"
+      ]
+    },
+    {
+      "unit": "4.9 GRAPHIC COMMUNICATION",
+      "topic_title": "4.9.1 Lettering",
+      "page_number": 18,
+      "specific_outcomes": [
+        "4.9.1.1 Print letters and numbers"
+      ]
+    },
+    {
+      "unit": "4.9 GRAPHIC COMMUNICATION",
+      "topic_title": "4.9.2 Types of Lines",
+      "page_number": 18,
+      "specific_outcomes": [
+        "4.9.2.1 Draw lines used in construction"
+      ]
+    },
+    {
+      "unit": "4.9 GRAPHIC COMMUNICATION",
+      "topic_title": "4.9.3 Angles",
+      "page_number": 18,
+      "specific_outcomes": [
+        "4.9.3.1 Construct angles"
+      ]
+    },
+    {
+      "unit": "4.9 GRAPHIC COMMUNICATION",
+      "topic_title": "4.9.4 Triangles",
+      "page_number": 18,
+      "specific_outcomes": [
+        "4.9.4.1 Construct triangles from given data"
+      ]
+    },
+    {
+      "unit": "4.9 GRAPHIC COMMUNICATION",
+      "topic_title": "4.9.5 Quadrilaterals",
+      "page_number": 19,
+      "specific_outcomes": [
+        "4.9.5.1 Construct quadrilaterals"
+      ]
+    },
+    {
+      "unit": "4.9 GRAPHIC COMMUNICATION",
+      "topic_title": "4.9.6 Circles",
+      "page_number": 19,
+      "specific_outcomes": [
+        "4.9.6.1 Construct circles"
+      ]
+    },
+    {
+      "unit": "4.9 GRAPHIC COMMUNICATION",
+      "topic_title": "4.9.7 Graphic Software",
+      "page_number": 19,
+      "specific_outcomes": [
+        "4.9.7.1 Use graphic software in product design"
+      ]
+    },
+    {
+      "unit": "4.10 TECHNOLOGY",
+      "topic_title": "4.10.1 Technological Innovations",
+      "page_number": 20,
+      "specific_outcomes": [
+        "4.10.1.1 Explore technological Innovations"
+      ]
+    },
+    {
+      "unit": "4.11 CODING",
+      "topic_title": "4.11.1 Block- Based Coding",
+      "page_number": 20,
+      "specific_outcomes": [
+        "4.11.1.1 Use Block-based coding Platforms"
+      ]
+    },
+    {
+      "unit": "4.12 STRUCTURES",
+      "topic_title": "4.12.1 Types of Structures",
+      "page_number": 20,
+      "specific_outcomes": [
+        "4.12.1.1 Classify Structures"
+      ]
+    },
+    {
+      "unit": "4.13 INTERNET",
+      "topic_title": "4.13.1 Internet",
+      "page_number": 20,
+      "specific_outcomes": [
+        "4.13.1.1 Use the Internet"
+      ]
+    },
+    {
+      "unit": "4.14 ENTREPRENEURSHIP",
+      "topic_title": "4.14.1 Business Idea",
+      "page_number": 21,
+      "specific_outcomes": [
+        "4.14.1.1 Develop a business idea"
+      ]
+    }
+  ]
+}

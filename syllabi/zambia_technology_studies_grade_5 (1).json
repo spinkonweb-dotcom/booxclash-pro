@@ -1,0 +1,146 @@
+{
+  "meta": {
+    "curriculum": "Zambia",
+    "grade": "5",
+    "subject": "Technology Studies"
+  },
+  "topics": [
+    {
+      "unit": "5.1 SAFETY",
+      "topic_title": "5.1.1 Care and Maintenance of tools and Equipment",
+      "page_number": 23,
+      "specific_outcomes": [
+        "5.1.1.1 Maintain tools and equipment"
+      ]
+    },
+    {
+      "unit": "5.2 WORD PROCESSING",
+      "topic_title": "5.2.1 Formatting",
+      "page_number": 23,
+      "specific_outcomes": [
+        "5.2.1 Format a word document"
+      ]
+    },
+    {
+      "unit": "5.3 TOOLS AND EQUIPMENT",
+      "topic_title": "5.3.1 Hand tools",
+      "page_number": 23,
+      "specific_outcomes": [
+        "5.3.1.1 Use hand tools to make products"
+      ]
+    },
+    {
+      "unit": "5.4 MATERIALS",
+      "topic_title": "5.4.1 Joining Materials",
+      "page_number": 23,
+      "specific_outcomes": [
+        "5.4.1.1 Join materials"
+      ]
+    },
+    {
+      "unit": "5.5 PRESENTATION",
+      "topic_title": "5.5.1 Multimedia Presentations",
+      "page_number": 24,
+      "specific_outcomes": [
+        "5.5.1.1 Develop multimedia presentations"
+      ]
+    },
+    {
+      "unit": "5.6 ENERGY",
+      "topic_title": "5.6.1 Design Circuits",
+      "page_number": 24,
+      "specific_outcomes": [
+        "5.6.1.1 Construct circuits in series and parallel"
+      ]
+    },
+    {
+      "unit": "5.7 SPREADSHEET",
+      "topic_title": "5.7.1 Addition and Subtraction in Spreadsheet",
+      "page_number": 24,
+      "specific_outcomes": [
+        "5.7.1.1 Perform addition and subtraction in spreadsheet"
+      ]
+    },
+    {
+      "unit": "5.8 GRAPHIC COMMUNICATION",
+      "topic_title": "5.8.1 Polygons",
+      "page_number": 25,
+      "specific_outcomes": [
+        "5.8.1.1 Construct regular polygons"
+      ]
+    },
+    {
+      "unit": "5.8 GRAPHIC COMMUNICATION",
+      "topic_title": "5.8.2",
+      "page_number": 25,
+      "specific_outcomes": [
+        "5.8.2.1 Construct irregular polygons"
+      ]
+    },
+    {
+      "unit": "5.8 GRAPHIC COMMUNICATION",
+      "topic_title": "5.8.3 Pictorial Drawing",
+      "page_number": 25,
+      "specific_outcomes": [
+        "5.8.3.1 Construct objects in pictorial view",
+        "5.8.3.2 Apply Rendering on pictorial drawings"
+      ]
+    },
+    {
+      "unit": "5.8 GRAPHIC COMMUNICATION",
+      "topic_title": "5.8.4 Image Editing tools",
+      "page_number": 26,
+      "specific_outcomes": [
+        "5.8.4.1 Edit images"
+      ]
+    },
+    {
+      "unit": "5.9 TECHNOLOGY",
+      "topic_title": "5.9.1 Sustainable Technology",
+      "page_number": 27,
+      "specific_outcomes": [
+        "5.9.1.1 Use sustainable Technology"
+      ]
+    },
+    {
+      "unit": "5.10 CODING",
+      "topic_title": "5.10.1 Block-Based Coding",
+      "page_number": 27,
+      "specific_outcomes": [
+        "5.10.1.1 Animate situations"
+      ]
+    },
+    {
+      "unit": "5.11 STRUCTURES",
+      "topic_title": "5.11.1 Designing Structures",
+      "page_number": 27,
+      "specific_outcomes": [
+        "5.11.1.1 Make strong and stable structures"
+      ]
+    },
+    {
+      "unit": "5.11 STRUCTURES",
+      "topic_title": "5.11.2 Site Preparation",
+      "page_number": 28,
+      "specific_outcomes": [
+        "5.11.2.1 Prepare a site for construction"
+      ]
+    },
+    {
+      "unit": "5.12 INTERNET",
+      "topic_title": "5.12.1 Online Communication",
+      "page_number": 28,
+      "specific_outcomes": [
+        "5.12.1.1 Use online communication tools responsibly"
+      ]
+    },
+    {
+      "unit": "5.13 ENTREPRENEURSHIP",
+      "topic_title": "5.13.1 Marketing",
+      "page_number": 29,
+      "specific_outcomes": [
+        "5.13.1.1 Design a Marketing plan"
+      ]
+    }
+  ]
+}

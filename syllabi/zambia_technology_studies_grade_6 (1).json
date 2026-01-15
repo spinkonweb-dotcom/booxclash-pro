@@ -1,0 +1,129 @@
+{
+  "meta": {
+    "curriculum": "Zambia",
+    "grade": "6",
+    "subject": "Technology Studies"
+  },
+  "topics": [
+    {
+      "unit": "6.1 SAFETY",
+      "topic_title": "First Aid",
+      "page_number": 31,
+      "specific_outcomes": [
+        "Apply First Aid"
+      ]
+    },
+    {
+      "unit": "6.2 WORD PROCESSING",
+      "topic_title": "Document Collaboration",
+      "page_number": 31,
+      "specific_outcomes": [
+        "Perform collaborative document editing and version control"
+      ]
+    },
+    {
+      "unit": "6.3 TOOLS AND EQUIPMENT",
+      "topic_title": "Building Tools",
+      "page_number": 31,
+      "specific_outcomes": [
+        "Classify building tools"
+      ]
+    },
+    {
+      "unit": "6.4 MATERIALS",
+      "topic_title": "Building Materials",
+      "page_number": 32,
+      "specific_outcomes": [
+        "Classify building Materials"
+      ]
+    },
+    {
+      "unit": "6.4 MATERIALS",
+      "topic_title": "Make bricks",
+      "page_number": 32,
+      "specific_outcomes": [
+        "Make bricks"
+      ]
+    },
+    {
+      "unit": "6.5 PRESENTATION",
+      "topic_title": "Animations",
+      "page_number": 32,
+      "specific_outcomes": [
+        "Create interactive presentations"
+      ]
+    },
+    {
+      "unit": "6.6 ENERGY",
+      "topic_title": "Installation of electrical components",
+      "page_number": 32,
+      "specific_outcomes": [
+        "Install electrical components"
+      ]
+    },
+    {
+      "unit": "6.7 SPREADSHEET",
+      "topic_title": "Multiplication and division in spreadsheet",
+      "page_number": 33,
+      "specific_outcomes": [
+        "Perform multiplication and division in spreadsheet"
+      ]
+    },
+    {
+      "unit": "6.8 GRAPHIC COMMUNICATION",
+      "topic_title": "Orthographic Projection",
+      "page_number": 33,
+      "specific_outcomes": [
+        "Construct Orthographic views"
+      ]
+    },
+    {
+      "unit": "6.8 GRAPHIC COMMUNICATION",
+      "topic_title": "Modeling",
+      "page_number": 33,
+      "specific_outcomes": [
+        "Create 3D models"
+      ]
+    },
+    {
+      "unit": "6.9 DESIGNING",
+      "topic_title": "Product Design",
+      "page_number": 34,
+      "specific_outcomes": [
+        "Design products to solve real life problems"
+      ]
+    },
+    {
+      "unit": "6.10 CODING",
+      "topic_title": "Block Based Coding",
+      "page_number": 34,
+      "specific_outcomes": [
+        "Create simple computer programs"
+      ]
+    },
+    {
+      "unit": "6.11 STRUCTURES",
+      "topic_title": "Building Structures",
+      "page_number": 34,
+      "specific_outcomes": [
+        "Construct buildings"
+      ]
+    },
+    {
+      "unit": "6.12 INTERNET",
+      "topic_title": "Digital Citizenship",
+      "page_number": 34,
+      "specific_outcomes": [
+        "Apply digital citizenship ethics"
+      ]
+    },
+    {
+      "unit": "6.13 ENTREPRENEURSHIP",
+      "topic_title": "Business Plan",
+      "page_number": 35,
+      "specific_outcomes": [
+        "Develop business plans"
+      ]
+    }
+  ]
+}

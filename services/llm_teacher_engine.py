@@ -24,7 +24,6 @@ def calculate_week_dates(start_date_str: str, week_num: int) -> Dict[str, str]:
     """
     try:
         # 1. Clean and Parse Input
-        # Handles 2025-01-13 (ISO) or 13.01.2025 (EU)
         clean_date = start_date_str.replace("/", "-").replace(".", "-")
         
         try:
@@ -33,20 +32,18 @@ def calculate_week_dates(start_date_str: str, week_num: int) -> Dict[str, str]:
             try:
                 start_dt = datetime.strptime(clean_date, "%d-%m-%Y")
             except ValueError:
-                # Fallback to current date if input is garbage, prevents crash
                 start_dt = datetime.now()
 
         # 2. Calculate Range
-        # Week 1 starts on start_dt. Week 2 starts 7 days later.
         week_start = start_dt + timedelta(days=(week_num - 1) * 7)
-        week_end = week_start + timedelta(days=4) # Friday is +4 days from Monday
+        week_end = week_start + timedelta(days=4) 
         
         # 3. Format Output
         return {
             "range_display": f"({week_start.strftime('%d.%m.%Y')} - {week_end.strftime('%d.%m.%Y')})",
             "start_iso": week_start.strftime("%Y-%m-%d"),
             "end_iso": week_end.strftime("%Y-%m-%d"),
-            "month": week_start.strftime("%B") # ✅ Returns full month name (e.g., January)
+            "month": week_start.strftime("%B") 
         }
     except Exception as e:
         print(f"⚠️ Date Calc Error: {e}")
@@ -79,12 +76,12 @@ def extract_json_string(text: str) -> str:
 # 1. PROFESSIONAL SCHEME GENERATOR
 # =====================================================
 async def generate_scheme_with_ai(
-    syllabus_data: List[dict], # ✅ FIX: Added this argument to match the route call
+    syllabus_data: List[dict], 
     subject: str,
     grade: str,
     term: str,
     num_weeks: int,
-    start_date: str = "2025-01-13" 
+    start_date: str = "2026-01-13" 
 ) -> List[dict]:
     
     print(f"\n📘 [Scheme Generator] Processing Professional Request for {subject} Grade {grade}...")
@@ -112,7 +109,6 @@ async def generate_scheme_with_ai(
     # Strict Slicing
     if total_units > 0:
         term_syllabus_data = syllabus_data[start_idx : min(end_idx, total_units)]
-        # Fallback if slice is empty (e.g. slight math error on small lists)
         if not term_syllabus_data:
             term_syllabus_data = syllabus_data
     else:
@@ -120,17 +116,16 @@ async def generate_scheme_with_ai(
 
     model = get_model()
 
-    # 3. PREPARE DATA SUMMARY (Include Page Numbers)
+    # 3. PREPARE DATA SUMMARY
     syllabus_summary = []
     for t in term_syllabus_data:
         if isinstance(t, dict):
             unit_code = t.get("unit") or t.get("title") or "Unknown"
-            # Extract page if available, default to empty
             page_ref = t.get("page") or t.get("page_number") or "" 
             
             syllabus_summary.append({
                 "unit": unit_code,
-                "page": page_ref, # Pass this to AI
+                "page": page_ref, 
                 "content": t.get("subtopics") or t.get("content") or [],
                 "outcomes": t.get("learning_outcomes") or t.get("outcomes") or ""
             })
@@ -149,20 +144,16 @@ async def generate_scheme_with_ai(
 
     INSTRUCTIONS:
     1. **Dates**: DO NOT calculate dates. Just output "Week 1", "Week 2", etc.
-    
     2. **Content Details (STRICT)**: 
         - Content MUST be limited to **EXACTLY 3 key points**.
         - NO asterisks (*), bolding, or symbols. Plain text only.
-
     3. **Outcomes (STRICT)**:
         - Provide **EXACTLY TWO** specific outcomes.
         - Start with "Learners should be able to...".
-        
     4. **References (CRITICAL)**:
         - You MUST use the "unit" and "page" provided in the SYLLABUS DATA above.
         - Format: "Syllabus Unit [X] Pg [Y]".
         - Also include: "Pupil's Book".
-        
     5. **Revision**: Week {num_weeks} MUST be "Revision and Assessments".
 
     OUTPUT FORMAT:
@@ -181,7 +172,6 @@ async def generate_scheme_with_ai(
         json_str = extract_json_string(response.text)
         data = json.loads(json_str)
 
-        # Handle nested JSON scenarios
         if isinstance(data, dict):
             for key in ["scheme", "weeks", "plan", "data"]:
                 if key in data and isinstance(data[key], list):
@@ -190,23 +180,20 @@ async def generate_scheme_with_ai(
         
         if not isinstance(data, list): return []
 
-        # ✅ 5. POST-PROCESSING: INJECT PYTHON CALCULATED DATES & MONTHS
+        # 5. POST-PROCESSING
         cleaned_data = []
         for i, item in enumerate(data):
             week_num = i + 1
-            if week_num > num_weeks: break # Safety cap
+            if week_num > num_weeks: break 
 
-            # Calculate the clean date data server-side
             date_info = calculate_week_dates(start_date, week_num)
             
-            # Inject calculated data
-            item['month'] = date_info['month'] # ✅ FIX: Month Name
+            item['month'] = date_info['month'] 
             item['week'] = f"Week {week_num} {date_info['range_display']}"
             item['week_number'] = week_num
             item['date_start'] = date_info['start_iso']
             item['date_end'] = date_info['end_iso']
             
-            # Ensure outcomes exist
             if 'outcomes' not in item or not item['outcomes']:
                  item['outcomes'] = [f"Learners should be able to understand {item.get('topic', 'the topic')}."]
 
@@ -290,14 +277,16 @@ async def generate_specific_lesson_plan(
     teacher_name: str = "Class Teacher",
     school_name: str = "Primary School"
 ) -> Dict[str, Any]:
-    print(f"\n📝 [Lesson Generator] Preparing Learner-Centered Plan for '{subtopic}'...")
+    print(f"\n📝 [Lesson Generator] Preparing Plan for {teacher_name} at {school_name}...")
     model = get_model()
 
+    # ✅ UPDATED PROMPT: STRICTLY ENFORCES REAL NAMES & BANS PLACEHOLDERS
     prompt = f"""
     Act as a professional modern teacher in Zambia. Create a Lesson Plan.
     
     CONTEXT:
-    - Teacher: {teacher_name}, School: {school_name}
+    - Teacher Name: "{teacher_name}" (STRICT RULE: Use this exact name. DO NOT use [Your Name] or [Teacher Name])
+    - School Name: "{school_name}" (STRICT RULE: Use this exact name. DO NOT use [School Name])
     - Grade: {grade}, Subject: {subject}
     - Topic: {theme}, Sub-topic: {subtopic}
     - Date: {date}, Time: {time_start}-{time_end}
@@ -305,15 +294,13 @@ async def generate_specific_lesson_plan(
 
     STRICT METHODOLOGY RULES (LEARNER-CENTERED):
     1. **Role**: The teacher is a **FACILITATOR**, not a lecturer.
-    2. **Methods**: Use ONLY learner-centered methods (e.g., Think-Pair-Share, Group Inquiry, Peer Teaching, Gallery Walk, Hands-on Activity, Brainstorming).
-    3. **Teacher Activity**: Use verbs like "Facilitate", "Guide", "Monitor", "Support", "Prompt".
-    4. **Learner Activity**: Learners must be DOING, DISCUSSING, or CREATING.
-
+    2. **Methods**: Use ONLY learner-centered methods (e.g., Think-Pair-Share, Group Inquiry).
+    3. **Teacher Activity**: Use verbs like "Facilitate", "Guide", "Monitor".
+    
     STRICT CONTENT RULES:
     1. **Format**: Use **BULLET POINTS (•)**.
-    2. **Summarize**: Keep content concise and actionable.
-    3. **Structure**: Standard Zambian format (Rationale, Prerequisite, etc.).
-    4. **JSON Safety**: Use \\n for newlines inside strings.
+    2. **No Placeholders**: If data is missing, INFER realistic details. NEVER output brackets like [ ].
+    3. **JSON Safety**: Use \\n for newlines inside strings.
 
     OUTPUT JSON (Strict structure):
     {{
@@ -334,23 +321,23 @@ async def generate_specific_lesson_plan(
         {{ 
             "stage": "INTRODUCTION", 
             "time": "5 min", 
-            "teacherActivity": "• Prompt learners to recall [Prior Concept].\\n• Pose a provoking question about {subtopic}.\\n• Outline lesson objectives.", 
-            "learnerActivity": "• Brainstorm answers in pairs.\\n• Share ideas with the class.\\n• Identify lesson goals.", 
-            "method": "Think-Pair-Share & Brainstorming" 
+            "teacherActivity": "• Prompt learners to recall...", 
+            "learnerActivity": "• Brainstorm answers...", 
+            "method": "Think-Pair-Share" 
         }},
         {{ 
             "stage": "DEVELOPMENT", 
             "time": "30 min", 
-            "teacherActivity": "• Organize learners into small groups.\\n• Provide materials and instructions for the task.\\n• Move around to monitor and guide groups.\\n• Facilitate a mini-plenary for groups to share progress.", 
-            "learnerActivity": "• Work in groups to solve/create [Task].\\n• Discuss findings with peers.\\n• Peer-assess other groups' work.", 
-            "method": "Group Inquiry & Hands-on Activity" 
+            "teacherActivity": "• Organize learners...", 
+            "learnerActivity": "• Work in groups...", 
+            "method": "Group Inquiry" 
         }},
         {{ 
             "stage": "CONCLUSION", 
             "time": "5 min", 
-            "teacherActivity": "• Facilitate a final reflection.\\n• Ask learners to state one new thing learned.\\n• Assign practical homework.", 
-            "learnerActivity": "• Reflect on the learning process.\\n• Share key takeaways.\\n• Record homework task.", 
-            "method": "Reflection & Class Discussion" 
+            "teacherActivity": "• Facilitate reflection...", 
+            "learnerActivity": "• Reflect on learning...", 
+            "method": "Class Discussion" 
         }}
       ]
     }}
@@ -363,26 +350,3 @@ async def generate_specific_lesson_plan(
     except Exception as e:
         print(f"❌ [Lesson Generator] Failed: {e}")
         return {}
-
-# =====================================================
-# 4. STUDENT TOOLS
-# =====================================================
-async def generate_quiz_json(topic: str, grade: str) -> Dict[str, Any]:
-    model = get_model()
-    try:
-        response = await model.generate_content_async(f"Quiz for {topic} Grade {grade}. JSON: {{'questions':[]}}")
-        return json.loads(extract_json_string(response.text))
-    except: return {"questions": []}
-
-async def generate_builder_json(goal: str, grade: str) -> Dict[str, Any]:
-    return {}
-
-async def generate_realistic_image(query: str) -> str:
-    return f"https://image.pollinations.ai/prompt/{re.sub(r'[^a-zA-Z0-9 ]', '', query)}?width=800&height=600&model=flux&nologo=true"
-
-async def optimize_search_term(user_query: str, subject: str) -> str:
-    model = get_model()
-    try:
-        response = await model.generate_content_async(f"Return one searchable noun for '{user_query}' in {subject}.")
-        return response.text.strip()
-    except: return user_query
