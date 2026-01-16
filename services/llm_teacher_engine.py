@@ -349,31 +349,4 @@ async def generate_specific_lesson_plan(
         return json.loads(json_str, strict=False)
     except Exception as e:
         print(f"❌ [Lesson Generator] Failed: {e}")
-<<<<<<< HEAD
         return {}
-=======
-        return {}
-
-# =====================================================
-# 4. STUDENT TOOLS
-# =====================================================
-async def generate_quiz_json(topic: str, grade: str) -> Dict[str, Any]:
-    model = get_model()
-    try:
-        response = await model.generate_content_async(f"Quiz for {topic} Grade {grade}. JSON: {{'questions':[]}}")
-        return json.loads(extract_json_string(response.text))
-    except: return {"questions": []}
-
-async def generate_builder_json(goal: str, grade: str) -> Dict[str, Any]:
-    return {}
-
-async def generate_realistic_image(query: str) -> str:
-    return f"https://image.pollinations.ai/prompt/{re.sub(r'[^a-zA-Z0-9 ]', '', query)}?width=800&height=600&model=flux&nologo=true"
-
-async def optimize_search_term(user_query: str, subject: str) -> str:
-    model = get_model()
-    try:
-        response = await model.generate_content_async(f"Return one searchable noun for '{user_query}' in {subject}.")
-        return response.text.strip()
-    except: return user_query
->>>>>>> 6731a54bc201c7f32c28e284b3a3042a961c5125
