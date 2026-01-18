@@ -12,3 +12,4 @@ google-genai
 pinecone
 httpx
 firebase_admin
+reportlab
