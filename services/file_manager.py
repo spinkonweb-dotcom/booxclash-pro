@@ -1,31 +1,59 @@
 from services.firebase_setup import db
 from google.cloud.firestore import Query
 from datetime import datetime
-
-# ❌ DELETE ANY LINES HERE THAT SAY: from services.file_manager import ...
+from typing import Union, List, Dict, Any
 
 # ==========================================
-# 1. SCHEMES OF WORK
+# 1. SCHEMES OF WORK (NORMALIZED SAVING)
 # ==========================================
-def save_generated_scheme(uid: str, subject: str, grade: str, term: str, data: list):
+def save_generated_scheme(uid: str, subject: str, grade: str, term: str, data: Union[List, Dict]):
     """
-    Saves the generated scheme to Firestore immediately after generation.
+    Saves the generated scheme to Firestore.
+    
+    CRITICAL FIX: 
+    Checks if 'data' is a Dict (New Format) or List (Old Format).
+    Extracts the actual weeks list into 'schemeData' so the frontend always gets an Array.
     """
     try:
         doc_ref = db.collection("generated_schemes").document()
         
+        # --- DATA NORMALIZATION ---
+        final_scheme_list = []
+        intro_info = {}
+
+        if isinstance(data, list):
+            # Case A: It's already just a list of weeks
+            final_scheme_list = data
+        elif isinstance(data, dict):
+            # Case B: It's an object { "intro_info": ..., "scheme_weeks": ... }
+            # We try multiple common keys to find the list
+            final_scheme_list = (
+                data.get("weeks") or 
+                data.get("scheme_weeks") or 
+                data.get("schemeData") or 
+                []
+            )
+            intro_info = data.get("intro_info") or {}
+        
+        # --- SAVE TO FIRESTORE ---
         doc_ref.set({
             "userId": uid,
             "schoolName": "Unknown School", 
             "subject": subject,
             "grade": grade,
             "term": term,
-            "schemeData": data,
+            
+            # ✅ ALWAYS SAVES AS AN ARRAY (Fixes frontend .find error)
+            "schemeData": final_scheme_list,
+            
+            # ✅ SAVES METADATA SEPARATELY
+            "introInfo": intro_info,
+            
             "createdAt": datetime.now(),
             "type": "Scheme of Work",
             "source": "backend_auto_save"
         })
-        print(f"💾 Scheme saved to Firestore ID: {doc_ref.id}")
+        print(f"💾 Scheme normalized and saved to Firestore ID: {doc_ref.id}")
         return True
     except Exception as e:
         print(f"❌ Firestore Save Error: {e}")
@@ -52,6 +80,7 @@ def load_generated_scheme(uid: str, subject: str, grade: str, term: str):
         
         for doc in docs:
             data = doc.to_dict()
+            # Since we fixed the save function, this will now reliably return a List
             return data.get("schemeData", []) 
             
         print("⚠️ Scheme not found in Firestore.")

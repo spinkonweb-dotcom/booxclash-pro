@@ -250,63 +250,121 @@ async def generate_scheme_with_ai(
         return {"intro_info": {}, "weeks": []}
 
 # =====================================================
-# 2. WEEKLY PLAN GENERATOR
+# 🛠️ HELPER: EXTRACT SCHEME DETAILS (Enhanced for CBC)
 # =====================================================
-async def generate_weekly_plan_from_scheme(
-    school: str, subject: str, grade: str, term: str, 
-    week_number: int, days: int, start_date: str, scheme_data: List[dict] = None
-) -> Dict[str, Any]:
-    print(f"\n🗓️ [Weekly Generator] Request: Week {week_number}...")
+def extract_scheme_details(scheme_data: List[dict], week_number: int) -> Dict[str, Any]:
+    """
+    Finds the week and returns ALL the rich CBC data found in the DB.
+    """
+    print(f"🔍 [Scheme Extractor] Looking for Week {week_number}...")
     
-    if not scheme_data: return {"days": []}
+    if not scheme_data:
+        return {"found": False, "topic": f"Week {week_number}", "content": [], "outcomes": [], "activities": [], "resources": [], "methods": [], "refs": []}
+
     week_key = str(week_number).strip()
     
-    # 1. Find the week in the scheme data
+    # 1. FIND THE WEEK
     found_week = next((
         item for item in scheme_data 
         if str(item.get("week_number", "")).strip() == week_key or 
            str(item.get("week", "")).lower().replace("week", "").strip().split()[0] == week_key
     ), None)
 
-    target_unit = "N/A"
-    
-    if found_week:
-        target_topic = found_week.get("topic")
-        target_content = found_week.get("content", [])
-        target_outcomes = found_week.get("specific_competences", [])
-        target_ref = found_week.get("references", ["Syllabus"])
-        
-        # 2. Extract Unit Number
-        unit_match = re.search(r"(?:Unit\s*|Topic\s*)?(\d+(?:\.\d+)*)", target_topic, re.IGNORECASE)
-        if unit_match:
-            target_unit = unit_match.group(1)
-        
-    else:
-        target_topic = f"Week {week_number} Content"
-        target_content = []
-        target_outcomes = []
-        target_ref = ["Syllabus"]
+    if not found_week:
+        print(f"❌ [Scheme Extractor] Week {week_number} not found.")
+        return {"found": False}
 
-    model = get_model()
+    # 2. EXTRACT CORE IDENTIFIERS
+    # We prioritize 'unit' -> 'topic' -> 'theme' to get the best "Component" title
+    topic = found_week.get("topic") or "Topic Not Set"
+    unit = found_week.get("unit") or "" 
+    component_title = unit if unit else topic # Use Unit (e.g. Unit 2.1) as the main component title if available
+
+    # 3. EXTRACT LISTS (Handle strings that need splitting or pre-existing lists)
+    def ensure_list(val):
+        if isinstance(val, list): return val
+        if isinstance(val, str) and val: return [val]
+        return []
+
+    # CBC Specific Fields
+    specific_competences = ensure_list(found_week.get("specific_competences") or found_week.get("outcomes"))
+    prescribed_competences = ensure_list(found_week.get("prescribed_competences") or found_week.get("competences"))
     
+    # Pedagogy Fields
+    content = ensure_list(found_week.get("content"))
+    learning_activities = ensure_list(found_week.get("learning_activities") or found_week.get("activities"))
+    methods = ensure_list(found_week.get("methods") or found_week.get("strategies"))
+    resources = ensure_list(found_week.get("resources"))
+    assessment = ensure_list(found_week.get("assessment"))
+    refs = ensure_list(found_week.get("references") or found_week.get("reference") or ["Syllabus"])
+
+    print(f"✅ [Scheme Extractor] Found: {component_title} | {len(specific_competences)} competencies | {len(learning_activities)} activities")
+
+    return {
+        "found": True,
+        "component": component_title, # e.g. "Unit 2.1: Sets"
+        "topic": topic,               # e.g. "Sets"
+        "subtopic": found_week.get("subtopic", ""),
+        
+        # Lists
+        "prescribed_competences": prescribed_competences,
+        "specific_competences": specific_competences,
+        "content": content,
+        "learning_activities": learning_activities,
+        "methods": methods,
+        "resources": resources,
+        "assessment": assessment,
+        "refs": refs
+    }
+
+# =====================================================
+# 2. WEEKLY PLAN GENERATOR (Context-Aware)
+# =====================================================
+async def generate_weekly_plan_from_scheme(
+    school: str, subject: str, grade: str, term: str, 
+    week_number: int, days: int, start_date: str, scheme_data: List[dict] = None
+) -> Dict[str, Any]:
+    
+    print(f"\n🗓️ [Weekly Generator] Request: Week {week_number}...")
+    
+    # 1. GET RICH DATA
+    details = extract_scheme_details(scheme_data, week_number)
+    
+    # Fallback if scheme is empty
+    if not details["found"]:
+         details["component"] = f"Week {week_number} Content"
+         details["specific_competences"] = ["Learners should be able to understand the topic."]
+
+    model = get_model() # Your Gemini/Model getter
+    
+    # 2. PROMPT
+    # We feed the lists directly into the prompt so the AI copies them.
     prompt = f"""
     Act as a Senior Teacher in Zambia. Create a Weekly Lesson Plan for {days} days.
     
     CONTEXT:
-    - Subject: {subject}, Grade: {grade}, Term: {term}
-    - Week: {week_number}
-    - MAIN TOPIC: "{target_topic}"
-    - UNIT NUMBER: "{target_unit}"
-    - OUTCOMES: {json.dumps(target_outcomes)}
-    - CONTENT: {json.dumps(target_content)}
-    - REFS: {json.dumps(target_ref)}
+    - Subject: {subject}, Grade: {grade}, Term: {term}, Week: {week_number}
+    
+    ⚠️ CRITICAL: YOU MUST USE THE FOLLOWING SCHEME DATA EXACTLY. DO NOT HALLUCINATE NEW CONTENT.
+    
+    1. COMPONENT / UNIT: "{details['component']}"
+    2. TOPIC: "{details['topic']}"
+    3. PRESCRIBED COMPETENCE: {json.dumps(details['prescribed_competences'])}
+    4. SPECIFIC COMPETENCES (Outcomes): {json.dumps(details['specific_competences'])}
+    5. CONTENT (Scope): {json.dumps(details['content'])}
+    6. LEARNING ACTIVITIES: {json.dumps(details['learning_activities'])}
+    7. METHODS (Strategies): {json.dumps(details['methods'])}
+    8. RESOURCES: {json.dumps(details['resources'])}
+    9. REFERENCES: {json.dumps(details['refs'])}
 
     INSTRUCTIONS:
-    1. **Format**: Create entries for {days} days.
-    2. **Topic Column**: You MUST set the "topic" field to exactly "{target_topic}".
-    3. **Specific Competence**: You MUST preserve the numbering from the outcomes provided.
-    4. **Subtopic**: Break down the content into specific daily lessons.
-    5. **Unit Column**: Use "{target_unit}".
+    - **Component Column**: Use "{details['component']}" for every day.
+    - **Topic/Subtopic**: Break the "CONTENT" list above into {days} logical subtopics (one for each day).
+    - **Specific Competence**: Copy the relevant competence from the list above that matches that day's subtopic.
+    - **Learning Activity**: Select 1-2 activities from the "LEARNING ACTIVITIES" list above that fit the day.
+    - **Strategies**: Use the "METHODS" list above.
+    - **T/L Resources**: Use the "RESOURCES" list above.
+    - **Expected Standard**: Write a short sentence summarizing what the learner will achieve that day (e.g., "Learners correctly identify...").
 
     OUTPUT JSON ONLY:
     {{
@@ -314,20 +372,22 @@ async def generate_weekly_plan_from_scheme(
       "days": [
         {{
           "day": "Monday", 
-          "unit": "{target_unit}",
-          "topic": "{target_topic}", 
-          "subtopic": "Sub-topic Title", 
-          "specific_competence": "4.1.1 Learners should be able to...", 
+          "component": "{details['component']}", 
+          "topic": "{details['topic']}", 
+          "subtopic": "1.1.1 [Subtopic Name]", 
+          "specific_competence": "Learners should be able to...", 
+          "scope_of_lesson": "Brief summary of content...",
           "learning_activity": "Learners will...", 
-          "resources": ["Textbook", "Chart"], 
-          "strategies": ["Group Work"],
-          "reference": "Syllabus Pg 12"
+          "expected_standard": "Learners correctly...",
+          "resources": ["Item 1", "Item 2"], 
+          "strategies": ["Group Work", "Demonstration"],
+          "reference": "{details['refs'][0] if details['refs'] else 'Syllabus'}"
         }}
       ]
     }}
     """
+    
     try:
-        # ✅ FIX: Force JSON response
         response = await model.generate_content_async(
             prompt,
             generation_config={"response_mime_type": "application/json"}
@@ -338,7 +398,7 @@ async def generate_weekly_plan_from_scheme(
         return {"days": []}
 
 # =====================================================
-# 3. DETAILED LESSON PLANNER
+# 3. DETAILED LESSON PLANNER (Matches CBC Form + Smart Context)
 # =====================================================
 async def generate_specific_lesson_plan(
     grade: str, subject: str, theme: str, subtopic: str, objectives: List[str],
@@ -347,29 +407,57 @@ async def generate_specific_lesson_plan(
 ) -> Dict[str, Any]:
     
     print(f"\n==========================================")
-    print(f"🔍 DEBUG: Generating Lesson Plan")
-    print(f"👤 Teacher Name: '{teacher_name}'")
-    print(f"📖 Topic:        '{theme}'")
+    print(f"🔍 DEBUG: Generating CBC Lesson Plan")
+    print(f"👤 Teacher: {teacher_name} | Grade: {grade}")
+    print(f"📖 Topic: {theme}")
     print(f"==========================================\n")
 
     model = get_model()
 
-    prompt = f"""
-    Act as a professional teacher in Zambia. Create a Lesson Plan matching the standard Ministry Competence Based Curriculum (CBC) format.
+    # 1. CALCULATE SMART CONTEXT (Class Size & Gender)
+    boys = attendance.get('boys', 0)
+    girls = attendance.get('girls', 0)
+    total_students = boys + girls
     
+    # Strategy based on class size
+    class_strategy = ""
+    if total_students > 45:
+        class_strategy = "LARGE CLASS. Use 'Row Groups' and 'Choral Response'. Do not pass small objects."
+    elif total_students < 20:
+        class_strategy = "SMALL CLASS. Use 'Individual Presentations' and 'Circle Time'."
+    else:
+        class_strategy = "STANDARD CLASS. Use 'Think-Pair-Share' and 'Group Work'."
+
+    # Gender note
+    gender_note = ""
+    if girls > boys * 2:
+        gender_note = f"Girls outnumber boys ({girls} vs {boys}). Encourage boys to lead."
+    elif boys > girls * 2:
+        gender_note = f"Boys outnumber girls ({boys} vs {girls}). Ensure girls speak up."
+
+    # 2. PROMPT
+    prompt = f"""
+    Act as a professional teacher in Zambia. Create a Lesson Plan matching the official **Competence Based Curriculum (CBC)** format shown in the Ministry images.
+
     CONTEXT:
     - School: "{school_name}"
     - Teacher: "{teacher_name}"
     - Grade: {grade}, Subject: {subject}
-    - Topic: "{theme}" (PRESERVE UNIT NUMBER if present)
-    - Subtopic: "{subtopic}" (PRESERVE UNIT NUMBER if present)
+    - Topic: "{theme}"
+    - Subtopic: "{subtopic}"
     - Date: {date} | Time: {time_start}-{time_end}
     - Objectives: {json.dumps(objectives)}
-
-    STRICT FORMATTING RULES:
-    1. **NO MARKDOWN STARS**: Do NOT use bolding like **Step 1**. Use plain text only.
-    2. **Lesson Progression**: Introduction (5 min), Development (30 min), Conclusion (5 min).
     
+    CLASSROOM DATA:
+    - Total: {total_students} learners.
+    - Context Rule: {class_strategy}
+    - Gender Note: {gender_note}
+
+    STRICT FORMATTING RULES (Based on User's Form):
+    1. **Learning Environment**: Must be split into 'Natural', 'Technological', and 'Artificial'.
+    2. **Assessment Criteria**: Every step in the table MUST have an assessment criteria (e.g., "Can learners identify...?").
+    3. **Expected Standard**: A broad statement of what is expected.
+
     OUTPUT JSON (Strict Structure):
     {{
       "teacherName": "{teacher_name}",
@@ -380,42 +468,69 @@ async def generate_specific_lesson_plan(
       "subtopic": "{subtopic}",
       "time": "{time_start} - {time_end}", 
       "duration": "40 minutes", 
-      "enrolment": {{ "boys": {attendance.get('boys', 0)}, "girls": {attendance.get('girls', 0)}, "total": {attendance.get('boys', 0) + attendance.get('girls', 0)} }},
+      "enrolment": {{ "boys": {boys}, "girls": {girls}, "total": {total_students} }},
       
-      "general_competences": ["Competence 1...", "Competence 2..."],
-      "specific_competence": "Learners should be able to...", 
-      "rationale": "Reason for lesson...", 
-      "prerequisite": "Prior knowledge...", 
-      "materials": "Teaching aids...", 
-      "references": "Syllabus Grade {grade}, Pupil's Book.",
+      "expected_standard": "Learners should be able to...",
+      
+      "learning_environment": {{
+          "natural": "e.g., Soil, sunlight, local plants...",
+          "technological": "e.g., Calculators, mobile phones, video...",
+          "artificial": "e.g., Charts, models, classroom furniture..."
+      }},
+      
+      "materials": "List all teaching aids here.",
+      "references": "Syllabus Grade {grade}, Pupil's Book page...",
       
       "steps": [
         {{ 
             "stage": "INTRODUCTION", 
             "time": "5 min", 
-            "teacherActivity": "Ask learners to...", 
-            "learnerActivity": "Learners will...", 
-            "method": "Q&A" 
+            "teacherActivity": "Teacher asks learners to...", 
+            "learnerActivity": "Learners respond by...", 
+            "assessment_criteria": "Teacher checks if learners can recall..." 
+        }},
+        {{ 
+            "stage": "DEVELOPMENT", 
+            "time": "30 min", 
+            "teacherActivity": "Teacher groups learners and...", 
+            "learnerActivity": "In groups, learners discuss...", 
+            "assessment_criteria": "Teacher observes if learners are able to classify..." 
+        }},
+        {{ 
+            "stage": "CONCLUSION", 
+            "time": "5 min", 
+            "teacherActivity": "Teacher summarizes by...", 
+            "learnerActivity": "Learners ask questions and...", 
+            "assessment_criteria": "Teacher evaluates understanding by..." 
         }}
       ],
-      "homework_content": "Give a specific homework assignment here."
+      "homework_content": "Specific task for home."
     }}
     """
+    
     try:
-        # ✅ FIX: Force JSON response
+        # Generate and parse
         response = await model.generate_content_async(
             prompt,
             generation_config={"response_mime_type": "application/json"}
         )
-        data = json.loads(extract_json_string(response.text), strict=False)
-        
-        # Hardcoded Footers
+        json_str = extract_json_string(response.text)
+        data = json.loads(json_str) # Removed strict=False to ensure clean JSON
+
+        # 3. POST-PROCESSING (Add the dots for the printed form)
         ai_homework = data.get("homework_content", "Refer to Pupil's Book.")
-        data["homework"] = f"{ai_homework}\n\n" + ("." * 200)
-        data["evaluation"] = "LESSON EVALUATION (indicate the weakness, strengthen and way forward )\n" + ("." * 200)
+        
+        # Add the "Evaluation" footer section typical in Zambian books
+        data["evaluation_footer"] = "LESSON EVALUATION (Indicate weaknesses, strengths, and way forward):\n" + ("." * 250)
 
         return data
 
     except Exception as e:
         print(f"❌ [Lesson Generator] Failed: {e}")
-        return {}
+        # Return a safe fallback so the app doesn't crash
+        return {
+            "teacherName": teacher_name,
+            "topic": theme,
+            "steps": [],
+            "error": "Failed to generate plan."
+        }
