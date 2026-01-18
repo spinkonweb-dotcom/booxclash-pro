@@ -2,6 +2,8 @@ from services.firebase_setup import db
 from google.cloud.firestore import Query
 from datetime import datetime
 
+# ❌ DELETE ANY LINES HERE THAT SAY: from services.file_manager import ...
+
 # ==========================================
 # 1. SCHEMES OF WORK
 # ==========================================
@@ -14,7 +16,7 @@ def save_generated_scheme(uid: str, subject: str, grade: str, term: str, data: l
         
         doc_ref.set({
             "userId": uid,
-            "schoolName": "Unknown School", # Default, user can update later
+            "schoolName": "Unknown School", 
             "subject": subject,
             "grade": grade,
             "term": term,
@@ -112,18 +114,26 @@ def load_weekly_plan(uid: str, subject: str, grade: str, term: str, week: int):
         return None
 
 # ==========================================
-# 3. LESSON PLANS (✅ ADDED)
+# 3. LESSON PLANS
 # ==========================================
-def save_lesson_plan(uid: str, subject: str, grade: str, term: str, week: int, data: dict):
+def save_lesson_plan(
+    uid: str, 
+    subject: str, 
+    grade: str, 
+    data: dict, 
+    term: str = "Term 1", 
+    week: int = 1, 
+    topic: str = "General Lesson"
+):
     """
     Saves the Lesson Plan to Firestore.
     """
     try:
         doc_ref = db.collection("generated_lesson_plans").document()
         
-        # Extract meaningful identifiers from the data if possible
-        topic = data.get("topic", "General Topic")
-        subtopic = data.get("subtopic", "General Lesson")
+        # Use passed topic, or fallback to data, or fallback to default
+        final_topic = topic or data.get("topic", "General Topic")
+        final_subtopic = data.get("subtopic", final_topic)
 
         doc_ref.set({
             "userId": uid,
@@ -131,8 +141,8 @@ def save_lesson_plan(uid: str, subject: str, grade: str, term: str, week: int, d
             "grade": grade,
             "term": term,
             "weekNumber": int(week),
-            "topic": topic,
-            "subtopic": subtopic,
+            "topic": final_topic,
+            "subtopic": final_subtopic,
             "lessonData": data,
             "createdAt": datetime.now(),
             "type": "Lesson Plan",

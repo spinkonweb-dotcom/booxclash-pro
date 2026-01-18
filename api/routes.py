@@ -12,10 +12,11 @@ from services.file_manager import (
     save_lesson_plan 
 )
 from services.credit_manager import check_and_deduct_credit
+from services.syllabus_manager import get_subjects_for_grade
 # ✅ ADDED: Database import to fetch user details
 from services.firebase_setup import db 
 
-from services.llm_teacher_engine import (
+from services.llm_teacher_engine_new import (
     generate_weekly_plan_from_scheme,
     generate_specific_lesson_plan,
     # generate_quiz_json,
@@ -51,6 +52,19 @@ async def get_weekly_plan(
 
     return data
 
+
+@router.get("/get-subjects/{grade}")
+async def get_subjects_endpoint(grade: str):
+    """
+    Frontend calls: /get-subjects/Grade 4
+    Backend returns: ["Mathematics", "English", "Science"]
+    """
+    subjects = get_subjects_for_grade(grade)
+    
+    if not subjects:
+        return {"subjects": [], "message": f"No syllabus files found for {grade}"}
+        
+    return {"subjects": subjects}
 
 @router.post("/agent")
 async def handle_agent_tool(

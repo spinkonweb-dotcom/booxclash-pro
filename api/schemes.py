@@ -7,7 +7,7 @@ from models.schemas import SchemeRequest, SchemeRow
 
 # Services
 # Ensure this import points to your updated agent_tools.py or wrapper
-from services.llm_teacher_engine import generate_scheme_with_ai
+from services.llm_teacher_engine_old import generate_scheme_with_ai
 from services.syllabus_manager import load_syllabus
 from services.file_manager import save_generated_scheme
 from services.credit_manager import check_and_deduct_credit

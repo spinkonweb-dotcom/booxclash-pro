@@ -7,46 +7,8 @@ from firebase_admin import firestore, auth  # <--- Essential Import
 from typing import List, Optional
 from pydantic import BaseModel
 
-# --- PDF GENERATION LIBRARIES ---
-from reportlab.pdfgen import canvas
-from reportlab.lib.pagesizes import A4
-from reportlab.lib import colors
-
 router = APIRouter()
 db = firestore.client()
-
-# ==========================================
-# ⚙️ CONFIGURATION & ROBUST PATH SETUP
-# ==========================================
-
-# 1. Get the directory where THIS file is located
-CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
-
-# 2. Define filenames
-LOGO_FILENAME = "logo.png"
-SIGNATURE_FILENAME = "signature.png"
-
-# 3. Company Details
-COMPANY_NAME = "Booxclash Learn Limited"
-CEO_NAME = "Chilongo Kondwani"
-CEO_TITLE = "CEO"
-
-# 4. Helper to find images safely
-def get_image_path(filename):
-    """
-    Tries to find the image in the current folder OR the folder above.
-    """
-    # Check current folder (e.g., api/)
-    path_current = os.path.join(CURRENT_DIR, filename)
-    if os.path.exists(path_current):
-        return path_current
-    
-    # Check parent folder (e.g., booxclash-pro/)
-    path_parent = os.path.join(os.path.dirname(CURRENT_DIR), filename)
-    if os.path.exists(path_parent):
-        return path_parent
-        
-    return None
 
 # ==========================================
 # 📦 MODELS & DEPENDENCIES
@@ -256,16 +218,21 @@ async def top_up_user(action: TopUpRequest, x_user_id: str = Header(None, alias=
         "last_payment_date": firestore.SERVER_TIMESTAMP
     })
     
-    # Get Name for Receipt
+    # Get User Data for Receipt
     u_data = user_ref.get().to_dict()
     u_name = u_data.get("name", "Valued Customer")
     
-    # Generate Receipt
-    pdf_file = generate_receipt_pdf(u_name, action.target_uid, action.amount_paid, plan_name, credits_to_add)
-
-    filename = f"Receipt_{action.target_uid[:5]}_K{action.amount_paid}.pdf"
-    return StreamingResponse(pdf_file, media_type="application/pdf", headers={'Content-Disposition': f'attachment; filename="{filename}"'})
-
+    # Return JSON Data for Frontend PDF Generation
+    return {
+        "status": "success",
+        "receipt_no": action.target_uid[:8].upper(),
+        "date": datetime.now().strftime('%Y-%m-%d'),
+        "user_name": u_name,
+        "user_uid": action.target_uid,
+        "plan_name": plan_name,
+        "credits": credits_to_add,
+        "amount": action.amount_paid
+    }
 # --- OTHER ENDPOINTS ---
 @router.post("/users/approve")
 async def approve_user(action: AdminAction, x_user_id: str = Header(None, alias="X-User-ID")):

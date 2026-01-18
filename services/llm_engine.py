@@ -1,4 +1,4 @@
-from services.llm_teacher_engine import (
+from services.llm_teacher_engine_new import (
     generate_scheme_with_ai,
     generate_weekly_plan_from_scheme,
     generate_specific_lesson_plan
