@@ -1,6 +1,5 @@
 from pydantic import BaseModel, Field, validator
-from typing import Optional, List, Dict, Any
-
+from typing import List, Optional, Any, Dict, Literal
 # -----------------------------------
 # 🎓 STUDENT / TUTOR MODELS
 # -----------------------------------
@@ -109,3 +108,27 @@ class SchemeResponse(BaseModel):
     
     class Config:
         extra = "allow"
+
+
+
+class WorksheetRequest(BaseModel):
+    uid: Optional[str] = None
+    grade: str
+    subject: str
+    topic: str
+    subtopic: Optional[str] = ""
+    difficulty: Literal["easy", "medium", "hard"] = "medium"
+    school_name: str
+
+# A single building block of a worksheet
+class WorksheetBlock(BaseModel):
+    id: int
+    type: Literal["mcq", "matching", "fill_blank", "svg_diagram", "open_question"]
+    instruction: str
+    content: Any # Dynamic: can be a string (SVG), list (MCQ options), or dict (Matching pairs)
+    answer_key: str 
+
+class WorksheetResponse(BaseModel):
+    title: str
+    grade: str
+    blocks: List[WorksheetBlock]

@@ -147,8 +147,9 @@ async def generate_scheme_with_ai(
         print(f"❌ [Scheme Generator] Failed: {e}")
         return []
 
+
 # =====================================================
-# 2. WEEKLY PLAN GENERATOR (FIXED & EXPORTED)
+# 2. WEEKLY PLAN GENERATOR (UPDATED)
 # =====================================================
 async def generate_weekly_plan_with_ai(
     grade: str, 
@@ -156,12 +157,15 @@ async def generate_weekly_plan_with_ai(
     term: str, 
     week_number: int, 
     school_name: str = "Unknown School", 
-    start_date: Optional[str] = None
+    start_date: Optional[str] = None,
+    days_count: int = 5  # 👈 Added parameter to control days
 ) -> Dict[str, Any]:
     """
     Generates a weekly forecast for the Old Curriculum.
+    - Adapts to the specific number of days requested.
+    - Enforces varied Teaching/Learning Aids.
     """
-    print(f"🧠 AI Generating Weekly Plan for: {subject} Grade {grade}, Week {week_number}")
+    print(f"🧠 AI Generating Weekly Plan | Subject: {subject} | Grade: {grade} | Week: {week_number} | Days: {days_count}")
 
     model = get_model()
 
@@ -175,7 +179,14 @@ async def generate_weekly_plan_with_ai(
     - Subject: {subject}
     - Term: {term}
     - Week: {week_number}
+    - Duration: {days_count} Days
     - Start Date: {start_date if start_date else "Monday of the week"}
+
+    CRITICAL INSTRUCTIONS:
+    1. **Days:** Generate exactly {days_count} entries (e.g., if 3 days, only generate Monday, Tuesday, Wednesday).
+    2. **Resources (Learning Aids):** Do NOT just repeat "Textbook" or "Chart". You MUST vary them based on the subtopic.
+       - Use specific real-world objects where possible (e.g., "Soil samples", "Grocery receipts", "Clock face", "Empty bottles", "Flashcards", "Newspaper clippings").
+    3. **Content:** Ensure the subtopics progress logically from Day 1 to Day {days_count}.
 
     STRICT JSON OUTPUT FORMAT:
     {{
@@ -191,55 +202,36 @@ async def generate_weekly_plan_with_ai(
         {{
           "day": "Monday",
           "date": "YYYY-MM-DD",
-          "subtopic": "Specific subtopic for Monday",
+          "subtopic": "Specific subtopic for Day 1",
           "objectives": ["Learner should be able to define X", "Learner should be able to list Y"],
-          "activities": "Teacher explains X using chart. Learners write notes.",
-          "resources": "Textbook Page 12, Chart"
+          "activities": "Teacher explains X using... Learners write notes.",
+          "resources": "Specific Aid (e.g. Real Leaf)"
         }},
         {{
           "day": "Tuesday",
           "date": "YYYY-MM-DD",
-          "subtopic": "Specific subtopic for Tuesday",
+          "subtopic": "Specific subtopic for Day 2",
           "objectives": ["Objective 1"],
-          "activities": "Class discussion.",
-          "resources": "Chalkboard"
-        }},
-        {{
-          "day": "Wednesday",
-          "date": "YYYY-MM-DD",
-          "subtopic": "Specific subtopic for Wednesday",
-          "objectives": ["Objective 1"],
-          "activities": "Group work.",
-          "resources": "Worksheets"
-        }},
-        {{
-          "day": "Thursday",
-          "date": "YYYY-MM-DD",
-          "subtopic": "Specific subtopic for Thursday",
-          "objectives": ["Objective 1"],
-          "activities": "Practical exercise.",
-          "resources": "Tools"
-        }},
-        {{
-          "day": "Friday",
-          "date": "YYYY-MM-DD",
-          "subtopic": "Weekly Test / Revision",
-          "objectives": ["Review understanding"],
-          "activities": "Learners write short quiz.",
-          "resources": "Quiz Paper"
+          "activities": "Class discussion...",
+          "resources": "Different Aid (e.g. Video Clip)"
         }}
+        ... (Repeat for exactly {days_count} days)
       ]
     }}
     """
 
     # 2. Call AI & Parse
     try:
-        response = await model.generate_content_async(prompt)
+        response = await model.generate_content_async(prompt, generation_config={"response_mime_type": "application/json"})
         json_str = extract_json_string(response.text)
         return json.loads(json_str)
     except Exception as e:
         print(f"❌ Weekly Plan Generation Failed: {e}")
-        return {}
+        # Return a safe fallback to prevent frontend crash
+        return {
+            "meta": {"school": school_name, "error": True},
+            "days": []
+        }
 
 # =====================================================
 # 3. DETAILED LESSON PLANNER (Strict Learner-Centered)
@@ -330,3 +322,52 @@ async def generate_specific_lesson_plan(
     except Exception as e:
         print(f"❌ [Lesson Generator] Failed: {e}")
         return {}
+
+
+async def generate_structured_worksheet(grade: str, subject: str, topic: str):
+    model = get_model()
+    
+    prompt = f"""
+    Act as a professional teacher. Create a structured worksheet for Grade {grade} {subject} on the topic: "{topic}".
+    
+    You MUST output a JSON object with a list of "blocks". 
+    Include at least one "matching" block and one "svg_diagram" (if applicable to the topic).
+
+    --- BLOCK TYPES & FORMATS ---
+    
+    1. "mcq":
+       content: {{ "question": "...", "options": ["A", "B", "C"], "correct": "A" }}
+       
+    2. "matching":
+       content: [
+         {{ "left": "Item 1", "right": "Match 1" }},
+         {{ "left": "Item 2", "right": "Match 2" }}
+       ]
+       
+    3. "svg_diagram":
+       instruction: "Label the diagram / Color the shape"
+       content: "<svg viewBox='0 0 100 100'>...simple primitives...</svg>" 
+       (KEEP SVGs VERY SIMPLE: Squares, Circles, Lines, Triangles. No complex art.)
+
+    4. "fill_blank":
+       content: "The capital of Zambia is ______."
+       answer_key: "Lusaka"
+
+    --- OUTPUT FORMAT ---
+    {{
+      "title": "Worksheet: {topic}",
+      "grade": "{grade}",
+      "blocks": [
+         {{ "id": 1, "type": "mcq", "instruction": "Choose the correct answer", "content": {{...}}, "answer_key": "A" }},
+         {{ "id": 2, "type": "svg_diagram", "instruction": "Color 1/2 of the shape", "content": "<svg>...</svg>", "answer_key": "Visual Check" }}
+      ]
+    }}
+    """
+    
+    try:
+        response = await model.generate_content_async(prompt, generation_config={"response_mime_type": "application/json"})
+        return json.loads(extract_json_string(response.text))
+    except Exception as e:
+        print(f"❌ Worksheet Generation Error: {e}")
+        # Return a fallback empty structure to prevent crash
+        return {"title": topic, "grade": grade, "blocks": []}

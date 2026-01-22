@@ -211,3 +211,45 @@ def load_lesson_plan(uid: str, subject: str, grade: str, term: str, week: int, s
     except Exception as e:
         print(f"❌ Firestore Read Error: {e}")
         return None
+
+# ==========================================
+# 4. RESOURCES (WORKSHEETS & NOTES) - NEW!
+# ==========================================
+def save_resource(uid: str, resource_type: str, data: dict, meta: dict):
+    """
+    Saves generated Worksheets or Notes to specific collections.
+    
+    Args:
+        uid: The user's ID
+        resource_type: Either 'worksheet' or 'notes'
+        data: The actual generated content (JSON)
+        meta: Metadata dict containing grade, subject, topic, etc.
+    """
+    try:
+        # Determine collection name based on type
+        col_name = "generated_worksheets" if resource_type == "worksheet" else "generated_notes"
+        
+        doc_ref = db.collection(col_name).document()
+        
+        # Structure the document
+        doc_ref.set({
+            "userId": uid,
+            "resourceType": resource_type,
+            "data": data, # The raw JSON content (questions, etc.)
+            
+            # Flatten metadata for easier querying
+            "grade": meta.get("grade"),
+            "subject": meta.get("subject"),
+            "topic": meta.get("topic"),
+            "meta": meta, # Full metadata object
+            
+            "createdAt": datetime.now(),
+            "type": resource_type.capitalize(), # For frontend display "Worksheet"
+            "source": "backend_auto_save"
+        })
+        
+        print(f"💾 {resource_type.title()} saved to Firestore ID: {doc_ref.id}")
+        return True
+    except Exception as e:
+        print(f"❌ Firestore Save Resource Error: {e}")
+        return False

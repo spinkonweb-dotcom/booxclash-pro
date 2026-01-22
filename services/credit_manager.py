@@ -1,4 +1,3 @@
-# FILE: services/credit_manager.py
 from datetime import datetime
 from google.cloud.firestore import Increment
 from services.firebase_setup import db 
@@ -7,10 +6,10 @@ def check_and_deduct_credit(uid: str, cost: int = 1):
     """
     Checks user credits and deducts 'cost' credits atomically.
     - Initializes new users with 3 credits.
-    - Approved users have unlimited access.
+    - NOW: Deducts credits for ALL users (including approved ones).
     """
 
-    # 🔧 Dev fallback
+    # 🔧 Dev fallback (Keep this for local testing if needed)
     if not uid or uid == "default_user":
         print("⚠️ Dev mode credit bypass")
         return True
@@ -24,22 +23,21 @@ def check_and_deduct_credit(uid: str, cost: int = 1):
     if not doc.exists:
         initial_credits = 3
         # We give them 3, but this action consumes 'cost'
-        # So we set their balance to 3 - cost
         user_ref.set({
             "credits": initial_credits - cost, 
             "is_approved": False,
             "joined_at": datetime.utcnow(),
-            "email": "user@example.com" # Placeholder if not passed
+            "email": "user@example.com" 
         })
         print(f"🆕 User initialized with 3 credits. Deducted {cost}. Remaining: {initial_credits - cost}")
         return True
 
     user_data = doc.to_dict()
 
-    # ✅ APPROVED USERS → UNLIMITED
-    if user_data.get("is_approved", False):
-        print(f"✅ Approved user detected: {uid}")
-        return True
+    # ❌ REMOVED: The block that gave approved users free access
+    # if user_data.get("is_approved", False):
+    #     print(f"✅ Approved user detected: {uid}")
+    #     return True
 
     # 🛡️ SAFETY: Missing credits field (Reset to 3)
     if "credits" not in user_data:
@@ -57,6 +55,7 @@ def check_and_deduct_credit(uid: str, cost: int = 1):
         )
 
     # 💰 ATOMIC CREDIT DEDUCTION
+    # 
     user_ref.update({
         "credits": Increment(-cost)
     })

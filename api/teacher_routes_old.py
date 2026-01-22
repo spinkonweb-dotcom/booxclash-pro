@@ -5,20 +5,22 @@ from fastapi import APIRouter, Header, HTTPException
 from pydantic import BaseModel
 
 # 1. Import Shared Models
-from models.schemas import SchemeRequest, SchemeRow
+from models.schemas import SchemeRequest, SchemeRow, WorksheetResponse, WorksheetRequest
 
 # 2. Import Services
 from services.llm_teacher_engine_old import (
     generate_scheme_with_ai,
     generate_weekly_plan_with_ai,
     generate_specific_lesson_plan,
+    generate_structured_worksheet
 )
 from services.syllabus_manager import load_syllabus
 from services.file_manager import (
     save_generated_scheme,
     load_generated_scheme,
     save_weekly_plan,
-    save_lesson_plan
+    save_lesson_plan,
+    save_resource  # 👈 ADDED THIS IMPORT
 )
 # ✅ IMPORT CREDIT MANAGER
 from services.credit_manager import check_and_deduct_credit
@@ -71,6 +73,10 @@ def extract_week_number(week_value) -> int:
     match = re.search(r"\d+", str(week_value))
     return int(match.group()) if match else 1
 
+# ✅ ADDED: Missing Helper Function
+def resolve_user_id(x_user_id: Optional[str], payload_uid: Optional[str]) -> str:
+    return x_user_id or payload_uid or "default_user"
+
 
 # ------------------------------------------------------------------
 # 1. Generate Scheme of Work
@@ -80,7 +86,7 @@ async def generate_scheme(
     request: SchemeRequest,
     x_user_id: Optional[str] = Header(None, alias="X-User-ID"),
 ):
-    uid = x_user_id or request.uid or "default_user"
+    uid = resolve_user_id(x_user_id, request.uid) # ✅ Updated to use helper
     print(f"📅 Generating Scheme: {request.subject} | Grade {request.grade}")
 
     # 1️⃣ Check Cache (Free if cached)
@@ -149,7 +155,7 @@ async def generate_weekly_plan(
     request: WeeklyPlanRequest,
     x_user_id: Optional[str] = Header(None, alias="X-User-ID"),
 ):
-    uid = x_user_id or request.uid or "default_user"
+    uid = resolve_user_id(x_user_id, request.uid)
     print(f"📅 Generating Weekly Plan: {request.subject} | Week {request.weekNumber}")
 
     # 1️⃣ DEDUCT CREDIT
@@ -166,6 +172,7 @@ async def generate_weekly_plan(
             week_number=request.weekNumber,
             school_name=request.school,
             start_date=request.startDate,
+            days_count=request.days
         )
 
         if not plan_data:
@@ -197,7 +204,7 @@ async def generate_lesson_plan(
     request: LessonPlanRequest,
     x_user_id: Optional[str] = Header(None, alias="X-User-ID"),
 ):
-    uid = x_user_id or request.uid or "default_user"
+    uid = resolve_user_id(x_user_id, request.uid)
     print(f"📝 Generating Lesson Plan: {request.subject} | {request.topic}")
 
     # 1️⃣ DEDUCT CREDIT
@@ -247,3 +254,29 @@ async def generate_lesson_plan(
     except Exception as e:
         print(f"❌ Lesson plan error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+
+
+# ------------------------------------------------------------------
+# 4. Generate Worksheet (Structured)
+# ------------------------------------------------------------------
+@router.post("/generate-worksheet-structured", response_model=WorksheetResponse)
+async def api_generate_structured_worksheet(
+    request: WorksheetRequest, 
+    x_user_id: Optional[str] = Header(None, alias="X-User-ID")
+):
+    # ✅ Fixed: Now uses the helper function defined above
+    uid = resolve_user_id(x_user_id, request.uid)
+    
+    # Check Credits
+    try: 
+        check_and_deduct_credit(uid, cost=1)
+    except Exception as e: 
+        raise HTTPException(status_code=402, detail=str(e))
+
+    # Generate
+    data = await generate_structured_worksheet(request.grade, request.subject, request.topic)
+    
+    # Save to Firebase (using the imported save_resource function)
+    save_resource(uid, "worksheet", data, request.dict())
+    
+    return data
