@@ -20,9 +20,8 @@ from services.file_manager import (
     load_generated_scheme,
     save_weekly_plan,
     save_lesson_plan,
-    save_resource  # 👈 ADDED THIS IMPORT
+    save_resource
 )
-# ✅ IMPORT CREDIT MANAGER
 from services.credit_manager import check_and_deduct_credit
 
 router = APIRouter()
@@ -40,6 +39,10 @@ class WeeklyPlanRequest(BaseModel):
     weekNumber: int
     days: Optional[int] = 5
     startDate: Optional[str] = None
+    
+    # Allow both 'topic' and 'theme'
+    topic: Optional[str] = None 
+    theme: Optional[str] = None
 
 class LessonPlanRequest(BaseModel):
     uid: str
@@ -73,7 +76,6 @@ def extract_week_number(week_value) -> int:
     match = re.search(r"\d+", str(week_value))
     return int(match.group()) if match else 1
 
-# ✅ ADDED: Missing Helper Function
 def resolve_user_id(x_user_id: Optional[str], payload_uid: Optional[str]) -> str:
     return x_user_id or payload_uid or "default_user"
 
@@ -86,7 +88,7 @@ async def generate_scheme(
     request: SchemeRequest,
     x_user_id: Optional[str] = Header(None, alias="X-User-ID"),
 ):
-    uid = resolve_user_id(x_user_id, request.uid) # ✅ Updated to use helper
+    uid = resolve_user_id(x_user_id, request.uid)
     print(f"📅 Generating Scheme: {request.subject} | Grade {request.grade}")
 
     # 1️⃣ Check Cache (Free if cached)
@@ -156,14 +158,27 @@ async def generate_weekly_plan(
     x_user_id: Optional[str] = Header(None, alias="X-User-ID"),
 ):
     uid = resolve_user_id(x_user_id, request.uid)
-    print(f"📅 Generating Weekly Plan: {request.subject} | Week {request.weekNumber}")
 
-    # 1️⃣ DEDUCT CREDIT
+    # 1️⃣ VALIDATE TOPIC BEFORE CREDITS
+    clean_topic = request.topic or request.theme
+    
+    # 🛑 GUARD CLAUSE: Stop here if no topic
+    if not clean_topic or clean_topic.strip() == "":
+        print("⚠️ ABORTING: No Topic provided. Preventing Credit Deduction.")
+        raise HTTPException(
+            status_code=400, 
+            detail="Topic is required. Please ensure a Scheme of Work exists for this week, or retry."
+        )
+    
+    print(f"📅 Generating Weekly Plan: {request.subject} | Week {request.weekNumber} | Topic: {clean_topic}")
+
+    # 2️⃣ DEDUCT CREDIT (Only reached if topic exists)
     try:
         check_and_deduct_credit(uid, cost=1)
     except Exception as e:
         raise HTTPException(status_code=402, detail=str(e))
 
+    # 3️⃣ GENERATE
     try:
         plan_data = await generate_weekly_plan_with_ai(
             grade=request.grade,
@@ -172,7 +187,8 @@ async def generate_weekly_plan(
             week_number=request.weekNumber,
             school_name=request.school,
             start_date=request.startDate,
-            days_count=request.days
+            days_count=request.days,
+            topic=clean_topic
         )
 
         if not plan_data:
@@ -264,7 +280,6 @@ async def api_generate_structured_worksheet(
     request: WorksheetRequest, 
     x_user_id: Optional[str] = Header(None, alias="X-User-ID")
 ):
-    # ✅ Fixed: Now uses the helper function defined above
     uid = resolve_user_id(x_user_id, request.uid)
     
     # Check Credits
@@ -276,7 +291,7 @@ async def api_generate_structured_worksheet(
     # Generate
     data = await generate_structured_worksheet(request.grade, request.subject, request.topic)
     
-    # Save to Firebase (using the imported save_resource function)
+    # Save to Firebase
     save_resource(uid, "worksheet", data, request.dict())
     
     return data

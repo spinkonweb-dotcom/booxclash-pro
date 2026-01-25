@@ -68,10 +68,10 @@ def extract_json_string(text: str) -> str:
         return text
 
 # =====================================================
-# 1. PROFESSIONAL SCHEME GENERATOR (FIXED FOR YOUR JSON)
+# 1. PROFESSIONAL SCHEME GENERATOR
 # =====================================================
 async def generate_scheme_with_ai(
-    syllabus_data: Any,  # Changed to Any to handle Dict or List
+    syllabus_data: Any,  # Handle Dict or List
     subject: str,
     grade: str,
     term: str,
@@ -81,7 +81,7 @@ async def generate_scheme_with_ai(
     
     print(f"\n📘 [Scheme Generator] Processing Professional Request for {subject} Grade {grade}...")
     
-    # 1️⃣ NORMALIZE DATA (Fixes the issue where data is inside "topics")
+    # 1️⃣ NORMALIZE DATA
     syllabus_list = []
     if isinstance(syllabus_data, dict):
         syllabus_list = syllabus_data.get("topics", [])
@@ -93,7 +93,6 @@ async def generate_scheme_with_ai(
         return [] 
 
     # 2️⃣ TERM SPLITTING LOGIC
-    # Filter for valid items
     clean_syllabus = [
         t for t in syllabus_list 
         if isinstance(t, dict) and (t.get("topic_title") or t.get("topic") or t.get("unit"))
@@ -103,7 +102,6 @@ async def generate_scheme_with_ai(
     if total_topics == 0:
         return []
 
-    # Calculate chunk size (divide by 3 terms)
     chunk_size = math.ceil(total_topics / 3)
     
     term_num = 1
@@ -119,13 +117,11 @@ async def generate_scheme_with_ai(
     if not term_syllabus:
         return []
 
-    # 3️⃣ PREPARE DATA SUMMARY (Updated for your JSON keys)
+    # 3️⃣ PREPARE DATA SUMMARY
     syllabus_summary = []
     for t in term_syllabus:
-        # ✅ FIX: Look for 'topic_title' first (as per your JSON)
         unit_title = t.get("topic_title") or t.get("topic") or t.get("unit") or "Unknown Topic"
         
-        # ✅ FIX: Look for 'learning_outcomes' first
         content_list = (
             t.get("learning_outcomes") or 
             t.get("subtopics") or 
@@ -190,7 +186,6 @@ async def generate_scheme_with_ai(
 
             date_info = calculate_week_dates(start_date, week_num)
             
-            # Ensure list format for table rendering
             if isinstance(item.get('content'), str): item['content'] = [item['content']]
             if isinstance(item.get('outcomes'), str): item['outcomes'] = [item['outcomes']]
 
@@ -210,23 +205,55 @@ async def generate_scheme_with_ai(
 # 2. WEEKLY PLAN GENERATOR
 # =====================================================
 async def generate_weekly_plan_with_ai(
-    grade: str, subject: str, term: str, week_number: int, 
-    school_name: str = "Unknown School", start_date: Optional[str] = None, days_count: int = 5 
+    grade: str, 
+    subject: str, 
+    term: str, 
+    week_number: int, 
+    school_name: str = "Unknown School", 
+    start_date: Optional[str] = None, 
+    days_count: int = 5,
+    topic: Optional[str] = None  # 👈 Accepts the topic
 ) -> Dict[str, Any]:
-    print(f"🧠 AI Generating Weekly Plan | Subject: {subject} | Week: {week_number}")
+    
+    # Smart Fallback: If topic is empty string/None, make a decent guess context
+    topic_context = topic if topic and len(topic) > 1 else f"Week {week_number} Syllabus Topic"
+    
+    print(f"🧠 AI Generating Weekly Plan | Subject: {subject} | Week: {week_number} | Topic: {topic_context}")
+    
     model = get_model()
 
     prompt = f"""
     Act as a Senior Teacher in Zambia. Create a Weekly Lesson Forecast.
-    DETAILS: School: {school_name}, Grade: {grade}, Subject: {subject}, Term: {term}, Week: {week_number}, Days: {days_count}
+    
+    DETAILS: 
+    - School: {school_name}
+    - Grade: {grade}
+    - Subject: {subject}
+    - Term: {term}
+    - Week: {week_number}
+    - Duration: {days_count} Days
+    - TOPIC FOCUS: "{topic_context}" 
+    
+    CRITICAL INSTRUCTIONS:
+    1. **Adhere to Topic**: You MUST generate lessons specifically for the topic: "{topic_context}".
+       - Do NOT generate generic content like "Introduction to Week 1 Syllabus Topic". 
+       - If the topic is "Fractions", every day must be about Fractions.
+    2. **Days**: Generate exactly {days_count} entries.
+    3. **Resources**: Vary them (e.g., "Soil samples", "Clock face", "Flashcards").
     
     STRICT JSON OUTPUT FORMAT:
     {{
-      "meta": {{ "school": "{school_name}", "grade": "{grade}", "subject": "{subject}", "week": {week_number} }},
+      "meta": {{ 
+        "school": "{school_name}", 
+        "grade": "{grade}", 
+        "subject": "{subject}", 
+        "week": {week_number},
+        "main_topic": "{topic_context}"
+      }},
       "days": [
         {{
           "day": "Monday",
-          "subtopic": "...",
+          "subtopic": "Specific subtopic of {topic_context}",
           "objectives": ["..."],
           "activities": "...",
           "resources": "..."
@@ -235,10 +262,12 @@ async def generate_weekly_plan_with_ai(
     }}
     Ensure exactly {days_count} days are generated.
     """
+    
     try:
         response = await model.generate_content_async(prompt, generation_config={"response_mime_type": "application/json"})
         return json.loads(extract_json_string(response.text))
-    except Exception:
+    except Exception as e:
+        print(f"❌ Weekly Plan Error: {e}")
         return {"meta": {"error": True}, "days": []}
 
 # =====================================================
