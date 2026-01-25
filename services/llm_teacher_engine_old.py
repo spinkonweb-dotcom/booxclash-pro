@@ -15,12 +15,9 @@ def get_model():
     return genai.GenerativeModel("gemini-2.5-flash")
 
 # =====================================================
-# 🛠️ HELPER: DATE CALCULATOR (Updated & Robust)
+# 🛠️ HELPER: DATE CALCULATOR
 # =====================================================
 def calculate_week_dates(start_date_str: str, week_num: int) -> Dict[str, str]:
-    """
-    Calculates dates server-side to prevent Frontend NaN errors.
-    """
     try:
         if not start_date_str:
              start_dt = datetime.now()
@@ -48,7 +45,7 @@ def calculate_week_dates(start_date_str: str, week_num: int) -> Dict[str, str]:
         return {"range_display": "", "start_iso": "", "end_iso": "", "month": ""}
 
 # =====================================================
-# 🛠️ HELPER: ROBUST JSON EXTRACTION
+# 🛠️ HELPER: JSON CLEANER
 # =====================================================
 def extract_json_string(text: str) -> str:
     try:
@@ -71,10 +68,10 @@ def extract_json_string(text: str) -> str:
         return text
 
 # =====================================================
-# 1. PROFESSIONAL SCHEME GENERATOR
+# 1. PROFESSIONAL SCHEME GENERATOR (FIXED FOR YOUR JSON)
 # =====================================================
 async def generate_scheme_with_ai(
-    syllabus_data: List[dict], 
+    syllabus_data: Any,  # Changed to Any to handle Dict or List
     subject: str,
     grade: str,
     term: str,
@@ -84,42 +81,100 @@ async def generate_scheme_with_ai(
     
     print(f"\n📘 [Scheme Generator] Processing Professional Request for {subject} Grade {grade}...")
     
-    if not syllabus_data or not isinstance(syllabus_data, list):
-        print(f"⚠️ [Scheme Generator] CRITICAL: No syllabus data found. AI will brainstorm.")
-        syllabus_data = [] 
+    # 1️⃣ NORMALIZE DATA (Fixes the issue where data is inside "topics")
+    syllabus_list = []
+    if isinstance(syllabus_data, dict):
+        syllabus_list = syllabus_data.get("topics", [])
+    elif isinstance(syllabus_data, list):
+        syllabus_list = syllabus_data
     
-    # 2. TERM SPLITTING LOGIC (simplified for brevity, keep your full logic if needed)
-    total_units = len(syllabus_data)
-    chunk_size = math.ceil(total_units / 3)
-    # ... (Your existing splitting logic is fine, keeping it minimal here) ...
-    
-    model = get_model()
+    if not syllabus_list:
+        print(f"⚠️ [Scheme Generator] CRITICAL: No topics found in syllabus data. Aborting.")
+        return [] 
 
-    # 3. PREPARE DATA SUMMARY
+    # 2️⃣ TERM SPLITTING LOGIC
+    # Filter for valid items
+    clean_syllabus = [
+        t for t in syllabus_list 
+        if isinstance(t, dict) and (t.get("topic_title") or t.get("topic") or t.get("unit"))
+    ]
+    total_topics = len(clean_syllabus)
+    
+    if total_topics == 0:
+        return []
+
+    # Calculate chunk size (divide by 3 terms)
+    chunk_size = math.ceil(total_topics / 3)
+    
+    term_num = 1
+    if "2" in str(term): term_num = 2
+    elif "3" in str(term): term_num = 3
+
+    start_index = (term_num - 1) * chunk_size
+    end_index = start_index + chunk_size
+    
+    term_syllabus = clean_syllabus[start_index:end_index]
+    print(f"📊 Logic: Total Topics: {total_topics} | Term: {term_num} | Slice: {start_index} to {end_index}")
+    
+    if not term_syllabus:
+        return []
+
+    # 3️⃣ PREPARE DATA SUMMARY (Updated for your JSON keys)
     syllabus_summary = []
-    for t in syllabus_data[:10]: # Limit context to avoid token overflow
-        if isinstance(t, dict):
-            unit_code = t.get("unit") or t.get("title") or "Unknown"
-            syllabus_summary.append({"unit": unit_code, "content": t.get("subtopics", [])})
+    for t in term_syllabus:
+        # ✅ FIX: Look for 'topic_title' first (as per your JSON)
+        unit_title = t.get("topic_title") or t.get("topic") or t.get("unit") or "Unknown Topic"
+        
+        # ✅ FIX: Look for 'learning_outcomes' first
+        content_list = (
+            t.get("learning_outcomes") or 
+            t.get("subtopics") or 
+            t.get("specific_outcomes") or 
+            t.get("content") or 
+            []
+        )
+        
+        syllabus_summary.append({
+            "unit": unit_title, 
+            "content": content_list
+        })
 
-    # 4. PROMPT
-    prompt = f"""
-    Act as a Senior Head Teacher at a top Zambian School. Create a professional Scheme of Work.
-    DETAILS: Subject: {subject}, Grade: {grade}, Term: {term}, Duration: {num_weeks} Weeks
+    # 4️⃣ PROMPT
+    model = get_model()
     
-    SYLLABUS DATA (Context): {json.dumps(syllabus_summary)}
+    prompt = f"""
+    Act as a Senior Head Teacher in Zambia. Create a Scheme of Work for **Term {term_num}**.
+    
+    DETAILS: 
+    - Subject: {subject}, Grade: {grade}
+    - Duration: {num_weeks} Weeks
+    
+    STRICT DATA SOURCE:
+    Below is the syllabus segment specifically for Term {term_num}. 
+    You MUST ONLY use these topics. 
+    
+    DATA: {json.dumps(syllabus_summary)}
 
+    INSTRUCTIONS:
+    1. **Expand & Map**: You have {len(term_syllabus)} main topics to cover in {num_weeks} weeks. 
+       - If a topic has many outcomes, split it across multiple weeks.
+       - If there are fewer topics than weeks, review key concepts.
+    2. **Content**: Populate "content" and "outcomes" using the `learning_outcomes` provided in the data.
+       - **CRITICAL**: If the data lists specific outcomes, copy them. Do not leave these fields blank.
+    3. **Sequence**: Maintain the order of the provided topics.
+    
     OUTPUT FORMAT (JSON List):
     [
       {{
         "week": "Week 1",
-        "topic": "Topic Title",
-        "content": ["Point 1...", "Point 2..."],
-        "outcomes": ["Learners should be able to..."],
-        "references": ["Syllabus Unit 1", "Pupil's Book"] 
+        "topic": "Topic Name",
+        "content": ["Subtopic/Outcome 1", "Subtopic/Outcome 2"],
+        "outcomes": ["Learner should be able to..."],
+        "references": ["Syllabus Ref"] 
       }}
     ]
     """
+    
     try:
         response = await model.generate_content_async(prompt)
         json_str = extract_json_string(response.text)
@@ -127,7 +182,7 @@ async def generate_scheme_with_ai(
 
         if not isinstance(data, list): return []
 
-        # 5. POST-PROCESSING
+        # 5️⃣ POST-PROCESSING
         cleaned_data = []
         for i, item in enumerate(data):
             week_num = i + 1
@@ -135,6 +190,10 @@ async def generate_scheme_with_ai(
 
             date_info = calculate_week_dates(start_date, week_num)
             
+            # Ensure list format for table rendering
+            if isinstance(item.get('content'), str): item['content'] = [item['content']]
+            if isinstance(item.get('outcomes'), str): item['outcomes'] = [item['outcomes']]
+
             item['month'] = date_info['month'] 
             item['week'] = f"Week {week_num} {date_info['range_display']}"
             item['week_number'] = week_num
@@ -147,227 +206,90 @@ async def generate_scheme_with_ai(
         print(f"❌ [Scheme Generator] Failed: {e}")
         return []
 
-
 # =====================================================
-# 2. WEEKLY PLAN GENERATOR (UPDATED)
+# 2. WEEKLY PLAN GENERATOR
 # =====================================================
 async def generate_weekly_plan_with_ai(
-    grade: str, 
-    subject: str, 
-    term: str, 
-    week_number: int, 
-    school_name: str = "Unknown School", 
-    start_date: Optional[str] = None,
-    days_count: int = 5  # 👈 Added parameter to control days
+    grade: str, subject: str, term: str, week_number: int, 
+    school_name: str = "Unknown School", start_date: Optional[str] = None, days_count: int = 5 
 ) -> Dict[str, Any]:
-    """
-    Generates a weekly forecast for the Old Curriculum.
-    - Adapts to the specific number of days requested.
-    - Enforces varied Teaching/Learning Aids.
-    """
-    print(f"🧠 AI Generating Weekly Plan | Subject: {subject} | Grade: {grade} | Week: {week_number} | Days: {days_count}")
-
+    print(f"🧠 AI Generating Weekly Plan | Subject: {subject} | Week: {week_number}")
     model = get_model()
 
-    # 1. Construct the Prompt
     prompt = f"""
-    Act as a Senior Teacher in Zambia. Create a Weekly Lesson Forecast (Old Curriculum).
+    Act as a Senior Teacher in Zambia. Create a Weekly Lesson Forecast.
+    DETAILS: School: {school_name}, Grade: {grade}, Subject: {subject}, Term: {term}, Week: {week_number}, Days: {days_count}
     
-    DETAILS:
-    - School: {school_name}
-    - Grade: {grade}
-    - Subject: {subject}
-    - Term: {term}
-    - Week: {week_number}
-    - Duration: {days_count} Days
-    - Start Date: {start_date if start_date else "Monday of the week"}
-
-    CRITICAL INSTRUCTIONS:
-    1. **Days:** Generate exactly {days_count} entries (e.g., if 3 days, only generate Monday, Tuesday, Wednesday).
-    2. **Resources (Learning Aids):** Do NOT just repeat "Textbook" or "Chart". You MUST vary them based on the subtopic.
-       - Use specific real-world objects where possible (e.g., "Soil samples", "Grocery receipts", "Clock face", "Empty bottles", "Flashcards", "Newspaper clippings").
-    3. **Content:** Ensure the subtopics progress logically from Day 1 to Day {days_count}.
-
     STRICT JSON OUTPUT FORMAT:
     {{
-      "meta": {{
-        "school": "{school_name}",
-        "grade": "{grade}",
-        "subject": "{subject}",
-        "term": "{term}",
-        "week": {week_number},
-        "main_topic": "The main topic for this week"
-      }},
+      "meta": {{ "school": "{school_name}", "grade": "{grade}", "subject": "{subject}", "week": {week_number} }},
       "days": [
         {{
           "day": "Monday",
-          "date": "YYYY-MM-DD",
-          "subtopic": "Specific subtopic for Day 1",
-          "objectives": ["Learner should be able to define X", "Learner should be able to list Y"],
-          "activities": "Teacher explains X using... Learners write notes.",
-          "resources": "Specific Aid (e.g. Real Leaf)"
-        }},
-        {{
-          "day": "Tuesday",
-          "date": "YYYY-MM-DD",
-          "subtopic": "Specific subtopic for Day 2",
-          "objectives": ["Objective 1"],
-          "activities": "Class discussion...",
-          "resources": "Different Aid (e.g. Video Clip)"
+          "subtopic": "...",
+          "objectives": ["..."],
+          "activities": "...",
+          "resources": "..."
         }}
-        ... (Repeat for exactly {days_count} days)
       ]
     }}
+    Ensure exactly {days_count} days are generated.
     """
-
-    # 2. Call AI & Parse
     try:
         response = await model.generate_content_async(prompt, generation_config={"response_mime_type": "application/json"})
-        json_str = extract_json_string(response.text)
-        return json.loads(json_str)
-    except Exception as e:
-        print(f"❌ Weekly Plan Generation Failed: {e}")
-        # Return a safe fallback to prevent frontend crash
-        return {
-            "meta": {"school": school_name, "error": True},
-            "days": []
-        }
+        return json.loads(extract_json_string(response.text))
+    except Exception:
+        return {"meta": {"error": True}, "days": []}
 
 # =====================================================
-# 3. DETAILED LESSON PLANNER (Strict Learner-Centered)
+# 3. LESSON PLAN GENERATOR
 # =====================================================
 async def generate_specific_lesson_plan(
-    grade: str,
-    subject: str,
-    theme: str,
-    subtopic: str,
-    objectives: List[str],
-    date: str,
-    time_start: str,
-    time_end: str,
-    attendance: Dict[str, int],
-    teacher_name: str = "Class Teacher",
-    school_name: str = "Primary School"
+    grade: str, subject: str, theme: str, subtopic: str, objectives: List[str], 
+    date: str, time_start: str, time_end: str, attendance: Dict[str, int], 
+    teacher_name: str = "Class Teacher", school_name: str = "Primary School"
 ) -> Dict[str, Any]:
-    print(f"\n📝 [Lesson Generator] Preparing Plan for {teacher_name} at {school_name}...")
+    print(f"\n📝 [Lesson Generator] {theme} - {subtopic}")
     model = get_model()
 
-    # ✅ UPDATED PROMPT: STRICTLY ENFORCES REAL NAMES & BANS PLACEHOLDERS
     prompt = f"""
-    Act as a professional modern teacher in Zambia. Create a Lesson Plan.
+    Create a Zambian Learner-Centered Lesson Plan.
+    Teacher: {teacher_name}, School: {school_name}
+    Topic: {theme}, Subtopic: {subtopic}
+    Objectives: {json.dumps(objectives)}
     
-    CONTEXT:
-    - Teacher Name: "{teacher_name}" (STRICT RULE: Use this exact name. DO NOT use [Your Name] or [Teacher Name])
-    - School Name: "{school_name}" (STRICT RULE: Use this exact name. DO NOT use [School Name])
-    - Grade: {grade}, Subject: {subject}
-    - Topic: {theme}, Sub-topic: {subtopic}
-    - Date: {date}, Time: {time_start}-{time_end}
-    - Objectives: {json.dumps(objectives)}
-
-    STRICT METHODOLOGY RULES (LEARNER-CENTERED):
-    1. **Role**: The teacher is a **FACILITATOR**, not a lecturer.
-    2. **Methods**: Use ONLY learner-centered methods (e.g., Think-Pair-Share, Group Inquiry).
-    3. **Teacher Activity**: Use verbs like "Facilitate", "Guide", "Monitor".
-    
-    STRICT CONTENT RULES:
-    1. **Format**: Use **BULLET POINTS (•)**.
-    2. **No Placeholders**: If data is missing, INFER realistic details. NEVER output brackets like [ ].
-    3. **JSON Safety**: Use \\n for newlines inside strings.
-
-    OUTPUT JSON (Strict structure):
+    OUTPUT JSON:
     {{
       "teacherName": "{teacher_name}",
       "schoolName": "{school_name}",
       "topic": "{theme}", 
       "subtopic": "{subtopic}",
       "time": "{time_start} - {time_end}", 
-      "duration": "40 minutes", 
-      "rationale": "Brief sentence on why this lesson is important.", 
-      "specific": "Brief statement of the skill developed.", 
-      "standard": "Relevant syllabus outcome.", 
-      "prerequisite": "Brief list of prior knowledge needed.", 
-      "materials": "List of teaching aids.", 
-      "references": "Zambian Syllabus Grade {grade}, Pupil's Book, Teacher's Guide.",
+      "rationale": "...", 
+      "specific": "...", 
+      "standard": "...", 
+      "prerequisite": "...", 
+      "materials": "...", 
+      "references": "...",
       "enrolment": {{ "boys": {attendance.get('boys', 0)}, "girls": {attendance.get('girls', 0)}, "total": {attendance.get('boys', 0) + attendance.get('girls', 0)} }},
       "steps": [
-        {{ 
-            "stage": "INTRODUCTION", 
-            "time": "5 min", 
-            "teacherActivity": "• Prompt learners to recall...", 
-            "learnerActivity": "• Brainstorm answers...", 
-            "method": "Think-Pair-Share" 
-        }},
-        {{ 
-            "stage": "DEVELOPMENT", 
-            "time": "30 min", 
-            "teacherActivity": "• Organize learners...", 
-            "learnerActivity": "• Work in groups...", 
-            "method": "Group Inquiry" 
-        }},
-        {{ 
-            "stage": "CONCLUSION", 
-            "time": "5 min", 
-            "teacherActivity": "• Facilitate reflection...", 
-            "learnerActivity": "• Reflect on learning...", 
-            "method": "Class Discussion" 
-        }}
+        {{ "stage": "INTRODUCTION", "time": "5 min", "teacherActivity": "...", "learnerActivity": "...", "method": "..." }},
+        {{ "stage": "DEVELOPMENT", "time": "30 min", "teacherActivity": "...", "learnerActivity": "...", "method": "..." }},
+        {{ "stage": "CONCLUSION", "time": "5 min", "teacherActivity": "...", "learnerActivity": "...", "method": "..." }}
       ]
     }}
     """
-
     try:
         response = await model.generate_content_async(prompt)
-        json_str = extract_json_string(response.text)
-        return json.loads(json_str, strict=False)
-    except Exception as e:
-        print(f"❌ [Lesson Generator] Failed: {e}")
+        return json.loads(extract_json_string(response.text), strict=False)
+    except Exception:
         return {}
-
 
 async def generate_structured_worksheet(grade: str, subject: str, topic: str):
     model = get_model()
-    
-    prompt = f"""
-    Act as a professional teacher. Create a structured worksheet for Grade {grade} {subject} on the topic: "{topic}".
-    
-    You MUST output a JSON object with a list of "blocks". 
-    Include at least one "matching" block and one "svg_diagram" (if applicable to the topic).
-
-    --- BLOCK TYPES & FORMATS ---
-    
-    1. "mcq":
-       content: {{ "question": "...", "options": ["A", "B", "C"], "correct": "A" }}
-       
-    2. "matching":
-       content: [
-         {{ "left": "Item 1", "right": "Match 1" }},
-         {{ "left": "Item 2", "right": "Match 2" }}
-       ]
-       
-    3. "svg_diagram":
-       instruction: "Label the diagram / Color the shape"
-       content: "<svg viewBox='0 0 100 100'>...simple primitives...</svg>" 
-       (KEEP SVGs VERY SIMPLE: Squares, Circles, Lines, Triangles. No complex art.)
-
-    4. "fill_blank":
-       content: "The capital of Zambia is ______."
-       answer_key: "Lusaka"
-
-    --- OUTPUT FORMAT ---
-    {{
-      "title": "Worksheet: {topic}",
-      "grade": "{grade}",
-      "blocks": [
-         {{ "id": 1, "type": "mcq", "instruction": "Choose the correct answer", "content": {{...}}, "answer_key": "A" }},
-         {{ "id": 2, "type": "svg_diagram", "instruction": "Color 1/2 of the shape", "content": "<svg>...</svg>", "answer_key": "Visual Check" }}
-      ]
-    }}
-    """
-    
+    prompt = f"""Create a worksheet for {grade} {subject}: {topic}. Output JSON with 'blocks' (mcq, matching, svg_diagram)."""
     try:
         response = await model.generate_content_async(prompt, generation_config={"response_mime_type": "application/json"})
         return json.loads(extract_json_string(response.text))
-    except Exception as e:
-        print(f"❌ Worksheet Generation Error: {e}")
-        # Return a fallback empty structure to prevent crash
+    except Exception:
         return {"title": topic, "grade": grade, "blocks": []}
