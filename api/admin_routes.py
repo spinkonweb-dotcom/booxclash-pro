@@ -1,9 +1,7 @@
 import os
-import io
 from datetime import datetime
 from fastapi import APIRouter, HTTPException, Header, Query
-from fastapi.responses import StreamingResponse
-from firebase_admin import firestore, auth  # <--- Essential Import
+from firebase_admin import firestore, auth
 from typing import List, Optional
 from pydantic import BaseModel
 
@@ -11,25 +9,37 @@ router = APIRouter()
 db = firestore.client()
 
 # ==========================================
-# 📦 MODELS & DEPENDENCIES
+# 📦 MODELS
 # ==========================================
 
 class AdminAction(BaseModel):
     target_uid: str
 
-class TopUpRequest(BaseModel):
+class UserTopUpRequest(BaseModel):
     target_uid: str
-    amount_paid: int  # 50 or 120
+    amount_paid: int 
+
+class SchoolTopUpRequest(BaseModel):
+    school_id: str
+    amount_paid: int
+    credits_to_add: int
+    max_teachers: int
+
+class SchoolApproveRequest(BaseModel):
+    school_id: str
 
 class ContentAction(BaseModel):
     doc_id: str
     collection_name: str 
 
+# ==========================================
+# 🛡️ DEPENDENCIES
+# ==========================================
+
 async def verify_admin(x_user_id: str):
     if not x_user_id:
         raise HTTPException(status_code=401, detail="Unauthorized")
     
-    # Check database for admin role
     user_ref = db.collection("users").document(x_user_id)
     user_doc = user_ref.get()
     
@@ -42,108 +52,94 @@ async def verify_admin(x_user_id: str):
     return True
 
 # ==========================================
-# 📄 PDF GENERATOR FUNCTION
+# 🚀 SCHOOL ENDPOINTS
 # ==========================================
-def generate_receipt_pdf(user_name: str, uid: str, amount: int, plan_name: str, credits: int):
-    buffer = io.BytesIO()
-    c = canvas.Canvas(buffer, pagesize=A4)
-    width, height = A4
 
-    # Resolve Image Paths
-    real_logo_path = get_image_path(LOGO_FILENAME)
-    real_sig_path = get_image_path(SIGNATURE_FILENAME)
+@router.get("/schools")
+async def get_all_schools(x_user_id: str = Header(None, alias="X-User-ID")):
+    await verify_admin(x_user_id)
+    try:
+        schools_ref = db.collection("schools").stream()
+        schools_list = []
+        for doc in schools_ref:
+            data = doc.to_dict()
+            # Count teachers linked to this school
+            teacher_count = len(list(db.collection("users").where("schoolId", "==", doc.id).stream()))
+            
+            schools_list.append({
+                "id": doc.id,
+                "schoolName": data.get("schoolName", "Unknown School"),
+                "email": data.get("email", ""),
+                "credits": data.get("credits", 0),
+                "subscriptionPlan": data.get("subscriptionPlan", "None"),  # Return the plan
+                "isApproved": data.get("isApproved", False),
+                "teacherCount": teacher_count,
+                "createdAt": str(data.get("createdAt", ""))
+            })
+        return schools_list
+    except Exception as e:
+        raise HTTPException(500, str(e))
 
-    # --- HEADER & LOGO ---
-    if real_logo_path:
-        try:
-            # Removed mask='auto' to prevent transparency issues
-            c.drawImage(real_logo_path, 40, height - 100, width=100, preserveAspectRatio=True)
-        except Exception as e:
-            print(f"Error loading logo: {e}")
+@router.post("/schools/approve")
+async def approve_school(action: SchoolApproveRequest, x_user_id: str = Header(None, alias="X-User-ID")):
+    await verify_admin(x_user_id)
+    db.collection("schools").document(action.school_id).update({
+        "isApproved": True,
+        "credits": firestore.Increment(50) # Optional: Free starter credits
+    })
+    return {"status": "success"}
 
-    # Company Info
-    c.setFont("Helvetica-Bold", 16)
-    c.drawRightString(width - 40, height - 50, "PAYMENT RECEIPT")
-    c.setFont("Helvetica-Bold", 12)
-    c.drawRightString(width - 40, height - 70, COMPANY_NAME)
-    c.setFont("Helvetica", 10)
-    c.drawRightString(width - 40, height - 85, f"Date: {datetime.now().strftime('%Y-%m-%d')}")
-    c.drawRightString(width - 40, height - 100, f"Receipt #: {uid[:8].upper()}")
-
-    # Divider
-    c.setStrokeColor(colors.grey)
-    c.line(40, height - 120, width - 40, height - 120)
-
-    # --- BILL TO ---
-    c.setFont("Helvetica-Bold", 12)
-    c.drawString(40, height - 150, "Bill To:")
-    c.setFont("Helvetica", 12)
-    c.drawString(40, height - 170, f"Name: {user_name}")
-    c.drawString(40, height - 190, f"User ID: {uid}")
-
-    # --- TABLE ---
-    y_start = height - 240
-    c.setFillColor(colors.lightgrey)
-    c.rect(40, y_start, width - 80, 25, fill=1, stroke=0)
+@router.post("/schools/topup")
+async def top_up_school(action: SchoolTopUpRequest, x_user_id: str = Header(None, alias="X-User-ID")):
+    await verify_admin(x_user_id)
     
-    c.setFillColor(colors.black)
-    c.setFont("Helvetica-Bold", 12)
-    c.drawString(50, y_start + 7, "Description")
-    c.drawRightString(width - 50, y_start + 7, "Amount (ZMW)")
+    school_ref = db.collection("schools").document(action.school_id)
+    if not school_ref.get().exists:
+        raise HTTPException(404, "School not found")
 
-    # Row
-    y_row = y_start - 30
-    c.setFont("Helvetica", 12)
-    c.drawString(50, y_row, f"{plan_name} - {credits} Credits")
-    c.drawRightString(width - 50, y_row, f"K{amount}.00")
+    # 1. Determine Plan Name based on Amount
+    plan_name = "Custom Top-up"
+    if action.amount_paid == 35: plan_name = "Bulk Monthly (K35)"
+    elif action.amount_paid == 50: plan_name = "Standard Monthly (K50)"
+    elif action.amount_paid == 120: plan_name = "Termly Boss (K120)"
 
-    # Total
-    c.line(40, y_row - 20, width - 40, y_row - 20)
-    c.setFont("Helvetica-Bold", 14)
-    c.drawString(width - 200, y_row - 50, "Total Paid:")
-    c.drawRightString(width - 50, y_row - 50, f"K{amount}.00")
-
-    # --- SIGNATURE ---
-    sig_y_position = y_row - 130
+    # 2. Update DB with Credits AND Plan Name
+    school_ref.update({
+        "credits": firestore.Increment(action.credits_to_add),
+        "lastPaymentAmount": action.amount_paid,
+        "lastPaymentDate": firestore.SERVER_TIMESTAMP,
+        "maxTeachers": action.max_teachers,
+        "subscriptionPlan": plan_name,  # <--- SAVES THE PLAN
+        "isApproved": True
+    })
     
-    if real_sig_path:
-        try:
-            c.drawImage(real_sig_path, width - 200, sig_y_position, width=120, preserveAspectRatio=True)
-        except Exception as e:
-            print(f"Error loading signature: {e}")
-    
-    c.setStrokeColor(colors.black)
-    c.line(width - 200, sig_y_position, width - 50, sig_y_position) 
-    
-    c.setFont("Helvetica-Bold", 10)
-    c.drawRightString(width - 50, sig_y_position - 15, CEO_NAME)
-    c.setFont("Helvetica", 10)
-    c.drawRightString(width - 50, sig_y_position - 30, CEO_TITLE)
-
-    c.drawString(40, 50, "Thank you for choosing Booxclash Learn!")
-    c.drawCentredString(width / 2, 30, "Generated automatically by system.")
-
-    c.save()
-    buffer.seek(0)
-    return buffer
+    # 3. Return Data for Receipt
+    s_data = school_ref.get().to_dict()
+    return {
+        "status": "success",
+        "receipt_no": f"SCH-{action.school_id[:6].upper()}-{int(datetime.now().timestamp())}",
+        "date": datetime.now().strftime('%Y-%m-%d'),
+        "user_name": s_data.get("schoolName", "Valued School"),
+        "user_uid": action.school_id,
+        "plan_name": plan_name,
+        "credits": action.credits_to_add,
+        "amount": action.amount_paid
+    }
 
 # ==========================================
-# 🚀 API ENDPOINTS
+# 👥 USER ENDPOINTS
 # ==========================================
 
 @router.get("/users")
 async def get_all_users(x_user_id: str = Header(None, alias="X-User-ID")):
     await verify_admin(x_user_id)
     
-    # 1. Fetch from Auth (The Master List)
     try:
         all_auth_users = auth.list_users().iterate_all()
     except Exception as e:
         raise HTTPException(500, f"Error fetching auth users: {str(e)}")
     
-    # 2. Fetch from DB
     db_docs = {doc.id: doc.to_dict() for doc in db.collection("users").stream()}
-    
     combined_users = []
     
     for user in all_auth_users:
@@ -151,15 +147,8 @@ async def get_all_users(x_user_id: str = Header(None, alias="X-User-ID")):
         email = user.email or "No Email"
         db_data = db_docs.get(uid, {})
         
-        # Robust Name Logic
-        display_name = db_data.get("name")
-        if not display_name: display_name = user.display_name
-        if not display_name and email != "No Email": display_name = email.split("@")[0].title()
-        if not display_name: display_name = "Unknown User"
-
-        # Determine Status
-        status = "active" if uid in db_docs else "new_signup"
-        if db_data.get("is_approved"): status = "approved"
+        display_name = db_data.get("name") or user.display_name or email.split("@")[0].title() or "Unknown"
+        status = "approved" if db_data.get("is_approved") else ("active" if uid in db_docs else "new_signup")
 
         combined_users.append({
             "uid": uid,
@@ -167,87 +156,76 @@ async def get_all_users(x_user_id: str = Header(None, alias="X-User-ID")):
             "name": display_name,
             "role": db_data.get("role", "user"),
             "credits": db_data.get("credits", 0),
+            "subscriptionPlan": db_data.get("subscriptionPlan", "None"), # Return plan
             "joined_at": str(db_data.get("joined_at", datetime.fromtimestamp(user.user_metadata.creation_timestamp / 1000) if user.user_metadata.creation_timestamp else "Unknown")),
             "status": status,
-            "is_approved": db_data.get("is_approved", False)
+            "is_approved": db_data.get("is_approved", False),
+            "schoolName": db.collection("schools").document(db_data.get("schoolId")).get().to_dict().get("schoolName") if db_data.get("schoolId") else None
         })
     
-    # Return sorted by newest
     return sorted(combined_users, key=lambda x: x['joined_at'], reverse=True)
 
 @router.post("/users/topup")
-async def top_up_user(action: TopUpRequest, x_user_id: str = Header(None, alias="X-User-ID")):
+async def top_up_user(action: UserTopUpRequest, x_user_id: str = Header(None, alias="X-User-ID")):
     await verify_admin(x_user_id)
     
+    # 1. Determine Plan & Credits
     credits_to_add = 0
-    plan_name = "Unknown"
-
-    if action.amount_paid == 50:
+    plan_name = "Custom Top-up"
+    
+    if action.amount_paid == 50: 
         credits_to_add = 80
-        plan_name = "Standard Plan (K50)"
-    elif action.amount_paid == 120:
+        plan_name = "Individual Monthly (K50)"
+    elif action.amount_paid == 120: 
         credits_to_add = 300
-        plan_name = "Premium Plan (K120)"
-    else:
-        raise HTTPException(status_code=400, detail="Invalid amount. Use 50 or 120.")
+        plan_name = "Individual Termly (K120)"
+    else: 
+        credits_to_add = int(action.amount_paid * 1.5)
 
     user_ref = db.collection("users").document(action.target_uid)
     
-    # AUTO-CREATE IF MISSING
+    # Auto-create if missing
     if not user_ref.get().exists:
         try:
             auth_user = auth.get_user(action.target_uid)
-            d_name = auth_user.display_name or auth_user.email.split('@')[0]
             user_ref.set({
                 "email": auth_user.email,
-                "name": d_name,
+                "name": auth_user.display_name or auth_user.email.split('@')[0],
                 "role": "user",
                 "joined_at": firestore.SERVER_TIMESTAMP,
                 "credits": 0,
                 "is_approved": False
             })
-        except:
-            pass # Continue to update()
+        except: pass
 
-    # Update DB
+    # 2. Update DB with Credits AND Plan
     user_ref.update({
         "is_approved": True, 
         "credits": firestore.Increment(credits_to_add),
         "last_payment_amount": action.amount_paid,
-        "current_plan": plan_name,
+        "subscriptionPlan": plan_name, # <--- SAVES THE PLAN
         "last_payment_date": firestore.SERVER_TIMESTAMP
     })
     
-    # Get User Data for Receipt
-    u_data = user_ref.get().to_dict()
-    u_name = u_data.get("name", "Valued Customer")
-    
-    # Return JSON Data for Frontend PDF Generation
-    return {
-        "status": "success",
-        "receipt_no": action.target_uid[:8].upper(),
-        "date": datetime.now().strftime('%Y-%m-%d'),
-        "user_name": u_name,
-        "user_uid": action.target_uid,
-        "plan_name": plan_name,
-        "credits": credits_to_add,
-        "amount": action.amount_paid
-    }
-# --- OTHER ENDPOINTS ---
+    return {"status": "success", "new_credits": credits_to_add, "plan": plan_name}
+
 @router.post("/users/approve")
 async def approve_user(action: AdminAction, x_user_id: str = Header(None, alias="X-User-ID")):
     await verify_admin(x_user_id)
-    db.collection("users").document(action.target_uid).update({"is_approved": True, "credits": 9999})
+    db.collection("users").document(action.target_uid).update({"is_approved": True})
     return {"status": "success"}
 
 @router.delete("/users/{target_uid}")
 async def delete_user(target_uid: str, x_user_id: str = Header(None, alias="X-User-ID")):
     await verify_admin(x_user_id)
-    try:
-        auth.delete_user(target_uid) # Delete from Auth
+    try: auth.delete_user(target_uid) 
     except: pass
-    db.collection("users").document(target_uid).delete() # Delete from DB
+    db.collection("users").document(target_uid).delete() 
     return {"status": "success"}
+
+# ==========================================
+# 📚 CONTENT & STATS
+# ==========================================
 
 @router.get("/content/all")
 async def get_all_content(type: str = Query(...), x_user_id: str = Header(None, alias="X-User-ID")):
@@ -266,9 +244,9 @@ async def delete_content(action: ContentAction, x_user_id: str = Header(None, al
 @router.get("/stats")
 async def get_stats(x_user_id: str = Header(None, alias="X-User-ID")):
     await verify_admin(x_user_id)
-    # Note: These are simple counts. For production with thousands of users, use aggregation queries.
     return {
         "total_users": len(list(db.collection("users").stream())),
+        "total_schools": len(list(db.collection("schools").stream())),
         "total_schemes": len(list(db.collection("generated_schemes").stream())),
         "total_lessons": len(list(db.collection("generated_lesson_plans").stream()))
     }

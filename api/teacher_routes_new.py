@@ -189,8 +189,12 @@ async def generate_scheme(
         final_response = SchemeResponse(intro=intro_data, rows=structured_rows)
 
         save_generated_scheme(
-            uid=user_id, subject=request.subject, grade=request.grade,
-            term=request.term, data=final_response.dict() 
+            uid=user_id, 
+            subject=request.subject, 
+            grade=request.grade,
+            term=request.term, 
+            school_name=request.schoolName,
+            data=final_response.dict() 
         )
 
         return final_response

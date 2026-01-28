@@ -123,6 +123,7 @@ async def generate_scheme(
                     subject=request.subject,
                     grade=request.grade,
                     term=request.term,
+                    school_name=request.schoolName,
                     data=ai_scheme,
                 )
 

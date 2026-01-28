@@ -6,7 +6,7 @@ from typing import Union, List, Dict, Any
 # ==========================================
 # 1. SCHEMES OF WORK (NORMALIZED SAVING)
 # ==========================================
-def save_generated_scheme(uid: str, subject: str, grade: str, term: str, data: Union[List, Dict]):
+def save_generated_scheme(uid: str, subject: str, grade: str, term: str, school_name: str, data: Union[List, Dict]):
     """
     Saves the generated scheme to Firestore.
     
@@ -25,20 +25,24 @@ def save_generated_scheme(uid: str, subject: str, grade: str, term: str, data: U
             # Case A: It's already just a list of weeks
             final_scheme_list = data
         elif isinstance(data, dict):
-            # Case B: It's an object { "intro_info": ..., "scheme_weeks": ... }
-            # We try multiple common keys to find the list
             final_scheme_list = (
+                data.get("rows") or          # ✅ NEW (THIS IS THE FIX)
                 data.get("weeks") or 
                 data.get("scheme_weeks") or 
                 data.get("schemeData") or 
                 []
             )
-            intro_info = data.get("intro_info") or {}
+            intro_info = (
+                data.get("intro") or          # ✅ Match your schema
+                data.get("intro_info") or 
+                {}
+            )
+
         
         # --- SAVE TO FIRESTORE ---
         doc_ref.set({
             "userId": uid,
-            "schoolName": "Unknown School", 
+            "schoolName": school_name, 
             "subject": subject,
             "grade": grade,
             "term": term,
