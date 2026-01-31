@@ -3,7 +3,7 @@ import json
 import asyncio
 import re
 import math
-from typing import List, Dict, Any, Union
+from typing import List, Dict, Any, Union,Optional
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
 import google.generativeai as genai
@@ -318,53 +318,218 @@ def extract_scheme_details(scheme_data: List[dict], week_number: int) -> Dict[st
     }
 
 # =====================================================
-# 2. WEEKLY PLAN GENERATOR (Context-Aware)
+# 🛠️ HELPER: FIND TOPIC IN MODULE
+# =====================================================
+def find_topic_content_in_module(module_data: Dict[str, Any], target_topic: str) -> str:
+    """
+    Searches the module JSON for a matching topic and returns its content.
+    """
+    if not module_data or not target_topic:
+        return ""
+
+    target_clean = target_topic.lower().strip()
+    found_content = []
+
+    # Recursive search function
+    def recursive_search(data):
+        if isinstance(data, dict):
+            # Check if this dict represents a topic
+            current_topic = data.get("topic", "") or data.get("title", "") or data.get("unit", "")
+            if isinstance(current_topic, str) and (target_clean in current_topic.lower() or current_topic.lower() in target_clean):
+                # Found a match! Collect useful fields
+                content_snippets = [
+                    f"Title: {current_topic}",
+                    f"Content: {str(data.get('content', ''))}",
+                    f"Activities: {str(data.get('activities', ''))}",
+                    f"Examples: {str(data.get('examples', ''))}"
+                ]
+                found_content.append("\n".join(content_snippets))
+            
+            # Recurse through all values
+            for key, value in data.items():
+                recursive_search(value)
+        
+        elif isinstance(data, list):
+            for item in data:
+                recursive_search(item)
+
+    recursive_search(module_data)
+    
+    # Return the top match or empty string
+    return found_content[0] if found_content else ""
+
+def extract_unit_id(text: str) -> str:
+    """
+    Extracts the first occurrence of a unit/topic ID like '1.1', '1.1.3', 'Unit 1'.
+    Returns cleaned ID string (e.g., '1.1.3') or None.
+    """
+    match = re.search(r'\b(\d+\.\d+(\.\d+)?)\b', str(text))
+    if match:
+        return match.group(1)
+    return None
+
+def normalize_text(text):
+    """
+    Cleans text for semantic comparison (removes numbers/special chars).
+    """
+    if not text: return ""
+    clean = re.sub(r'^(unit|topic|week)?\s*\d+(\.\d+)*\s*', '', str(text), flags=re.IGNORECASE)
+    return re.sub(r'[^a-z0-9]', '', clean.lower())
+
+def find_structured_module_content(module_data: Dict[str, Any], search_topic: str) -> Dict[str, Any]:
+    """
+    PRIORITY 1: Match exactly by Unit ID (e.g., Search '1.1.1' -> Module '1.1.1').
+    PRIORITY 2: Match by Text content if no ID is found.
+    """
+    if not module_data or "topics" not in module_data:
+        return None
+
+    # 1. Extract ID from the Scheme Topic (e.g., "1.1.1 Branches..." -> "1.1.1")
+    search_id = extract_unit_id(search_topic)
+    search_text_clean = normalize_text(search_topic)
+    
+    print(f"   🔍 Module Search | ID: '{search_id}' | Text: '{search_text_clean}'")
+
+    for topic in module_data.get("topics", []):
+        topic_id = str(topic.get("topic_id", ""))
+        topic_title = topic.get("topic_title", "")
+        
+        # --- LEVEL 1: TOPIC CHECK ---
+        # Check ID Match (e.g. "1" == "1")
+        topic_id_match = (search_id and search_id == topic_id)
+        
+        for sub in topic.get("sub_topics", []):
+            sub_id = str(sub.get("subtopic_id", ""))
+            sub_title = sub.get("subtopic_title", "")
+            
+            # --- LEVEL 2: SUBTOPIC CHECK ---
+            # Check strict ID match (e.g. Scheme "1.1" == Module "1.1")
+            sub_id_match = (search_id and search_id == sub_id)
+            
+            # Check text match (backup)
+            sub_text_clean = normalize_text(sub_title)
+            text_match = (search_text_clean in sub_text_clean) or (sub_text_clean in search_text_clean)
+            
+            # 🔥 DECISION LOGIC 🔥
+            # If we have a Search ID, require strictly the ID match.
+            # If we don't have a Search ID, rely on text.
+            is_match = False
+            
+            if search_id:
+                # If searching by ID, only return if ID matches
+                if sub_id_match:
+                    is_match = True
+                    print(f"      ✅ STRICT ID MATCH: {search_id} == {sub_id}")
+            else:
+                # If no ID in search, use text
+                if text_match:
+                    is_match = True
+                    print(f"      ✅ TEXT MATCH: '{search_text_clean}' ~= '{sub_text_clean}'")
+
+            if is_match:
+                # Format the content
+                blocks_text = ""
+                for block in sub.get("instructional_blocks", []):
+                    t_steps = " ".join(block.get("teacher_steps", []))
+                    l_tasks = " ".join(block.get("learner_tasks", []))
+                    
+                    blocks_text += f"""
+                    [Activity ID: {block.get('block_id')}]
+                    - Hook: {block.get('hook')}
+                    - Teacher: {t_steps}
+                    - Learner: {l_tasks}
+                    """
+
+                return {
+                    "found": True,
+                    "unit_id": sub_id,
+                    "topic_title": f"{topic_title}: {sub_title}",
+                    "pages": str(sub.get("page_number", topic.get("page_number", "N/A"))),
+                    "context_text": f"""
+                    TOPIC: {topic_title}
+                    SUBTOPIC: {sub_title} (ID: {sub_id})
+                    COMPETENCES: {', '.join(sub.get('competences', []))}
+                    
+                    ACTIVITIES:
+                    {blocks_text}
+                    """
+                }
+            
+    return None
+
+# =====================================================
+# 2. WEEKLY PLAN GENERATOR 
 # =====================================================
 async def generate_weekly_plan_from_scheme(
     school: str, subject: str, grade: str, term: str, 
-    week_number: int, days: int, start_date: str, scheme_data: List[dict] = None
+    week_number: int, days: int, start_date: str, 
+    scheme_data: List[dict] = None,
+    module_data: Optional[Dict[str, Any]] = None
 ) -> Dict[str, Any]:
     
     print(f"\n🗓️ [Weekly Generator] Request: Week {week_number}...")
     
-    # 1. GET RICH DATA
+    # 1. USE THE EXTRACTOR HELPER
+    # This helper is much better at finding the week than the inline logic was
     details = extract_scheme_details(scheme_data, week_number)
     
-    # Fallback if scheme is empty
     if not details["found"]:
-         details["component"] = f"Week {week_number} Content"
-         details["specific_competences"] = ["Learners should be able to understand the topic."]
+        print(f"   ⚠️ Week {week_number} not found in Scheme. Using generic fallback.")
+        # If not found, we try to at least provide the subject context
+        details["topic"] = f"General {subject} Concepts"
+        details["refs"] = "Standard Syllabus"
 
-    model = get_model() # Your Gemini/Model getter
+    # 2. FETCH STRUCTURED MODULE CONTENT
+    # We search using the Topic name from the Scheme (e.g., "Unit 1.1: Branches of Chemistry")
+    module_info = find_structured_module_content(module_data, details['topic'])
     
-    # 2. PROMPT
-    # We feed the lists directly into the prompt so the AI copies them.
+    module_prompt_insert = ""
+    
+    if module_info:
+        print(f"   ↳ ✅ Module Found: Unit {module_info['unit_id']}, Pages: {module_info['pages']}")
+        module_prompt_insert = f"""
+        🔥🔥 **OFFICIAL MODULE DATA FOUND** 🔥🔥
+        1. **UNIT ID**: {module_info['unit_id']}
+        2. **PAGE NUMBERS**: {module_info['pages']}
+        3. **CONTENT SOURCE**: Use the specific activities below to fill 'scope_of_lesson' and 'learning_activity'.
+        
+        --- MODULE CONTENT START ---
+        {module_info['context_text']}
+        --- MODULE CONTENT END ---
+        
+        **MANDATORY INSTRUCTION**: 
+        In the 'reference' field of the JSON, you MUST write: "Module Unit {module_info['unit_id']}, Page {module_info['pages']}".
+        """
+    else:
+        # FALLBACK TO SCHEME REFERENCES
+        print(f"   ↳ ⚠️ Module not found for Topic: '{details['topic']}'. Falling back to Scheme References.")
+        module_prompt_insert = f"""
+        ⚠️ **MODULE DATA NOT FOUND**
+        
+        **MANDATORY INSTRUCTION**:
+        You MUST use the 'REFERENCES' from the Scheme of Work provided: "{details.get('refs', 'Syllabus')}".
+        
+        In the 'reference' field of the JSON output, write exactly: "{details.get('refs', 'Standard Syllabus')}".
+        """
+
+    model = get_model() 
+    
+    # 3. PROMPT
     prompt = f"""
     Act as a Senior Teacher in Zambia. Create a Weekly Lesson Plan for {days} days.
     
     CONTEXT:
     - Subject: {subject}, Grade: {grade}, Term: {term}, Week: {week_number}
+    - Topic: {details['topic']}
+    - Competencies: {", ".join(details.get('specific_competences', []))}
     
-    ⚠️ CRITICAL: YOU MUST USE THE FOLLOWING SCHEME DATA EXACTLY. DO NOT HALLUCINATE NEW CONTENT.
-    
-    1. COMPONENT / UNIT: "{details['component']}"
-    2. TOPIC: "{details['topic']}"
-    3. PRESCRIBED COMPETENCE: {json.dumps(details['prescribed_competences'])}
-    4. SPECIFIC COMPETENCES (Outcomes): {json.dumps(details['specific_competences'])}
-    5. CONTENT (Scope): {json.dumps(details['content'])}
-    6. LEARNING ACTIVITIES: {json.dumps(details['learning_activities'])}
-    7. METHODS (Strategies): {json.dumps(details['methods'])}
-    8. RESOURCES: {json.dumps(details['resources'])}
-    9. REFERENCES: {json.dumps(details['refs'])}
+    {module_prompt_insert}
 
     INSTRUCTIONS:
-    - **Component Column**: Use "{details['component']}" for every day.
-    - **Topic/Subtopic**: Break the "CONTENT" list above into {days} logical subtopics (one for each day).
-    - **Specific Competence**: Copy the relevant competence from the list above that matches that day's subtopic.
-    - **Learning Activity**: Select 1-2 activities from the "LEARNING ACTIVITIES" list above that fit the day.
-    - **Strategies**: Use the "METHODS" list above.
-    - **T/L Resources**: Use the "RESOURCES" list above.
-    - **Expected Standard**: Write a short sentence summarizing what the learner will achieve that day (e.g., "Learners correctly identify...").
+    - **Topic**: Use "{details['topic']}".
+    - **Subtopic**: Break the topic into {days} logical daily lessons.
+    - **Scope of Lesson**: If Module Data is present, summarize the 'Teacher' and 'Learner' steps from the module.
+    - **Reference**: STRICTLY follow the 'MANDATORY INSTRUCTION' above.
 
     OUTPUT JSON ONLY:
     {{
@@ -372,16 +537,16 @@ async def generate_weekly_plan_from_scheme(
       "days": [
         {{
           "day": "Monday", 
-          "component": "{details['component']}", 
+          "component": "{details.get('component', subject)}", 
           "topic": "{details['topic']}", 
-          "subtopic": "1.1.1 [Subtopic Name]", 
-          "specific_competence": "Learners should be able to...", 
-          "scope_of_lesson": "Brief summary of content...",
-          "learning_activity": "Learners will...", 
-          "expected_standard": "Learners correctly...",
-          "resources": ["Item 1", "Item 2"], 
-          "strategies": ["Group Work", "Demonstration"],
-          "reference": "{details['refs'][0] if details['refs'] else 'Syllabus'}"
+          "subtopic": "Name of sub-lesson", 
+          "specific_competence": "Learner should be able to...", 
+          "scope_of_lesson": "Brief teacher content...",
+          "learning_activity": "What learners do...", 
+          "expected_standard": "Assessment goal...",
+          "resources": {json.dumps(details.get('resources', ["Textbook"]))}, 
+          "strategies": {json.dumps(details.get('methods', ["Inquiry"]))},
+          "reference": "..." 
         }}
       ]
     }}
@@ -398,46 +563,65 @@ async def generate_weekly_plan_from_scheme(
         return {"days": []}
 
 # =====================================================
-# 3. DETAILED LESSON PLANNER (Matches CBC Form + Smart Context)
+# 3. SPECIFIC LESSON PLANNER (Deep Module Integration)
 # =====================================================
 async def generate_specific_lesson_plan(
     grade: str, subject: str, theme: str, subtopic: str, objectives: List[str],
     date: str, time_start: str, time_end: str, attendance: Dict[str, int],
-    teacher_name: str = "Class Teacher", school_name: str = "Primary School"
+    teacher_name: str = "Class Teacher", school_name: str = "Primary School",
+    module_data: Optional[Dict[str, Any]] = None,
+    scheme_references: str = "Standard Syllabus" 
 ) -> Dict[str, Any]:
     
-    print(f"\n==========================================")
-    print(f"🔍 DEBUG: Generating CBC Lesson Plan")
-    print(f"👤 Teacher: {teacher_name} | Grade: {grade}")
-    print(f"📖 Topic: {theme}")
-    print(f"==========================================\n")
+    print(f"\n🔍 [Lesson Plan] Generating for: {theme} - {subtopic}")
+
+    # 1. FETCH STRUCTURED MODULE CONTENT (For metadata & content)
+    # We search the module using the subtopic name provided by the UI
+    module_info = find_structured_module_content(module_data, subtopic)
+    
+    # Fallback to searching by the main topic/theme if subtopic fails
+    if not module_info:
+        module_info = find_structured_module_content(module_data, theme)
+
+    module_prompt_insert = ""
+    final_reference = scheme_references # Default to what came from the scheme
+
+    if module_info:
+        unit_id = module_info.get("unit_id", "N/A")
+        pages = module_info.get("pages", "N/A")
+        final_reference = f"Official Module Unit {unit_id}, Page {pages}"
+        
+        print(f"   ↳ ✅ Module Found: {final_reference}")
+        module_prompt_insert = f"""
+        🔥🔥 **OFFICIAL MODULE DATA (SOURCE OF TRUTH)** 🔥🔥
+        **UNIT ID**: {unit_id}
+        **RELEVANT PAGES**: {pages}
+        
+        **TEACHING GUIDELINES FROM MODULE**:
+        {module_info['context_text']}
+        
+        **INSTRUCTION**: 
+        1. In the 'references' field, write: "{final_reference}".
+        2. Use the 'Teacher steps' and 'Learner tasks' from the module text above to build the 'DEVELOPMENT' stage.
+        """
+    else:
+        print(f"   ↳ ⚠️ Module not found for '{subtopic}'. Using Scheme Reference: {scheme_references}")
+        module_prompt_insert = f"""
+        **MANDATORY INSTRUCTION**:
+        Use the references provided from the Scheme of Work: "{scheme_references}".
+        In the 'references' field, write exactly: "{scheme_references}".
+        """
 
     model = get_model()
 
-    # 1. CALCULATE SMART CONTEXT (Class Size & Gender)
+    # 2. CALCULATE CONTEXT
     boys = attendance.get('boys', 0)
     girls = attendance.get('girls', 0)
     total_students = boys + girls
     
-    # Strategy based on class size
-    class_strategy = ""
-    if total_students > 45:
-        class_strategy = "LARGE CLASS. Use 'Row Groups' and 'Choral Response'. Do not pass small objects."
-    elif total_students < 20:
-        class_strategy = "SMALL CLASS. Use 'Individual Presentations' and 'Circle Time'."
-    else:
-        class_strategy = "STANDARD CLASS. Use 'Think-Pair-Share' and 'Group Work'."
-
-    # Gender note
-    gender_note = ""
-    if girls > boys * 2:
-        gender_note = f"Girls outnumber boys ({girls} vs {boys}). Encourage boys to lead."
-    elif boys > girls * 2:
-        gender_note = f"Boys outnumber girls ({boys} vs {girls}). Ensure girls speak up."
-
-    # 2. PROMPT
+    # 3. PROMPT
     prompt = f"""
-    Act as a professional teacher in Zambia. Create a Lesson Plan matching the official **Competence Based Curriculum (CBC)** format shown in the Ministry images.
+    Act as a professional teacher in Zambia. Create a **Competence Based Curriculum (CBC)** Lesson Plan.
 
     CONTEXT:
     - School: "{school_name}"
@@ -445,18 +629,9 @@ async def generate_specific_lesson_plan(
     - Grade: {grade}, Subject: {subject}
     - Topic: "{theme}"
     - Subtopic: "{subtopic}"
-    - Date: {date} | Time: {time_start}-{time_end}
     - Objectives: {json.dumps(objectives)}
     
-    CLASSROOM DATA:
-    - Total: {total_students} learners.
-    - Context Rule: {class_strategy}
-    - Gender Note: {gender_note}
-
-    STRICT FORMATTING RULES (Based on User's Form):
-    1. **Learning Environment**: Must be split into 'Natural', 'Technological', and 'Artificial'.
-    2. **Assessment Criteria**: Every step in the table MUST have an assessment criteria (e.g., "Can learners identify...?").
-    3. **Expected Standard**: A broad statement of what is expected.
+    {module_prompt_insert}
 
     OUTPUT JSON (Strict Structure):
     {{
@@ -473,64 +648,163 @@ async def generate_specific_lesson_plan(
       "expected_standard": "Learners should be able to...",
       
       "learning_environment": {{
-          "natural": "e.g., Soil, sunlight, local plants...",
-          "technological": "e.g., Calculators, mobile phones, video...",
-          "artificial": "e.g., Charts, models, classroom furniture..."
+          "natural": "Classroom",
+          "technological": "N/A",
+          "artificial": "Desks/Chalkboard"
       }},
       
-      "materials": "List all teaching aids here.",
-      "references": "Syllabus Grade {grade}, Pupil's Book page...",
+      "materials": "List specific aids mentioned in the module content if any.",
+      "references": "{final_reference}",
       
       "steps": [
         {{ 
             "stage": "INTRODUCTION", 
             "time": "5 min", 
-            "teacherActivity": "Teacher asks learners to...", 
-            "learnerActivity": "Learners respond by...", 
-            "assessment_criteria": "Teacher checks if learners can recall..." 
+            "teacherActivity": "Create a hook based on the subtopic.", 
+            "learnerActivity": "...", 
+            "assessment_criteria": "..." 
         }},
         {{ 
             "stage": "DEVELOPMENT", 
             "time": "30 min", 
-            "teacherActivity": "Teacher groups learners and...", 
-            "learnerActivity": "In groups, learners discuss...", 
-            "assessment_criteria": "Teacher observes if learners are able to classify..." 
+            "teacherActivity": "Step-by-step instructions from the module.", 
+            "learnerActivity": "Corresponding learner tasks from the module.", 
+            "assessment_criteria": "..." 
         }},
         {{ 
             "stage": "CONCLUSION", 
             "time": "5 min", 
-            "teacherActivity": "Teacher summarizes by...", 
-            "learnerActivity": "Learners ask questions and...", 
-            "assessment_criteria": "Teacher evaluates understanding by..." 
+            "teacherActivity": "Summary of key points.", 
+            "learnerActivity": "...", 
+            "assessment_criteria": "..." 
         }}
       ],
-      "homework_content": "Specific task for home."
+      "homework_content": "A short task."
     }}
     """
     
     try:
-        # Generate and parse
         response = await model.generate_content_async(
             prompt,
             generation_config={"response_mime_type": "application/json"}
         )
-        json_str = extract_json_string(response.text)
-        data = json.loads(json_str) # Removed strict=False to ensure clean JSON
-
-        # 3. POST-PROCESSING (Add the dots for the printed form)
-        ai_homework = data.get("homework_content", "Refer to Pupil's Book.")
+        data = json.loads(extract_json_string(response.text))
         
-        # Add the "Evaluation" footer section typical in Zambian books
-        data["evaluation_footer"] = "LESSON EVALUATION (Indicate weaknesses, strengths, and way forward):\n" + ("." * 250)
-
+        # Safety check: Ensure the reference is correctly set
+        data["references"] = final_reference
+        data["evaluation_footer"] = "LESSON EVALUATION:\n" + ("." * 200)
+        
         return data
 
     except Exception as e:
         print(f"❌ [Lesson Generator] Failed: {e}")
-        # Return a safe fallback so the app doesn't crash
+        return {"error": "Failed to generate plan."}
+# =====================================================
+# 4. LESSON NOTES GENERATOR (Blackboard/Student Notes)
+# =====================================================
+async def generate_lesson_notes(
+    grade: str, subject: str, topic: str, subtopic: str,
+    module_data: Optional[Dict[str, Any]] = None
+) -> Dict[str, Any]:
+    """
+    Generates detailed blackboard notes. 
+    Strictly uses Module Unit IDs and Page Numbers if available.
+    """
+    
+    print(f"\n📝 [Notes Generator] Generating notes for: {topic} - {subtopic}")
+
+    # 1. FETCH STRUCTURED MODULE CONTENT (For metadata like Unit ID and Pages)
+    # We search by subtopic first for precision
+    module_info = find_structured_module_content(module_data, subtopic)
+    
+    # If not found by subtopic, try the main topic
+    if not module_info:
+        module_info = find_structured_module_content(module_data, topic)
+
+    module_context_str = ""
+    reference_str = "Standard Syllabus Knowledge" # Default fallback
+
+    if module_info:
+        unit_id = module_info.get("unit_id", "N/A")
+        pages = module_info.get("pages", "N/A")
+        reference_str = f"Official Module Unit {unit_id}, Page {pages}"
+        
+        print(f"   ↳ ✅ Module Found: Unit {unit_id}, Page {pages}")
+        
+        module_context_str = f"""
+        🔥🔥 **OFFICIAL MODULE DATA (SOURCE OF TRUTH)** 🔥🔥
+        REFERENCE: {reference_str}
+        CONTENT:
+        {module_info['context_text']}
+        
+        **MANDATORY INSTRUCTION**: 
+        1. Use the terminology and definitions found in the text above.
+        2. You MUST include "{reference_str}" in the 'reference' field of the JSON.
+        """
+    else:
+        print("   ⚠️ No specific module content found. Using AI pedagogical knowledge.")
+        module_context_str = "⚠️ No module data provided. Use standard Zambian Curriculum standards."
+
+    model = get_model()
+
+    # 2. PROMPT
+    prompt = f"""
+    Act as a simplified, clear Teacher in Zambia. 
+    Write **Lesson Notes** that a teacher would write on the blackboard for Grade {grade} students to copy into their exercise books.
+    
+    CONTEXT:
+    - Subject: {subject}
+    - Topic: {topic}
+    - Subtopic: {subtopic}
+    
+    {module_context_str}
+
+    INSTRUCTIONS:
+    1. **Simple Language**: Keep it clear for Grade {grade}.
+    2. **Definitions**: Must be accurate to the source material provided.
+    3. **Examples**: Provide 2-3 worked examples.
+    4. **Exercise**: Provide 3-5 short questions for classwork.
+    
+    OUTPUT JSON FORMAT (Strict):
+    {{
+      "topic_heading": "{topic}: {subtopic}",
+      "reference": "{reference_str}", 
+      "introduction": "Brief sentence introducing the concept...",
+      "key_definitions": [
+        {{ "term": "Term", "definition": "..." }}
+      ],
+      "explanation_points": [
+        "Point 1",
+        "Point 2"
+      ],
+      "worked_examples": [
+        {{ "question": "Example 1", "solution": "..." }}
+      ],
+      "class_exercise": [
+        "Question 1..."
+      ],
+      "homework_question": "..."
+    }}
+    """
+
+    try:
+        response = await model.generate_content_async(
+            prompt,
+            generation_config={"response_mime_type": "application/json"}
+        )
+        data = json.loads(extract_json_string(response.text))
+        
+        # Double check: ensure the reference is explicitly set in case the AI missed it
+        if module_info and "reference" not in data:
+            data["reference"] = reference_str
+            
+        return data
+
+    except Exception as e:
+        print(f"❌ [Notes Generator] Error: {e}")
         return {
-            "teacherName": teacher_name,
-            "topic": theme,
-            "steps": [],
-            "error": "Failed to generate plan."
+            "topic_heading": f"{topic}",
+            "reference": reference_str,
+            "explanation_points": ["Error generating notes. Please try again."],
+            "class_exercise": []
         }

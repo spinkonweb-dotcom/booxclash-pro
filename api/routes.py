@@ -19,13 +19,24 @@ from services.firebase_setup import db
 from services.llm_teacher_engine_new import (
     generate_weekly_plan_from_scheme,
     generate_specific_lesson_plan,
-    # generate_quiz_json,
-    # generate_builder_json,
-    # generate_realistic_image,
-    # optimize_search_term
 )
 
 router = APIRouter()
+
+# ⚡️ CONFIGURATION: STRICT MAPPING
+# Keys = What the user might ask for (Old/Alt terms)
+# Values = Where the ACTUAL files are stored (Current System)
+GRADE_MAP = {
+    # Lower Secondary: "Grade 8" files don't exist -> Map to "Form 1"
+    "grade 8": "Form 1",
+    "grade 9": "Form 2",
+    
+    # Upper Secondary: "Form 3" files don't exist -> Map to "Grade 10"
+    "form 3": "Grade 10",
+    "form 4": "Grade 11",
+    "form 5": "Grade 12",
+    "form 6": "Grade 13", 
+}
 
 class PlanQuery(BaseModel):
     grade: str
@@ -56,13 +67,38 @@ async def get_weekly_plan(
 @router.get("/get-subjects/{grade}")
 async def get_subjects_endpoint(grade: str):
     """
-    Frontend calls: /get-subjects/Grade 4
-    Backend returns: ["Mathematics", "English", "Science"]
+    Handles fetching subjects with strict curriculum mapping.
+    
+    SCENARIOS:
+    1. Input "Form 1" -> Returns subjects from "Form 1" folder. (No Map)
+    2. Input "Grade 8" -> Maps to "Form 1" -> Returns subjects from "Form 1" folder.
+    3. Input "Grade 10" -> Returns subjects from "Grade 10" folder. (No Map)
+    4. Input "Form 3" -> Maps to "Grade 10" -> Returns subjects from "Grade 10" folder.
     """
-    subjects = get_subjects_for_grade(grade)
+    
+    # Normalize input to lowercase for key lookup
+    normalized_key = grade.lower().strip()
+    
+    # Default target is exactly what was requested
+    target_grade = grade 
+
+    # Check if this grade needs to be redirected to a valid folder name
+    if normalized_key in GRADE_MAP:
+        mapped_grade = GRADE_MAP[normalized_key]
+        print(f"🔄 Mapping Request '{grade}' -> '{mapped_grade}' (File System Source)")
+        target_grade = mapped_grade
+    
+    # Fetch subjects from the correct folder
+    subjects = get_subjects_for_grade(target_grade)
     
     if not subjects:
-        return {"subjects": [], "message": f"No syllabus files found for {grade}"}
+        # Fallback: Just in case the mapping was wrong and the original actually exists
+        if target_grade != grade:
+             print(f"⚠️ Target '{target_grade}' empty. Retrying original '{grade}'...")
+             subjects = get_subjects_for_grade(grade)
+
+    if not subjects:
+        return {"subjects": [], "message": f"No syllabus files found for {grade} (checked {target_grade})"}
         
     return {"subjects": subjects}
 
@@ -77,7 +113,6 @@ async def handle_agent_tool(
         args = request.arguments or {}
         uid = x_user_id or request.student.uid or "default_user"
 
-        # ... (generate_weekly logic remains the same) ...
         if request.tool_name == "generate_weekly":
             try:
                 check_and_deduct_credit(uid)
@@ -117,18 +152,14 @@ async def handle_agent_tool(
             print(f"📝 Requesting Lesson Plan...")
 
             # ✅ 1. FETCH REAL TEACHER NAME FROM FIREBASE
-            # This prevents "[Your Name]" by checking the DB source of truth
             db_teacher_name = "Class Teacher"
             if uid != "default_user":
                 user_doc = db.collection("users").document(uid).get()
                 if user_doc.exists:
                     db_teacher_name = user_doc.to_dict().get("name", "Class Teacher")
             
-            # Use DB name if available, otherwise frontend arg, otherwise default
             teacher_name = db_teacher_name 
             
-            # 2. Logic for School Name (Args -> Default)
-            # We don't typically save school in user profile, so rely on Args or a clean default
             school_name = args.get("school")
             if not school_name or school_name == "Unknown School":
                 school_name = "Primary School"
@@ -138,7 +169,6 @@ async def handle_agent_tool(
             theme = args.get("topic") or request.student.subject
             target_date = args.get("startDate")
 
-            # 3. Attempt Load Weekly Plan to enrich context
             weekly_data = load_weekly_plan(
                 uid=uid,
                 subject=request.student.subject,
@@ -162,7 +192,6 @@ async def handle_agent_tool(
                         if not objectives:
                             objectives = found_day.get("objectives", objectives)
 
-            # 4. Generate with Real Names
             attendance = {"boys": args.get("boys", 0), "girls": args.get("girls", 0)}
             
             lesson_json = await generate_specific_lesson_plan(
@@ -175,8 +204,8 @@ async def handle_agent_tool(
                 time_start=args.get("startTime", "08:00"),
                 time_end=args.get("endTime", "08:40"),
                 attendance=attendance,
-                teacher_name=teacher_name, # ✅ Uses DB Name
-                school_name=school_name    # ✅ Uses Clean Default
+                teacher_name=teacher_name, 
+                school_name=school_name    
             )
 
             if lesson_json:
@@ -191,23 +220,6 @@ async def handle_agent_tool(
                 )
             
             return {"status": "success", "type": "lesson_plan", "data": lesson_json}
-
-        # ... (Rest of the tools remain the same) ...
-        if request.tool_name == "trigger_quiz":
-             topic = args.get("topic", "General Knowledge")
-             quiz_data = await generate_quiz_json(topic, request.student.grade)
-             return {"status": "success", "type": "quiz", "data": quiz_data}
-
-        if request.tool_name == "trigger_simulation":
-             topic = args.get("topic", "Science")
-             sim_data = await generate_builder_json(topic, request.student.grade)
-             return {"status": "success", "type": "simulation", "data": sim_data}
-
-        if request.tool_name == "trigger_image":
-             raw_prompt = args.get("prompt", "")
-             optimized_prompt = await optimize_search_term(raw_prompt, request.student.grade)
-             image_url = await generate_realistic_image(optimized_prompt)
-             return { "status": "success", "type": "image", "data": {"url": image_url, "prompt": optimized_prompt} }
 
         if request.tool_name not in ["generate_weekly", "generate_lesson", "trigger_quiz", "trigger_simulation", "trigger_image"]:
              raise HTTPException(status_code=400, detail=f"Unknown tool: {request.tool_name}")

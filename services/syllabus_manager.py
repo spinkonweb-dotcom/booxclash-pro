@@ -1,7 +1,7 @@
 import json
 import os
 from pathlib import Path
-from typing import List, Dict, Any, Union
+from typing import List, Dict, Any, Union, Optional
 
 # ==========================================
 # 1. CURRICULUM ROUTING LOGIC
@@ -11,7 +11,7 @@ from typing import List, Dict, Any, Union
 NEW_CURRICULUM_GRADES = {
     "pre-school", "reception", 
     "grade 1", "grade 2", "grade 4", 
-     "form 1", "form 2", "form 3", "form 4"
+    "form 1", "form 2", "form 3", "form 4"
 }
 
 # Define which grades use the OLD Curriculum
@@ -26,180 +26,184 @@ def get_curriculum_folder(grade: str) -> str:
     """
     norm_grade = str(grade).lower().strip()
     
-    # Check for exact matches or partial matches (e.g. "4" matches "grade 4")
-    # If user sends "4", we assume "grade 4" logic
     if norm_grade in NEW_CURRICULUM_GRADES or f"grade {norm_grade}" in NEW_CURRICULUM_GRADES:
         return "new"
     elif norm_grade in OLD_CURRICULUM_GRADES or f"grade {norm_grade}" in OLD_CURRICULUM_GRADES:
         return "old"
     
-    # Default fallback if unknown (Safe option)
     return "new"
 
 # ==========================================
 # 2. ROBUST DIRECTORY CONFIGURATION
 # ==========================================
-def get_syllabi_root_dir():
-    """Robustly finds the root 'syllabi' folder."""
+def get_root_dir(folder_name: str) -> Path:
     current_file = Path(__file__).resolve()
-    
     paths_to_check = [
-        current_file.parent.parent / "syllabi",         # Standard Project Structure
-        Path(os.getcwd()) / "syllabi",                  # Root execution
-        Path(os.getcwd()) / "backend-fastapi" / "syllabi", # Monorepo
-        current_file.parent / "syllabi"                 # Inside current folder
+        current_file.parent.parent / folder_name,
+        Path(os.getcwd()) / folder_name,
+        Path(os.getcwd()) / "backend-fastapi" / folder_name,
+        current_file.parent / folder_name
     ]
-
     for path in paths_to_check:
         if path.exists() and path.is_dir():
             return path
-            
-    # Fallback
-    return current_file.parent.parent / "syllabi"
+    return current_file.parent.parent / folder_name
 
-SYLLABI_ROOT_DIR = get_syllabi_root_dir()
+SYLLABI_ROOT_DIR = get_root_dir("syllabi")
+MODULES_ROOT_DIR = get_root_dir("modules")
 
 # ==========================================
-# 3. ROBUST FILE FINDER (UPDATED)
+# 3. ROBUST FILE FINDER
 # ==========================================
-def find_syllabus_file(country: str, grade: str, subject: str) -> Path | None:
-    """
-    1. Determines curriculum type (New vs Old).
-    2. Looks into the specific subfolder (syllabi/new or syllabi/old).
-    3. Finds the file using flexible matching.
-    """
-    if not SYLLABI_ROOT_DIR.exists():
-        print(f"❌ Critical: Syllabi root not found at {SYLLABI_ROOT_DIR}")
+
+def find_file(root_dir: Path, country: str, grade: str, subject: str, must_include: str = "") -> Optional[Path]:
+    if not root_dir.exists():
         return None
 
-    # 1. Determine Folder (New vs Old)
     curr_type = get_curriculum_folder(grade)
-    target_dir = SYLLABI_ROOT_DIR / curr_type
+    target_dir = root_dir / curr_type
     
-    print(f"📂 Routing '{grade}' to -> {target_dir}")
-
     if not target_dir.exists():
-        print(f"⚠️ Subfolder '{curr_type}' does not exist inside syllabi.")
-        return None
+        target_dir = root_dir
 
-    # 2. Normalize Inputs for Search
-    search_country = country.lower().strip() # "zambia"
-    search_subject = subject.lower().strip().replace(" ", "_") # "mathematics"
-    raw_grade = str(grade).lower().replace(" ", "") # "grade2" or "2"
+    search_country = country.lower().strip()
+    search_subject = subject.lower().strip().replace(" ", "_")
+    
+    # Clean input for search
+    raw_input = str(grade).lower().replace(" ", "")
+    
+    # STRICT TAG GENERATION
+    # If input is "form1", only look for form tags. If "grade1", only grade tags.
+    possible_grade_tags = []
+    
+    # Extract number (e.g. "1" from "form1")
+    raw_num = raw_input.replace("grade", "").replace("form", "")
 
-    # Create grade variations
-    if "grade" not in raw_grade and "form" not in raw_grade:
-        possible_grade_tags = [f"grade{raw_grade}", f"grade_{raw_grade}", f"form{raw_grade}"]
+    if "form" in raw_input:
+        # Looking for Form files (e.g., ...grade_form_1.json or ...form_1.json)
+        possible_grade_tags = [f"form{raw_num}", f"form_{raw_num}"] 
+    elif "grade" in raw_input:
+        # Looking for Grade files (e.g., ...grade_1.json)
+        possible_grade_tags = [f"grade{raw_num}", f"grade_{raw_num}"]
     else:
-        possible_grade_tags = [raw_grade]
+        # Fallback if just "1" is passed
+        possible_grade_tags = [f"grade{raw_num}", f"grade_{raw_num}", f"form{raw_num}"]
 
-    # 3. Scan the TARGET Subfolder
     for file_path in target_dir.glob("*.json"):
         filename = file_path.name.lower()
         
-        # Match Logic:
-        # A. Must start with Country? (Optional, remove if your files don't start with zambia)
-        if not filename.startswith(search_country):
-            # strict check: if file is "math_grade4.json" and country is "zambia", this fails.
-            # Relaxed check: Just check if country is in name IF the file includes country
-            pass 
+        if must_include and must_include not in filename: continue
+        if search_country not in filename and "zambia" not in filename: pass 
+        if search_subject not in filename: continue
             
-        # B. Must contain Subject
-        if search_subject not in filename:
-            continue
-            
-        # C. Must contain Grade
+        # Strict Grade Check
         if any(tag in filename for tag in possible_grade_tags):
-            print(f"✅ Found Syllabus in '{curr_type}': {filename}")
+            # Anti-collision check: If looking for "Grade 1", ensure we didn't hit "Grade Form 1"
+            if "grade" in raw_input and "form" not in raw_input:
+                if "form" in filename:
+                    continue # Skip Form files when asking for Grade
+                    
+            print(f"✅ Found {must_include if must_include else 'Syllabus'} File: {filename}")
             return file_path
             
     return None
 
-# ==========================================
-# 4. THE LOADER FUNCTION
-# ==========================================
-def load_syllabus(country: str, grade: str, subject: str) -> List[Dict[str, Any]]:
-    """
-    Loads syllabus safely from the correct New/Old folder.
-    """
-    print(f"🔎 Requesting: {country} | {grade} | {subject}")
-    
-    file_path = find_syllabus_file(country, grade, subject)
+def find_syllabus_file(country: str, grade: str, subject: str) -> Optional[Path]:
+    return find_file(SYLLABI_ROOT_DIR, country, grade, subject)
 
+def find_module_file(country: str, grade: str, subject: str) -> Optional[Path]:
+    return find_file(MODULES_ROOT_DIR, country, grade, subject, must_include="module")
+
+# ==========================================
+# 4. LOADERS & HELPERS
+# ==========================================
+
+def load_syllabus(country: str, grade: str, subject: str) -> List[Dict[str, Any]]:
+    file_path = find_syllabus_file(country, grade, subject)
     if file_path and file_path.exists():
         try:
             with open(file_path, "r", encoding="utf-8") as f:
                 data = json.load(f)
-                
-                # --- NORMALIZE DATA STRUCTURE ---
                 if isinstance(data, dict):
-                    if "topics" in data:
-                        return data["topics"]
-                    elif "content" in data:
-                        return data["content"]
-                    else:
-                        return [data] # Wrap object in list
-                        
+                    if "topics" in data: return data["topics"]
+                    elif "content" in data: return data["content"]
+                    else: return [data]
                 elif isinstance(data, list):
                     return data
-                
-                return []
         except Exception as e:
             print(f"❌ JSON Error in {file_path.name}: {e}")
             return []
-    else:
-        print(f"⚠️ No syllabus found for {country} - Grade {grade} - {subject}")
-        return []
+    return []
+
+def load_module(country: str, grade: str, subject: str) -> Optional[Dict[str, Any]]:
+    file_path = find_module_file(country, grade, subject)
+    if file_path and file_path.exists():
+        try:
+            with open(file_path, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception:
+            return None
+    return None
 
 def get_subjects_for_grade(grade: str) -> list[str]:
     """
-    1. Decides if Grade 4 is 'new' or 'old'.
-    2. Scans that specific folder.
-    3. Returns a list of subjects found (e.g. ['Mathematics', 'Science'])
+    Scans syllabus folder to see what subjects exist for a grade.
+    STRICTLY separates 'Form' vs 'Grade' files.
     """
-    # 1. Determine which folder to check
-    curr_type = get_curriculum_folder(grade) # Uses the function we wrote earlier
+    curr_type = get_curriculum_folder(grade)
     target_dir = SYLLABI_ROOT_DIR / curr_type
     
-    print(f"📂 Scanning for {grade} in: {target_dir}")
-
     if not target_dir.exists():
         return []
 
     found_subjects = set()
     
-    # Clean the input grade for matching (e.g. "Grade 4" -> "4" and "grade4")
-    raw_grade_num = str(grade).lower().replace("grade", "").replace(" ", "").strip() # "4"
-    search_tags = [f"grade{raw_grade_num}", f"grade_{raw_grade_num}", f"form{raw_grade_num}"]
+    # Normalize input
+    grade_input = str(grade).lower().strip()
+    
+    # Extract the pure number (e.g., "1")
+    raw_num = grade_input.replace("grade", "").replace("form", "").replace(" ", "").strip()
+    
+    # ⚡️ STRICT SEARCH TAGS
+    search_tags = []
+    
+    if "form" in grade_input:
+        # If user explicitly said "Form 1", look for 'form1', 'form_1'
+        # This matches: zambia_chemistry_grade_form_1.json
+        search_tags = [f"form{raw_num}", f"form_{raw_num}"]
+    else:
+        # If user explicitly said "Grade 1", look for 'grade1', 'grade_1'
+        # This matches: zambia_creative_and_technology_studies_grade_1.json
+        search_tags = [f"grade{raw_num}", f"grade_{raw_num}"]
 
-    # 2. Scan files
     for file_path in target_dir.glob("*.json"):
-        filename = file_path.stem.lower() # "mathematics_grade4" (no .json)
+        filename = file_path.stem.lower()
         
-        # Check if this file belongs to the requested grade
-        # It must contain "grade4" or "grade_4" etc.
+        # 1. Check if file matches our strict tags
         if any(tag in filename for tag in search_tags):
             
-            # 3. Extract Subject from Filename
-            # Strategy: Remove the grade part, remove 'zambia', remove 'syllabus'
-            # Remaining text is the subject.
-            
+            # ⚡️ ANTI-COLLISION SAFETY
+            # If we want "Grade 1", reject files containing "Form" (like grade_form_1)
+            if "grade" in grade_input and "form" not in grade_input:
+                if "form" in filename:
+                    continue 
+
+            # If we want "Form 1", reject files that look like "Grade 1" but lack "Form"
+            # (Though our search_tags logic above usually handles this, this is double safety)
+            if "form" in grade_input:
+                if "form" not in filename:
+                    continue
+
+            # 2. Extract Subject Name
             parts = filename.split("_")
             clean_parts = []
-            
             for part in parts:
-                # Filter out "zambia", "grade4", "syllabus", "new", "old"
-                if part in ["zambia", "syllabus", "curriculum", "new", "old", "ecz"]:
-                    continue
-                if "grade" in part or "form" in part or part == raw_grade_num:
-                    continue
-                
-                clean_parts.append(part.title()) # "mathematics" -> "Mathematics"
+                if part in ["zambia", "syllabus", "curriculum", "new", "old", "ecz"]: continue
+                # Remove number, grade, form from the visible subject name
+                if "grade" in part or "form" in part or part == raw_num: continue
+                clean_parts.append(part.title())
             
-            # Join what's left (e.g. "Social" + "Studies")
             subject_name = " ".join(clean_parts)
-            
-            if subject_name:
-                found_subjects.add(subject_name)
+            if subject_name: found_subjects.add(subject_name)
 
     return sorted(list(found_subjects))

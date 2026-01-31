@@ -13,9 +13,13 @@ from models.schemas import SchemeRequest, SchemeRow, SchemeResponse
 from services.llm_teacher_engine_new import (
     generate_scheme_with_ai, 
     generate_weekly_plan_from_scheme, 
-    generate_specific_lesson_plan
+    generate_specific_lesson_plan,
+    generate_lesson_notes
 )
-from services.syllabus_manager import load_syllabus
+
+# ✅ UPDATED: Import load_module here
+from services.syllabus_manager import load_syllabus, load_module
+
 from services.file_manager import (
     save_generated_scheme, 
     load_generated_scheme, 
@@ -30,6 +34,12 @@ db = firestore.client()
 # ==========================================
 # 📌 REQUEST MODELS
 # ==========================================
+class LessonNotesRequest(BaseModel):
+    uid: Optional[str] = None
+    grade: str
+    subject: str
+    topic: str
+    subtopic: str
 
 class WeeklyPlanRequest(BaseModel):
     uid: Optional[str] = None
@@ -79,7 +89,6 @@ def get_week_metadata(start_date_str: str | None, week_index: int):
         month_name = monday.strftime("%B")
         date_range = f"({monday.strftime('%d.%m.%Y')} - {friday.strftime('%d.%m.%Y')})"
         
-        # ✅ UPDATED: Includes Month Name in the string
         return month_name, date_range, f"Week {week_index + 1} ({month_name}) {date_range}"
     except Exception as e:
         print(f"Error calculating dates: {e}")
@@ -123,7 +132,8 @@ async def generate_scheme(
         raise HTTPException(status_code=403, detail=str(e))
 
     real_syllabus_data = load_syllabus(country="Zambia", grade=request.grade, subject=request.subject)
-    
+    print(f"📚 Syllabus Loaded: {'YES' if real_syllabus_data else 'NO'} ({len(real_syllabus_data) if real_syllabus_data else 0} topics)")
+
     try:
         ai_result = await generate_scheme_with_ai(
             syllabus_data=real_syllabus_data,
@@ -152,19 +162,16 @@ async def generate_scheme(
             # 2. Handle References (Strict Syllabus + Page format)
             refs = item.get("references", [])
             if not refs or len(refs) == 0:
-                # ✅ UPDATED: Strict fallback with page numbers
                 refs = [
                     f"Syllabus Grade {request.grade} Pg {10 + i}", 
                     f"Pupil's Book Grade {request.grade} Pg {15 + (i*2)}"
                 ]
             
             # 3. Handle Unit Number (Smart Extraction)
-            # Even if we don't display a column, we capture it for the Weekly Plan generator
             unit_val = item.get("unit", "N/A")
             topic_text = item.get("topic", "")
 
             if unit_val == "N/A" or not unit_val:
-                # Regex: Look for pattern like "4.1" or "10.2" at start of topic
                 match = re.search(r"\b(\d+\.\d+)\b", topic_text)
                 if match: 
                     unit_val = match.group(1)
@@ -172,7 +179,7 @@ async def generate_scheme(
             row = SchemeRow(
                 month=month_name,
                 week=week_display,
-                unit=unit_val,  # Saved for DB/Weekly Plans, even if not shown in table
+                unit=unit_val,  
                 topic=topic_text if not is_last_week else "End of Term",
                 prescribed_competences=item.get("prescribed_competences", ["Communication", "Critical Thinking"]),
                 specific_competences=item.get("specific_competences", item.get("outcomes", ["Learners should be able to..."])), 
@@ -211,17 +218,19 @@ async def generate_weekly(
     user_id = resolve_user_id(x_user_id, request.uid)
     print(f"📅 WEEKLY PLAN | User: {user_id} | Week {request.weekNumber}")
 
-    # Get context from the previously generated scheme to maintain Unit consistency
+    # Get context from the previously generated scheme
     scheme_context = get_best_available_scheme(user_id, request.subject, request.grade, request.term)
     
-    # Support both list format and dict format (legacy vs new)
     scheme_rows = []
     if scheme_context:
         if isinstance(scheme_context, list):
             scheme_rows = scheme_context
         elif isinstance(scheme_context, dict):
-            # Check for 'rows', 'schemeData', or 'weeks'
             scheme_rows = scheme_context.get("rows") or scheme_context.get("schemeData") or scheme_context.get("weeks") or []
+
+    # ✅ UPDATED: Load Module
+    module_data = load_module(country="Zambia", grade=request.grade, subject=request.subject)
+    print(f"📦 Module Loaded: {'YES' if module_data else 'NO'}")
 
     try:
         check_and_deduct_credit(user_id)
@@ -234,12 +243,13 @@ async def generate_weekly(
             week_number=request.weekNumber,
             days=request.days,
             start_date=request.startDate,
-            scheme_data=scheme_rows
+            scheme_data=scheme_rows,
+            module_data=module_data  # 👈 Passed here
         )
 
         save_weekly_plan(
             uid=user_id, subject=request.subject, grade=request.grade,
-            term=request.term, week=request.weekNumber, data=plan
+            term=request.term, week=request.weekNumber,school_name=request.school, data=plan
         )
         return {"data": plan}
     except Exception as e:
@@ -258,18 +268,56 @@ async def generate_lesson(
         check_and_deduct_credit(user_id)
         attendance = {"boys": request.boys, "girls": request.girls}
         
+        # ✅ UPDATED: Load Module
+        module_data = load_module(country="Zambia", grade=request.grade, subject=request.subject)
+        print(f"📦 Module Loaded: {'YES' if module_data else 'NO'}")
+
         lesson = await generate_specific_lesson_plan(
             grade=request.grade, subject=request.subject, theme=request.topic,
             subtopic=request.subtopic, objectives=request.objectives,
             date=request.date, time_start=request.timeStart, time_end=request.timeEnd,
-            attendance=attendance, teacher_name=request.teacherName, school_name=request.school
+            attendance=attendance, teacher_name=request.teacherName, school_name=request.school,
+            module_data=module_data # 👈 Passed here
         )
 
         save_lesson_plan(
             uid=user_id, subject=request.subject, grade=request.grade,
-            term=request.term, week=request.weekNumber, data=lesson
+            term=request.term, week=request.weekNumber,school_name=request.school, data=lesson
         )
         return {"data": lesson}
+    except Exception as e:
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/generate-lesson-notes")
+async def generate_notes(
+    request: LessonNotesRequest,
+    x_user_id: str = Header(None, alias="X-User-ID")
+):
+    user_id = resolve_user_id(x_user_id, request.uid)
+    print(f"📒 LESSON NOTES | User: {user_id} | {request.topic}")
+
+    try:
+        check_and_deduct_credit(user_id)
+        
+        # 1. Load Module
+        module_data = load_module(country="Zambia", grade=request.grade, subject=request.subject)
+        
+        # 2. Generate Notes
+        notes = await generate_lesson_notes(
+            grade=request.grade,
+            subject=request.subject,
+            topic=request.topic,
+            subtopic=request.subtopic,
+            module_data=module_data
+        )
+        
+        # 3. Save (Optional - assuming you have a save_lesson_notes function, otherwise skip)
+        # save_lesson_notes(user_id, request.subject, request.grade, request.topic, notes)
+
+        return {"data": notes}
+
     except Exception as e:
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))

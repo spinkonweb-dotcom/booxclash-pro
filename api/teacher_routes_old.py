@@ -199,6 +199,7 @@ async def generate_weekly_plan(
             uid=uid,
             subject=request.subject,
             grade=request.grade,
+            school_name=request.school,
             term=request.term,
             week=request.weekNumber,
             data=plan_data,
@@ -258,6 +259,7 @@ async def generate_lesson_plan(
                 grade=request.grade,
                 data=plan_data,
                 term=request.term,
+                school_name=request.school,
                 week=request.weekNumber,
                 topic=request.topic
             )

@@ -1,874 +1,611 @@
 {
   "meta": {
     "curriculum": "Zambia",
-    "grade": "FORM 1",
-    "subject": "ENGLISH LANGUAGE",
+    "grade": "Form 1",
+    "subject": "English Language",
     "philosophy": "Quality, life long education for all which is accessible, inclusive and relevant to individual, national and global needs",
-    "competence_learning": "The English Language Syllabus for Ordinary Level (O-Level) Secondary School has been developed to meet the needs of learners in Form 1-4. It is designed to help them develop essential skills in listening, reading, speaking, writing, creating, and reflecting upon increasingly intricate spoken, written, and multimodal texts. The aim is to foster accuracy, fluency, and purpose in communication, aligning with the Competence-Based Curriculum of the 21st Century. Moreover, the syllabus endeavours to instil knowledge, skills, values, and positive attitudes, nurturing children to become productive and beneficial members of both their communities and Zambian society. This syllabus builds upon the foundation laid at Primary School, ensuring a seamless transition into O-Level Secondary Education. It is interconnected with the curriculum offered at lower levels, facilitating continuity and progression. The content outlined in this syllabus is tailored towards enhancing language skills for effective communication and learning across various subjects. The suggested learning activities are carefully designed to immerse learners in linguistic practice, fostering proficiency through consistent engagement. It is envisioned that this syllabus will enrich the learning experience at the O-Level Secondary, making it more meaningful and enjoyable. Its activity-oriented approach is intended to promote engagement and pave the way for a seamless transition into tertiary education and the job market.",
+    "competence_learning": "Analytical Thinking: Grasp and breakdown information and effectively share with others; Break down problem; Test hypothesis; Apply SWOT analysis; Evaluate solution. Citizenship: Display orderliness in one’s actions; Analyse the impact of policy decisions on prevailing conditions in the community; Resolve conflict and build consensus in a group; Prepare for further education, career opportunities, and global citizenship. Collaboration: Respect the views of group members while working together; Listen to other group members and make meaningful contribution to a given task. Communication: Use appropriate language (verbal and non-verbal) in different situations; Apply good listening, speaking, reading, and writing skills; Express oneself using different media and symbols; Effectively share one’s thoughts and emotions and understand others; Express oneself (spoken and written) clearly and effectively; Manage one’s emotions; Speak effectively in public; Ask for feedback. Creativity and innovation: Organise information and ideas; Justify one’s reasoning and procedures; Ask thoughtful questions; Understand connections between seemingly unrelated subject matter. Critical Thinking: Solve complex problems; Analyse texts, to improve the ability to understand; Ensure opinions are based on facts; Become more open minded towards different views; Participate in debates and discussions on global issues. Digital literacy: Analyse and synthesise complex digital information; Communicate responsibly using social media. Emotional Intelligence: Express empathy for others; Work effectively with others; Demonstrate self-control; Communicate and relate effectively with others; Collaborate with others; Negotiate and resolve differences amicably. Entrepreneurship: Exhibit leadership skills; Understand the importance of ethical business practices, social responsibility, and sustainability. Environmental Sustainability: Understand appropriate mitigation to climate change. Problem Solving: Make sense of the gathered information from diverse sources by identifying misconceptions, main and supporting ideas, conflicting information, point of view or biases.",
     "goals": [
-      "To develop the learners' ability to communicate effectively and confidently in English language both orally and in writing.",
-      "To enable learners to think critically as well as analyse and evaluate information to form informed opinions and decisions.",
-      "To foster the learners’ creativity, imagination, and problem solving.",
-      "To prepare learners for real life situations, academic pursuits, and career opportunities."
+      "Develop essential skills in listening, reading, speaking, writing, creating, and reflecting upon increasingly intricate spoken, written, and multimodal texts.",
+      "Foster accuracy, fluency, and purpose in communication, aligning with the Competence-Based Curriculum of the 21st Century.",
+      "Instil knowledge, skills, values, and positive attitudes, nurturing children to become productive and beneficial members of both their communities and Zambian society.",
+      "Ensure a seamless transition into O-Level Secondary Education.",
+      "Enhance language skills for effective communication and learning across various subjects.",
+      "Immerse learners in linguistic practice, fostering proficiency through consistent engagement.",
+      "Develop the learners’ ability to communicate effectively and confidently in English language both orally and in writing.",
+      "Enable learners to think critically as well as analyse and evaluate information to form informed opinions and decisions.",
+      "Develop the learners’ communicative competence in English Language including other skills of listening and speaking, reading and writing.",
+      "Improve the learners’ ability to use English Language accurately and appropriately.",
+      "Foster the learners’ creativity, imagination, and problem solving.",
+      "Prepare them for real life situations, academic pursuits, and career opportunities."
     ]
   },
   "topics": [
     {
       "unit": "1.1.1",
       "topic_title": "GREETINGS",
-      "page_number": 15,
+      "page_number": 2,
       "subtopics": [
-        "1.1.1.1. Formal and Informal Greetings"
+        "Formal and Informal Greetings"
       ],
       "specific_outcomes": [
-        "1.1.1.1.1. Use appropriate greetings in different contexts"
+        "Use appropriate greetings in different contexts"
       ]
     },
     {
       "unit": "1.1.2",
       "topic_title": "REQUESTS",
-      "page_number": 15,
+      "page_number": 2,
       "subtopics": [
-        "1.1.2.1. Polite Requests"
+        "Polite Requests"
       ],
       "specific_outcomes": [
-        "1.1.2.1.1. Make polite requests in different contexts"
+        "Make polite requests in different contexts"
       ]
     },
     {
       "unit": "1.1.3",
       "topic_title": "INTRODUCTIONS",
-      "page_number": 16,
+      "page_number": 3,
       "subtopics": [
-        "1.1.3.1. Personal Introduction"
+        "Personal Introduction"
       ],
       "specific_outcomes": [
-        "1.1.3.1.1. Make introductions of oneself"
+        "Make introductions of oneself"
       ]
     },
     {
       "unit": "1.1.4",
       "topic_title": "INVITATIONS",
-      "page_number": 16,
+      "page_number": 3,
       "subtopics": [
-        "1.1.4.1. Extending and Responding to Invitations"
+        "Extending and Responding to Invitations"
       ],
       "specific_outcomes": [
-        "1.1.4.1.1. Use appropriate language when extending and responding to invitations"
+        "Use appropriate language when extending and responding to invitations"
       ]
     },
     {
       "unit": "1.1.5",
       "topic_title": "APOLOGIES AND COMPLIMENTS",
-      "page_number": 17,
+      "page_number": 4,
       "subtopics": [
-        "1.1.5.1. Expressing Apologies and Compliments"
+        "Expressing Apologies and Compliments"
       ],
       "specific_outcomes": [
-        "1.1.5.1.1. Use appropriate language when apologising and complimenting"
+        "Use appropriate language when apologising and complimenting"
       ]
     },
     {
       "unit": "1.1.6",
       "topic_title": "LANGUAGE IN SOCIAL SETTINGS",
-      "page_number": 18,
+      "page_number": 5,
       "subtopics": [
-        "1.1.6.1.Language Use in Different Social Settings"
+        "Language Use in Different Social Settings"
       ],
       "specific_outcomes": [
-        "1.1.6.1.1. Use appropriate language in different social settings"
+        "Use appropriate language in different social settings"
       ]
     },
     {
       "unit": "1.1.7",
       "topic_title": "PHONE CONVERSATIONS",
-      "page_number": 19,
+      "page_number": 6,
       "subtopics": [
-        "1.1.7.1. Making and Receiving Phone Calls"
+        "Making and Receiving Phone Calls"
       ],
       "specific_outcomes": [
-        "1.1.7.1.1. Use appropriate language when making or receiving phone calls"
+        "Use appropriate language when making or receiving phone calls"
       ]
     },
     {
       "unit": "1.1.8",
       "topic_title": "MAKING AN OFFER",
-      "page_number": 19,
+      "page_number": 6,
       "subtopics": [
-        "1.1.8.1. Making and Accepting an Offer"
+        "Making and Accepting an Offer"
       ],
       "specific_outcomes": [
-        "1.1.8.1.1. Use appropriate language when making and responding to an offer"
+        "Use appropriate language when making and responding to an offer"
       ]
     },
     {
       "unit": "1.1.9",
       "topic_title": "PUBLIC SPEAKING",
-      "page_number": 20,
+      "page_number": 7,
       "subtopics": [
-        "1.1.9.1. Debate"
+        "Debate"
       ],
       "specific_outcomes": [
-        "1.1.9.1.1. Use appropriate language to debate on different cross cutting issues"
+        "Use appropriate language to debate on different cross cutting issues"
       ]
     },
     {
       "unit": "1.1.10",
       "topic_title": "DRAMA",
-      "page_number": 20,
+      "page_number": 7,
       "subtopics": [
-        "1.1.10.1. Short Plays"
+        "Short Plays"
       ],
       "specific_outcomes": [
-        "1.1.10.1.1. Use appropriate language to dramatise short plays"
+        "Use appropriate language to dramatise short plays"
       ]
     },
     {
       "unit": "1.1.11",
       "topic_title": "PROCESS",
-      "page_number": 21,
+      "page_number": 8,
       "subtopics": [
-        "1.1.11.1. Describing a Process"
+        "Describing a Process"
       ],
       "specific_outcomes": [
-        "1.1.11.1.1. Describe simple processes"
+        "Describe simple processes"
       ]
     },
     {
       "unit": "1.1.12",
       "topic_title": "POETRY",
-      "page_number": 21,
+      "page_number": 8,
       "subtopics": [
-        "1.1.12.1. Reciting Poems"
+        "Reciting Poems"
       ],
       "specific_outcomes": [
-        "1.1.12.1.1. Recite poems"
+        "Recite poems"
       ]
     },
     {
       "unit": "1.1.13",
       "topic_title": "DIRECTIONS",
-      "page_number": 22,
+      "page_number": 9,
       "subtopics": [
-        "1.1.13.1. Giving Directions"
+        "Giving Directions"
       ],
       "specific_outcomes": [
-        "1.1.13.1.1. Give directions"
+        "Give directions"
       ]
     },
     {
       "unit": "1.1.14",
       "topic_title": "FIGURATIVE LANGUAGE",
-      "page_number": 22,
+      "page_number": 9,
       "subtopics": [
-        "1.1.14.1. Proverbs"
+        "Proverbs",
+        "Riddles",
+        "Idiomatic Expressions"
       ],
       "specific_outcomes": [
-        "1.1.14.1.1. Use proverbs in various social contexts"
-      ]
-    },
-    {
-      "unit": "1.1.14",
-      "topic_title": "FIGURATIVE LANGUAGE",
-      "page_number": 23,
-      "subtopics": [
-        "1.1.14.2. Riddles"
-      ],
-      "specific_outcomes": [
-        "1.1.14.2.1. Use Riddles in various social contexts"
-      ]
-    },
-    {
-      "unit": "1.1.14",
-      "topic_title": "FIGURATIVE LANGUAGE",
-      "page_number": 24,
-      "subtopics": [
-        "1.1.14.3. Idiomatic Expressions"
-      ],
-      "specific_outcomes": [
-        "1.1.14.3.1. Use idiomatic expressions in speech"
+        "Use proverbs in various social contexts",
+        "Use Riddles in various social contexts",
+        "Use idiomatic expressions in speech"
       ]
     },
     {
       "unit": "1.2.1",
       "topic_title": "COMPREHENSION",
-      "page_number": 25,
+      "page_number": 12,
       "subtopics": [
-        "1.2.1.1. Listening Comprehension"
+        "Listening Comprehension",
+        "Reading Comprehension"
       ],
       "specific_outcomes": [
-        "1.2.1.1.1. Listen and comprehend information"
-      ]
-    },
-    {
-      "unit": "1.2.1",
-      "topic_title": "COMPREHENSION",
-      "page_number": 25,
-      "subtopics": [
-        "1.2.1.2. Reading Comprehension"
-      ],
-      "specific_outcomes": [
-        "1.2.1.2.1. Read and comprehend information"
-      ]
-    },
-    {
-      "unit": "1.2.1",
-      "topic_title": "COMPREHENSION",
-      "page_number": 26,
-      "subtopics": [
-        "1.2.1.2. Reading Comprehension"
-      ],
-      "specific_outcomes": [
-        "1.2.1.2.2. Read a variety of texts extensively"
+        "Listen and comprehend information",
+        "Read and comprehend information",
+        "Read a variety of texts extensively"
       ]
     },
     {
       "unit": "1.3.1",
       "topic_title": "BASIC WRITING SKILLS",
-      "page_number": 27,
+      "page_number": 14,
       "subtopics": [
-        "1.3.1.1. The Sentence"
+        "The Sentence",
+        "Spelling",
+        "Punctuation",
+        "Paragraphing"
       ],
       "specific_outcomes": [
-        "1.3.1.1.1. Write correct sentences"
-      ]
-    },
-    {
-      "unit": "1.3.1",
-      "topic_title": "BASIC WRITING SKILLS",
-      "page_number": 27,
-      "subtopics": [
-        "1.3.1.2. Spelling"
-      ],
-      "specific_outcomes": [
-        "1.3.1.2.1. Apply spelling rules"
-      ]
-    },
-    {
-      "unit": "1.3.1",
-      "topic_title": "BASIC WRITING SKILLS",
-      "page_number": 28,
-      "subtopics": [
-        "1.3.1.3. Punctuation"
-      ],
-      "specific_outcomes": [
-        "1.3.1.3.1. Use appropriate punctuation marks in sentences"
-      ]
-    },
-    {
-      "unit": "1.3.1",
-      "topic_title": "BASIC WRITING SKILLS",
-      "page_number": 28,
-      "subtopics": [
-        "1.3.1.4. Paragraphing"
-      ],
-      "specific_outcomes": [
-        "1.3.1.4.1. Write paragraphs"
+        "Write correct sentences",
+        "Apply spelling rules",
+        "Use appropriate punctuation marks in sentences",
+        "Write paragraphs"
       ]
     },
     {
       "unit": "1.3.2",
       "topic_title": "NARRATIVE WRITING",
-      "page_number": 29,
+      "page_number": 16,
       "subtopics": [
-        "1.3.2.1. Story Writing"
+        "Story Writing"
       ],
       "specific_outcomes": [
-        "1.3.2.1.1. Write stories"
+        "Write stories"
       ]
     },
     {
       "unit": "1.3.3",
       "topic_title": "DESCRIPTIVE WRITING",
-      "page_number": 29,
+      "page_number": 16,
       "subtopics": [
-        "1.3.3.1. Describing a Person, an Animal or an Object"
+        "Describing a Person, an Animal or an Object"
       ],
       "specific_outcomes": [
-        "1.3.3.1.1. Write a description of a person, an animal or an object"
+        "Write a description of a person, an animal or an object"
       ]
     },
     {
       "unit": "1.3.4",
       "topic_title": "LETTER WRITING",
-      "page_number": 30,
+      "page_number": 17,
       "subtopics": [
-        "1.3.4.1. Informal Letter"
+        "Informal Letter"
       ],
       "specific_outcomes": [
-        "1.3.4.1.1. Write Informal Letters"
+        "Write Informal Letters"
       ]
     },
     {
       "unit": "1.3.5",
       "topic_title": "EXPOSITORY WRITING",
-      "page_number": 30,
+      "page_number": 17,
       "subtopics": [
-        "1.3.5.1. Writing Expository Essays"
+        "Writing Expository Essays"
       ],
       "specific_outcomes": [
-        "1.3.5.1.1. Write expository essays"
+        "Write expository essays"
       ]
     },
     {
       "unit": "1.3.6",
       "topic_title": "PERSUASIVE WRITING",
-      "page_number": 31,
+      "page_number": 18,
       "subtopics": [
-        "1.3.6.1. An Argumentative Composition"
+        "An Argumentative Composition",
+        "Discursive Composition"
       ],
       "specific_outcomes": [
-        "1.3.6.1.1. Write an argumentative composition"
-      ]
-    },
-    {
-      "unit": "1.3.6",
-      "topic_title": "PERSUASIVE WRITING",
-      "page_number": 31,
-      "subtopics": [
-        "1.3.6.2. Discursive Composition"
-      ],
-      "specific_outcomes": [
-        "1.3.6.2.1. Write a discursive composition"
+        "Write an argumentative composition",
+        "Write a discursive composition"
       ]
     },
     {
       "unit": "1.3.7",
       "topic_title": "DIARY WRITING",
-      "page_number": 32,
+      "page_number": 19,
       "subtopics": [
-        "1.3.7.1. Introduction to Writing Diary Entries"
+        "Introduction to Writing Diary Entries"
       ],
       "specific_outcomes": [
-        "1.3.7.1.1. Write diary entries"
+        "Write diary entries"
       ]
     },
     {
       "unit": "1.4.1",
       "topic_title": "PARTS OF SPEECH",
-      "page_number": 33,
+      "page_number": 20,
       "subtopics": [
-        "1.4.1.1. Introduction to Parts of Speech"
+        "Introduction to Parts of Speech"
       ],
       "specific_outcomes": [
-        "1.4.1.1.1. Use parts of speech in sentences"
+        "Use parts of speech in sentences"
       ]
     },
     {
       "unit": "1.4.2",
       "topic_title": "TENSES",
-      "page_number": 33,
+      "page_number": 20,
       "subtopics": [
-        "1.4.2.1. Present Simple Tense"
+        "Present Simple Tense",
+        "Present Continuous Tense",
+        "Past Simple Tense",
+        "Past Continuous Tense",
+        "The Future Simple Tense",
+        "Future Continuous Tenses",
+        "The Present Perfect Tense",
+        "The Present Perfect Continuous Tense",
+        "Past Perfect Tense",
+        "Past Perfect Continuous Tense",
+        "Future Perfect Tense",
+        "Future Perfect Continuous Tense"
       ],
       "specific_outcomes": [
-        "1.4.2.1.1. Use Present Simple Tense in sentences"
-      ]
-    },
-    {
-      "unit": "1.4.2",
-      "topic_title": "TENSES",
-      "page_number": 33,
-      "subtopics": [
-        "1.4.2.2. Present Continuous Tense"
-      ],
-      "specific_outcomes": [
-        "1.4.2.2.1. Use Present Continuous Tense in sentences"
-      ]
-    },
-    {
-      "unit": "1.4.2",
-      "topic_title": "TENSES",
-      "page_number": 34,
-      "subtopics": [
-        "1.4.2.3. Past Simple Tense"
-      ],
-      "specific_outcomes": [
-        "1.4.2.3.1. Use the Past Simple Tense in sentences"
-      ]
-    },
-    {
-      "unit": "1.4.2",
-      "topic_title": "TENSES",
-      "page_number": 34,
-      "subtopics": [
-        "1.4.2.4. Past Continuous Tense"
-      ],
-      "specific_outcomes": [
-        "1.4.2.4.1. Use the Past Continuous Tense in Sentences"
-      ]
-    },
-    {
-      "unit": "1.4.2",
-      "topic_title": "TENSES",
-      "page_number": 35,
-      "subtopics": [
-        "1.4.2.5. The Future Simple Tense"
-      ],
-      "specific_outcomes": [
-        "1.4.2.5.1. Use Future Simple Tense in sentences"
-      ]
-    },
-    {
-      "unit": "1.4.2",
-      "topic_title": "TENSES",
-      "page_number": 36,
-      "subtopics": [
-        "1.4.2.6. Future Continuous Tenses"
-      ],
-      "specific_outcomes": [
-        "1.4.2.6.1. Use Future Continuous Tense in sentences"
-      ]
-    },
-    {
-      "unit": "1.4.2",
-      "topic_title": "TENSES",
-      "page_number": 36,
-      "subtopics": [
-        "1.4.2.7. The Present Perfect Tense"
-      ],
-      "specific_outcomes": [
-        "1.4.2.7.1. Use Present Perfect Tense in sentences"
-      ]
-    },
-    {
-      "unit": "1.4.2",
-      "topic_title": "TENSES",
-      "page_number": 36,
-      "subtopics": [
-        "1.4.2.8. The Present Perfect Continuous Tense"
-      ],
-      "specific_outcomes": [
-        "1.4.2.8.1. Use Present Perfect Continuous Tense in sentences"
-      ]
-    },
-    {
-      "unit": "1.4.2",
-      "topic_title": "TENSES",
-      "page_number": 37,
-      "subtopics": [
-        "1.4.2.9. Past Perfect Tense"
-      ],
-      "specific_outcomes": [
-        "1.4.2.9.1. Use Past Perfect Tense in sentences"
-      ]
-    },
-    {
-      "unit": "1.4.2",
-      "topic_title": "TENSES",
-      "page_number": 37,
-      "subtopics": [
-        "1.4.2.10. Past Perfect Continuous Tense"
-      ],
-      "specific_outcomes": [
-        "1.4.2.10.1. Use Past Perfect Continuous Tense in sentences"
-      ]
-    },
-    {
-      "unit": "1.4.2",
-      "topic_title": "TENSES",
-      "page_number": 38,
-      "subtopics": [
-        "1.4.2.11. Future Perfect Tense"
-      ],
-      "specific_outcomes": [
-        "1.4.2.11.1. Use Future Perfect Tense in sentences"
-      ]
-    },
-    {
-      "unit": "1.4.2",
-      "topic_title": "TENSES",
-      "page_number": 38,
-      "subtopics": [
-        "1.4.2.12. Future Perfect Continuous Tense"
-      ],
-      "specific_outcomes": [
-        "1.4.2.12.1. Use Future Perfect Continuous Tense in sentences"
+        "Use Present Simple Tense in sentences",
+        "Use Present Continuous Tense in sentences",
+        "Use the Past Simple Tense in sentences",
+        "Use the Past Continuous Tense in Sentences",
+        "Use Future Simple Tense in sentences",
+        "Use Future Continuous Tense in sentences",
+        "Use Present Perfect Tense in sentences",
+        "Use Present Perfect Continuous Tense in sentences",
+        "Use Past Perfect Tense in sentences",
+        "Use Past Perfect Continuous Tense in sentences",
+        "Use Future Perfect Tense in sentences",
+        "Use Future Perfect Continuous Tense in sentences"
       ]
     },
     {
       "unit": "1.4.3",
       "topic_title": "NOUNS",
-      "page_number": 39,
+      "page_number": 26,
       "subtopics": [
-        "1.4.3.1. Possessive Nouns"
+        "Possessive Nouns",
+        "Irregular Nouns",
+        "Countable Nouns",
+        "Uncountable Nouns",
+        "Collective Nouns"
       ],
       "specific_outcomes": [
-        "1.4.3.1.1. Use possessive nouns in sentences"
-      ]
-    },
-    {
-      "unit": "1.4.3",
-      "topic_title": "NOUNS",
-      "page_number": 39,
-      "subtopics": [
-        "1.4.3.2. Irregular Nouns"
-      ],
-      "specific_outcomes": [
-        "1.4.3.2.1. Change irregular nouns from singular to plural"
-      ]
-    },
-    {
-      "unit": "1.4.3",
-      "topic_title": "NOUNS",
-      "page_number": 39,
-      "subtopics": [
-        "1.4.3.3. Countable Nouns"
-      ],
-      "specific_outcomes": [
-        "1.4.3.3.1. Use countable nouns in sentences"
-      ]
-    },
-    {
-      "unit": "1.4.3",
-      "topic_title": "NOUNS",
-      "page_number": 40,
-      "subtopics": [
-        "1.4.3.4. Uncountable Nouns"
-      ],
-      "specific_outcomes": [
-        "1.4.3.4.1. Use uncountable nouns in sentences"
-      ]
-    },
-    {
-      "unit": "1.4.3",
-      "topic_title": "NOUNS",
-      "page_number": 40,
-      "subtopics": [
-        "1.4.3.5. Collective Nouns"
-      ],
-      "specific_outcomes": [
-        "1.4.3.5.1. Construct sentences using collective nouns"
+        "Use possessive nouns in sentences",
+        "Change irregular nouns from singular to plural",
+        "Use countable nouns in sentences",
+        "Use uncountable nouns in sentences",
+        "Construct sentences using collective nouns"
       ]
     },
     {
       "unit": "1.4.4",
       "topic_title": "ARTICLES",
-      "page_number": 40,
+      "page_number": 27,
       "subtopics": [
-        "1.4.4.1. Definite and Indefinite Articles"
+        "Definite and Indefinite Articles"
       ],
       "specific_outcomes": [
-        "1.4.4.1.1. Use articles in sentences"
+        "Use articles in sentences"
       ]
     },
     {
       "unit": "1.4.5",
       "topic_title": "INTENSIFIERS",
-      "page_number": 41,
+      "page_number": 28,
       "subtopics": [
-        "1.4.5.1. Using Intensifiers"
+        "Using Intensifiers"
       ],
       "specific_outcomes": [
-        "1.4.5.1.1. Use intensifiers in sentences"
+        "Use intensifiers in sentences"
       ]
     },
     {
       "unit": "1.4.6",
       "topic_title": "ADJECTIVES",
-      "page_number": 41,
+      "page_number": 28,
       "subtopics": [
-        "1.4.6.1. Order of Adjectives"
+        "Order of Adjectives"
       ],
       "specific_outcomes": [
-        "1.4.6.1.1. Use the correct order of adjectives in sentences"
+        "Use the correct order of adjectives in sentences"
       ]
     },
     {
       "unit": "1.4.7",
       "topic_title": "VERBS",
-      "page_number": 42,
+      "page_number": 29,
       "subtopics": [
-        "1.4.7.1. Linking Verbs"
+        "Linking Verbs"
       ],
       "specific_outcomes": [
-        "1.4.7.1.1. Use linking verbs in sentences"
+        "Use linking verbs in sentences"
       ]
     },
     {
       "unit": "1.4.8",
       "topic_title": "AGREEMENT",
-      "page_number": 42,
+      "page_number": 29,
       "subtopics": [
-        "1.4.8.1. Subject -Verb Agreement"
+        "Subject -Verb Agreement"
       ],
       "specific_outcomes": [
-        "1.4.8.1.1. Use correct verb forms with the subject in a sentence"
+        "Use correct verb forms with the subject in a sentence"
       ]
     },
     {
       "unit": "1.4.9",
       "topic_title": "REASON",
-      "page_number": 43,
+      "page_number": 30,
       "subtopics": [
-        "1.4.9.1. Expressing Reason"
+        "Expressing Reason"
       ],
       "specific_outcomes": [
-        "1.4.9.1.1. Use expressions of reason in sentences"
+        "Use expressions of reason in sentences"
       ]
     },
     {
       "unit": "1.4.10",
       "topic_title": "PURPOSE",
-      "page_number": 43,
+      "page_number": 30,
       "subtopics": [
-        "1.4.10.1. Different Ways of Expressing Purpose"
+        "Different Ways of Expressing Purpose"
       ],
       "specific_outcomes": [
-        "1.4.10.1.1. Use different expressions to show purpose in sentences"
+        "Use different expressions to show purpose in sentences"
       ]
     },
     {
       "unit": "1.4.11",
       "topic_title": "RESULT",
-      "page_number": 44,
+      "page_number": 31,
       "subtopics": [
-        "1.4.11.1. Different Ways of Expressing Result"
+        "Different Ways of Expressing Result"
       ],
       "specific_outcomes": [
-        "1.4.11.1.1. Use different expressions of result in sentences"
+        "Use different expressions of result in sentences"
       ]
     },
     {
       "unit": "1.4.12",
       "topic_title": "ADVERBS",
-      "page_number": 44,
+      "page_number": 31,
       "subtopics": [
-        "1.4.12.1. Position of Adverbs"
+        "Position of Adverbs"
       ],
       "specific_outcomes": [
-        "1.4.12.1.1. Use adverbs in different positions in sentences"
+        "Use adverbs in different positions in sentences"
       ]
     },
     {
       "unit": "1.4.13",
       "topic_title": "PREPOSITIONS",
-      "page_number": 44,
+      "page_number": 31,
       "subtopics": [
-        "1.4.13.1. Types of Prepositions"
+        "Types of Prepositions"
       ],
       "specific_outcomes": [
-        "1.4.13.1.1. Use prepositions in sentences"
+        "Use prepositions in sentences"
       ]
     },
     {
       "unit": "1.4.14",
       "topic_title": "PHRASAL VERBS",
-      "page_number": 45,
+      "page_number": 32,
       "subtopics": [
-        "1.4.14.1. Phrasal Verbs"
+        "Phrasal Verbs"
       ],
       "specific_outcomes": [
-        "1.4.14.1.1. Use phrasal verbs in sentences"
+        "Use phrasal verbs in sentences"
       ]
     },
     {
       "unit": "1.4.15",
       "topic_title": "QUESTION TAGS",
-      "page_number": 46,
+      "page_number": 33,
       "subtopics": [
-        "1.4.15.1. Question Tags and Short Answers"
+        "Question Tags and Short Answers"
       ],
       "specific_outcomes": [
-        "1.4.15.1.1. Add question tags to statements"
+        "Add question tags to statements"
       ]
     },
     {
       "unit": "1.4.16",
       "topic_title": "CONTRAST",
-      "page_number": 46,
+      "page_number": 33,
       "subtopics": [
-        "1.4.16.1. Use ‘But’ and ‘Yet’ in Sentences to Show Contrast"
+        "Use ‘But’ and ‘Yet’ in Sentences to Show Contrast"
       ],
       "specific_outcomes": [
-        "1.4.16.1.1. Use ‘but’ and ‘yet’ to show contrast in sentences"
+        "Use ‘but’ and ‘yet’ to show contrast in sentences"
       ]
     },
     {
       "unit": "1.4.17",
       "topic_title": "CONDITION",
-      "page_number": 47,
+      "page_number": 34,
       "subtopics": [
-        "1.4.17.1. Types of Condition"
+        "Types of Condition",
+        "Tense Changes in Conditional Clause and Main Clause"
       ],
       "specific_outcomes": [
-        "1.4.17.1.1. Use conditional sentences"
-      ]
-    },
-    {
-      "unit": "1.4.17",
-      "topic_title": "CONDITION",
-      "page_number": 47,
-      "subtopics": [
-        "1.4.17.2. Tense Changes in Conditional Clause and Main Clause"
-      ],
-      "specific_outcomes": [
-        "1.4.17.2.1. Use appropriate tenses in conditional sentences"
+        "Use conditional sentences",
+        "Use appropriate tenses in conditional sentences"
       ]
     },
     {
       "unit": "1.4.18",
       "topic_title": "ABILITY",
-      "page_number": 48,
+      "page_number": 35,
       "subtopics": [
-        "1.4.18.1. Expressing Ability"
+        "Expressing Ability"
       ],
       "specific_outcomes": [
-        "1.4.18.1.1. Express ability in sentences"
+        "Express ability in sentences"
       ]
     },
     {
       "unit": "1.4.19",
       "topic_title": "THE GERUND AND PRESENT PARTICIPLE",
-      "page_number": 49,
+      "page_number": 36,
       "subtopics": [
-        "1.4.19.1. Difference between Gerunds and Present Participles"
+        "Difference between Gerunds and Present Participles"
       ],
       "specific_outcomes": [
-        "1.4.19.1.1. Use gerunds and present participles in sentences"
+        "Use gerunds and present participles in sentences"
       ]
     },
     {
       "unit": "1.4.20",
       "topic_title": "SENSE RELATIONS",
-      "page_number": 49,
+      "page_number": 36,
       "subtopics": [
-        "1.4.20.1. Antonyms"
+        "Antonyms",
+        "Synonyms",
+        "Homonyms",
+        "Homophones"
       ],
       "specific_outcomes": [
-        "1.4.20.1.1. Use Antonyms"
-      ]
-    },
-    {
-      "unit": "1.4.20",
-      "topic_title": "SENSE RELATIONS",
-      "page_number": 49,
-      "subtopics": [
-        "1.4.20.2. Synonyms"
-      ],
-      "specific_outcomes": [
-        "1.4.20.2.1. Use Synonyms"
-      ]
-    },
-    {
-      "unit": "1.4.20",
-      "topic_title": "SENSE RELATIONS",
-      "page_number": 50,
-      "subtopics": [
-        "1.4.20.3. Homonyms"
-      ],
-      "specific_outcomes": [
-        "1.4.20.3.1. Use Homonyms"
-      ]
-    },
-    {
-      "unit": "1.4.20",
-      "topic_title": "SENSE RELATIONS",
-      "page_number": 50,
-      "subtopics": [
-        "1.4.20.4. Homophones"
-      ],
-      "specific_outcomes": [
-        "1.4.20.4.1. Use Homophones"
+        "Use Antonyms",
+        "Use Synonyms",
+        "Use Homonyms",
+        "Use Homophones"
       ]
     },
     {
       "unit": "1.5.1",
       "topic_title": "INTRODUCTION TO SUMMARY",
-      "page_number": 51,
+      "page_number": 38,
       "subtopics": [
-        "1.5.1.1. Types of Summaries"
+        "Types of Summaries",
+        "Title Summary",
+        "Sentence Summary",
+        "Paragraph Summary"
       ],
       "specific_outcomes": [
-        "1.5.1.1.1. Identify types of summaries"
-      ]
-    },
-    {
-      "unit": "1.5.1",
-      "topic_title": "INTRODUCTION TO SUMMARY",
-      "page_number": 51,
-      "subtopics": [
-        "1.5.1.2. Title Summary"
-      ],
-      "specific_outcomes": [
-        "1.5.1.2.1. Choose best title summary"
-      ]
-    },
-    {
-      "unit": "1.5.1",
-      "topic_title": "INTRODUCTION TO SUMMARY",
-      "page_number": 51,
-      "subtopics": [
-        "1.5.1.3. Sentence Summary"
-      ],
-      "specific_outcomes": [
-        "1.5.1.3.1. Choose the best sentence summary"
-      ]
-    },
-    {
-      "unit": "1.5.1",
-      "topic_title": "INTRODUCTION TO SUMMARY",
-      "page_number": 51,
-      "subtopics": [
-        "1.5.1.4. Paragraph Summary"
-      ],
-      "specific_outcomes": [
-        "1.5.1.4.1. Choose the best paragraph summary"
+        "Identify types of summaries",
+        "Choose best title summary",
+        "Choose the best sentence summary",
+        "Choose the best paragraph summary"
       ]
     },
     {
       "unit": "1.5.2",
       "topic_title": "ABBREVIATIONS",
-      "page_number": 52,
+      "page_number": 39,
       "subtopics": [
-        "1.5.2.1. Types of Abbreviations"
+        "Types of Abbreviations"
       ],
       "specific_outcomes": [
-        "1.5.2.1.1. Apply abbreviations in writing"
+        "Apply abbreviations in writing"
       ]
     },
     {
       "unit": "1.5.3",
       "topic_title": "SHORT MESSAGES",
-      "page_number": 53,
+      "page_number": 40,
       "subtopics": [
-        "1.5.3.1. Short Message System (SMS)"
+        "Short Message System (SMS)"
       ],
       "specific_outcomes": [
-        "1.5.3.1.1. Use short message system in summary"
+        "Use short message system in summary"
       ]
     },
     {
       "unit": "1.5.4",
       "topic_title": "ADVERTISEMENTS",
-      "page_number": 53,
+      "page_number": 40,
       "subtopics": [
-        "1.5.4.1. Types of Advertisements"
+        "Types of Advertisements"
       ],
       "specific_outcomes": [
-        "1.5.4.1.1. Write advertisements"
+        "Write advertisements"
       ]
     },
     {
       "unit": "1.5.5",
       "topic_title": "NOTE SUMMARY",
-      "page_number": 53,
+      "page_number": 40,
       "subtopics": [
-        "1.5.5.1. Types of Note Summaries"
+        "Types of Note Summaries"
       ],
       "specific_outcomes": [
-        "1.5.5.1.1. Write Note Summaries"
+        "Write Note Summaries"
       ]
     },
     {
       "unit": "1.5.6",
       "topic_title": "TABULATION",
-      "page_number": 54,
+      "page_number": 41,
       "subtopics": [
-        "1.5.6.1. Tabulation Skills"
+        "Tabulation Skills"
       ],
       "specific_outcomes": [
-        "1.5.6.1.1. Apply tabulation skills"
+        "Apply tabulation skills"
       ]
     }
   ]

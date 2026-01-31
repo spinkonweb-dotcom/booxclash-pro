@@ -96,14 +96,16 @@ def load_generated_scheme(uid: str, subject: str, grade: str, term: str):
 # ==========================================
 # 2. WEEKLY PLANS
 # ==========================================
-def save_weekly_plan(uid: str, subject: str, grade: str, term: str, week: int, data: dict):
+def save_weekly_plan(uid: str, subject: str, grade: str, term: str, week: int, school_name: str, data: dict):
     """
     Saves the Weekly Plan to Firestore.
+    ✅ UPDATED: Now accepts and saves 'school_name'.
     """
     try:
         doc_ref = db.collection("generated_weekly_plans").document()
         doc_ref.set({
             "userId": uid,
+            "schoolName": school_name,  # <--- SAVING SCHOOL NAME
             "subject": subject,
             "grade": grade,
             "term": term,
@@ -153,6 +155,7 @@ def save_lesson_plan(
     uid: str, 
     subject: str, 
     grade: str, 
+    school_name: str,  # <--- ADDED PARAMETER
     data: dict, 
     term: str = "Term 1", 
     week: int = 1, 
@@ -160,6 +163,7 @@ def save_lesson_plan(
 ):
     """
     Saves the Lesson Plan to Firestore.
+    ✅ UPDATED: Now accepts and saves 'school_name'.
     """
     try:
         doc_ref = db.collection("generated_lesson_plans").document()
@@ -170,6 +174,7 @@ def save_lesson_plan(
 
         doc_ref.set({
             "userId": uid,
+            "schoolName": school_name,  # <--- SAVING SCHOOL NAME
             "subject": subject,
             "grade": grade,
             "term": term,
