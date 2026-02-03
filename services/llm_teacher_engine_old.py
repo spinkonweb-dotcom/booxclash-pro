@@ -71,128 +71,124 @@ def extract_json_string(text: str) -> str:
 # 1. PROFESSIONAL SCHEME GENERATOR
 # =====================================================
 async def generate_scheme_with_ai(
-    syllabus_data: Any,  # Handle Dict or List
+    syllabus_data: Any,
     subject: str,
     grade: str,
     term: str,
     num_weeks: int,
-    start_date: str = "2026-01-13" 
+    start_date: str = "2026-01-13"
 ) -> List[dict]:
     
-    print(f"\n📘 [Scheme Generator] Processing Professional Request for {subject} Grade {grade}...")
+    print(f"\n📘 [Scheme Generator] Processing {subject} Grade {grade} for Term {term}...")
     
-    # 1️⃣ NORMALIZE DATA
-    syllabus_list = []
+    # 1️⃣ ROBUST DATA EXTRACTION
+    full_topic_list = []
     if isinstance(syllabus_data, dict):
-        syllabus_list = syllabus_data.get("topics", [])
-    elif isinstance(syllabus_data, list):
-        syllabus_list = syllabus_data
-    
-    if not syllabus_list:
-        print(f"⚠️ [Scheme Generator] CRITICAL: No topics found in syllabus data. Aborting.")
-        return [] 
-
-    # 2️⃣ TERM SPLITTING LOGIC
-    clean_syllabus = [
-        t for t in syllabus_list 
-        if isinstance(t, dict) and (t.get("topic_title") or t.get("topic") or t.get("unit"))
-    ]
-    total_topics = len(clean_syllabus)
-    
-    if total_topics == 0:
-        return []
-
-    chunk_size = math.ceil(total_topics / 3)
-    
-    term_num = 1
-    if "2" in str(term): term_num = 2
-    elif "3" in str(term): term_num = 3
-
-    start_index = (term_num - 1) * chunk_size
-    end_index = start_index + chunk_size
-    
-    term_syllabus = clean_syllabus[start_index:end_index]
-    print(f"📊 Logic: Total Topics: {total_topics} | Term: {term_num} | Slice: {start_index} to {end_index}")
-    
-    if not term_syllabus:
-        return []
-
-    # 3️⃣ PREPARE DATA SUMMARY
-    syllabus_summary = []
-    for t in term_syllabus:
-        unit_title = t.get("topic_title") or t.get("topic") or t.get("unit") or "Unknown Topic"
-        
-        content_list = (
-            t.get("learning_outcomes") or 
-            t.get("subtopics") or 
-            t.get("specific_outcomes") or 
-            t.get("content") or 
+        # Scan common keys where the list might be hiding
+        full_topic_list = (
+            syllabus_data.get("topics") or 
+            syllabus_data.get("units") or 
+            syllabus_data.get("content") or 
+            syllabus_data.get("syllabus") or 
             []
         )
-        
-        syllabus_summary.append({
-            "unit": unit_title, 
-            "content": content_list
-        })
+    elif isinstance(syllabus_data, list):
+        full_topic_list = syllabus_data
+    
+    total_topics = len(full_topic_list)
+    if total_topics == 0:
+        print(f"⚠️ [Scheme Generator] CRITICAL: No topics found in syllabus data.")
+        return []
 
-    # 4️⃣ PROMPT
+    # 2️⃣ TERM DIVISION LOGIC (Split by 3)
+    chunk_size = math.ceil(total_topics / 3)
+    
+    # Normalize term input
+    term_int = 1
+    if "2" in str(term): term_int = 2
+    elif "3" in str(term): term_int = 3
+
+    start_index = (term_int - 1) * chunk_size
+    end_index = start_index + chunk_size
+    
+    # Get the specific slice for this term
+    term_syllabus_slice = full_topic_list[start_index:end_index]
+    
+    print(f"📊 Split Logic: Total {total_topics} items. Term {term_int} gets items {start_index} to {end_index}.")
+    
+    if not term_syllabus_slice:
+        print("⚠️ Warning: Term slice resulted in empty list. Using full list as fallback.")
+        term_syllabus_slice = full_topic_list
+
+    # 3️⃣ PROMPT CONSTRUCTION
     model = get_model()
     
+    # Dump the RAW slice to JSON so the AI sees 'unit', 'page_number', etc.
+    data_context = json.dumps(term_syllabus_slice)
+
     prompt = f"""
-    Act as a Senior Head Teacher in Zambia. Create a Scheme of Work for **Term {term_num}**.
+    Act as a Senior Head Teacher in Zambia. Create a Scheme of Work for **Term {term_int}**.
     
     DETAILS: 
     - Subject: {subject}, Grade: {grade}
     - Duration: {num_weeks} Weeks
+    - Start Date: {start_date}
     
     STRICT DATA SOURCE:
-    Below is the syllabus segment specifically for Term {term_num}. 
-    You MUST ONLY use these topics. 
+    The JSON data below represents the specific syllabus chunk for Term {term_int}.
     
-    DATA: {json.dumps(syllabus_summary)}
-
-    INSTRUCTIONS:
-    1. **Expand & Map**: You have {len(term_syllabus)} main topics to cover in {num_weeks} weeks. 
-       - If a topic has many outcomes, split it across multiple weeks.
-       - If there are fewer topics than weeks, review key concepts.
-    2. **Content**: Populate "content" and "outcomes" using the `learning_outcomes` provided in the data.
-       - **CRITICAL**: If the data lists specific outcomes, copy them. Do not leave these fields blank.
-    3. **Sequence**: Maintain the order of the provided topics.
+    CRITICAL REQUIREMENTS:
+    1. **Mandatory Fields**: You MUST include the `unit` (e.g., "12.12") and `page_number` (e.g., 73) for every topic. Extract these EXACTLY as they appear in the data.
+    2. **No Data Loss**: Do NOT summarize. If the data lists specific outcomes like "12.12.6.6 Differentiate...", you must include them in the 'outcomes' list.
+    3. **Allocation**: Map these {len(term_syllabus_slice)} topics across {num_weeks} weeks.
+    
+    DATA SLICE: 
+    {data_context}
     
     OUTPUT FORMAT (JSON List):
     [
       {{
-        "week": "Week 1",
-        "topic": "Topic Name",
-        "content": ["Subtopic/Outcome 1", "Subtopic/Outcome 2"],
-        "outcomes": ["Learner should be able to..."],
-        "references": ["Syllabus Ref"] 
+        "week_number": 1,
+        "unit": "12.12",             <-- MUST EXTRACT FROM DATA
+        "page_number": 73,           <-- MUST EXTRACT FROM DATA
+        "topic": "ORGANIC CHEMISTRY",
+        "content": ["12.12.6 Macromolecules (Polymers)"],
+        "outcomes": ["12.12.6.6 Differentiate between...", "12.12.6.7 Describe typical uses..."],
+        "resources": ["Textbook Page 73", "Molecule Models"] 
       }}
     ]
     """
     
     try:
+        # Generate
         response = await model.generate_content_async(prompt)
         json_str = extract_json_string(response.text)
         data = json.loads(json_str)
 
         if not isinstance(data, list): return []
 
-        # 5️⃣ POST-PROCESSING
+        # 4️⃣ POST-PROCESSING
         cleaned_data = []
         for i, item in enumerate(data):
-            week_num = i + 1
-            if week_num > num_weeks: break 
+            week_num = item.get('week_number', i + 1)
+            
+            if week_num > num_weeks: continue
 
             date_info = calculate_week_dates(start_date, week_num)
             
+            # Ensure list formatting
             if isinstance(item.get('content'), str): item['content'] = [item['content']]
             if isinstance(item.get('outcomes'), str): item['outcomes'] = [item['outcomes']]
 
+            # Add display metadata
             item['month'] = date_info['month'] 
             item['week'] = f"Week {week_num} {date_info['range_display']}"
             item['week_number'] = week_num
             
+            # Fallback for unit/page if AI missed them (rare with strict prompt)
+            if 'unit' not in item: item['unit'] = "N/A"
+            if 'page_number' not in item: item['page_number'] = "-"
+
             cleaned_data.append(item)
 
         return cleaned_data

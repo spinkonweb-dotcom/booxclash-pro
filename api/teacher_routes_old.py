@@ -43,6 +43,7 @@ class WeeklyPlanRequest(BaseModel):
     # Allow both 'topic' and 'theme'
     topic: Optional[str] = None 
     theme: Optional[str] = None
+    schoolId: Optional[str] = None  # 👈 Added schoolId
 
 class LessonPlanRequest(BaseModel):
     uid: str
@@ -60,6 +61,7 @@ class LessonPlanRequest(BaseModel):
     boys: Optional[int] = 0
     girls: Optional[int] = 0
     objectives: List[str] = []
+    schoolId: Optional[str] = None  # 👈 Added schoolId
 
 
 # ------------------------------------------------------------------
@@ -87,9 +89,13 @@ def resolve_user_id(x_user_id: Optional[str], payload_uid: Optional[str]) -> str
 async def generate_scheme(
     request: SchemeRequest,
     x_user_id: Optional[str] = Header(None, alias="X-User-ID"),
+    x_school_id: Optional[str] = Header(None, alias="X-School-ID")  # 👈 Added Header
 ):
     uid = resolve_user_id(x_user_id, request.uid)
-    print(f"📅 Generating Scheme: {request.subject} | Grade {request.grade}")
+    # Fallback to body schoolId if header missing
+    school_id = x_school_id or getattr(request, "schoolId", None)
+
+    print(f"📅 Generating Scheme: {request.subject} | Grade {request.grade} | School: {school_id}")
 
     # 1️⃣ Check Cache (Free if cached)
     cached = load_generated_scheme(uid, request.subject, request.grade, request.term)
@@ -99,7 +105,8 @@ async def generate_scheme(
     else:
         # 2️⃣ DEDUCT CREDIT (Only if generating new)
         try:
-            check_and_deduct_credit(uid, cost=1)
+            # ✅ Updated to use school_id
+            check_and_deduct_credit(uid, cost=1, school_id=school_id)
         except Exception as e:
             raise HTTPException(status_code=402, detail=str(e)) # 402 Payment Required
 
@@ -135,6 +142,17 @@ async def generate_scheme(
     rows: List[SchemeRow] = []
     for item in ai_scheme or []:
         week_num = extract_week_number(item.get("week_number") or item.get("week"))
+        
+        # --- 🛠️ FIX STARTS HERE: Force references to be a List ---
+        raw_refs = item.get("references")
+        if isinstance(raw_refs, str):
+            final_refs = [raw_refs]  # Convert string to list
+        elif isinstance(raw_refs, list):
+            final_refs = raw_refs    # Keep as list
+        else:
+            final_refs = ["Syllabus Ref"] # Default
+        # --------------------------------------------------------
+
         rows.append(
             SchemeRow(
                 month=item.get("month") or get_month_name(week_num),
@@ -142,7 +160,7 @@ async def generate_scheme(
                 topic=item.get("topic", ""),
                 content=item.get("content", []),
                 outcomes=item.get("outcomes", []),
-                references=item.get("references", ["Syllabus Ref"]),
+                references=final_refs, # ✅ Use the sanitized list
                 isSpecialRow=item.get("isSpecialRow", False),
             )
         )
@@ -157,8 +175,10 @@ async def generate_scheme(
 async def generate_weekly_plan(
     request: WeeklyPlanRequest,
     x_user_id: Optional[str] = Header(None, alias="X-User-ID"),
+    x_school_id: Optional[str] = Header(None, alias="X-School-ID") # 👈 Added Header
 ):
     uid = resolve_user_id(x_user_id, request.uid)
+    school_id = x_school_id or request.schoolId
 
     # 1️⃣ VALIDATE TOPIC BEFORE CREDITS
     clean_topic = request.topic or request.theme
@@ -171,11 +191,12 @@ async def generate_weekly_plan(
             detail="Topic is required. Please ensure a Scheme of Work exists for this week, or retry."
         )
     
-    print(f"📅 Generating Weekly Plan: {request.subject} | Week {request.weekNumber} | Topic: {clean_topic}")
+    print(f"📅 Generating Weekly Plan: {request.subject} | Week {request.weekNumber} | Topic: {clean_topic} | School: {school_id}")
 
     # 2️⃣ DEDUCT CREDIT (Only reached if topic exists)
     try:
-        check_and_deduct_credit(uid, cost=1)
+        # ✅ Updated to use school_id
+        check_and_deduct_credit(uid, cost=1, school_id=school_id)
     except Exception as e:
         raise HTTPException(status_code=402, detail=str(e))
 
@@ -221,13 +242,17 @@ async def generate_weekly_plan(
 async def generate_lesson_plan(
     request: LessonPlanRequest,
     x_user_id: Optional[str] = Header(None, alias="X-User-ID"),
+    x_school_id: Optional[str] = Header(None, alias="X-School-ID") # 👈 Added Header
 ):
     uid = resolve_user_id(x_user_id, request.uid)
-    print(f"📝 Generating Lesson Plan: {request.subject} | {request.topic}")
+    school_id = x_school_id or request.schoolId
+
+    print(f"📝 Generating Lesson Plan: {request.subject} | {request.topic} | School: {school_id}")
 
     # 1️⃣ DEDUCT CREDIT
     try:
-        check_and_deduct_credit(uid, cost=1)
+        # ✅ Updated to use school_id
+        check_and_deduct_credit(uid, cost=1, school_id=school_id)
     except Exception as e:
         raise HTTPException(status_code=402, detail=str(e))
 
@@ -281,13 +306,16 @@ async def generate_lesson_plan(
 @router.post("/generate-worksheet-structured", response_model=WorksheetResponse)
 async def api_generate_structured_worksheet(
     request: WorksheetRequest, 
-    x_user_id: Optional[str] = Header(None, alias="X-User-ID")
+    x_user_id: Optional[str] = Header(None, alias="X-User-ID"),
+    x_school_id: Optional[str] = Header(None, alias="X-School-ID") # 👈 Added Header
 ):
     uid = resolve_user_id(x_user_id, request.uid)
-    
+    school_id = x_school_id or getattr(request, "schoolId", None)
+
     # Check Credits
     try: 
-        check_and_deduct_credit(uid, cost=1)
+        # ✅ Updated to use school_id
+        check_and_deduct_credit(uid, cost=1, school_id=school_id)
     except Exception as e: 
         raise HTTPException(status_code=402, detail=str(e))
 

@@ -1,43 +1,52 @@
 from pydantic import BaseModel, Field, validator
 from typing import List, Optional, Any, Dict, Literal
-# -----------------------------------
-# 🎓 STUDENT / TUTOR MODELS
-# -----------------------------------
-class StudentProfile(BaseModel):
+
+# ==========================================
+# 🚀 GENERATION REQUEST (The Main Input Model)
+# ==========================================
+# This fixes the "AttributeError: 'GenerationRequest' object has no attribute 'term'"
+class GenerationRequest(BaseModel):
+    # Request Meta
+    type: str = "lesson"  # 'lesson', 'weekly', 'scheme'
     uid: Optional[str] = None
-    student_name: str = Field(alias="name") 
-    grade: str
-    subject: str
-    country: str = "Zambia"
-    credits: Optional[int] = 3  # ✅ Defaults to 3 if missing
+    school_id: Optional[str] = None
     
+    # Curriculum Data
+    grade: Optional[str] = "Grade 9"
+    subject: Optional[str] = "Mathematics"
+    topic: Optional[str] = ""
+    subtopic: Optional[str] = ""
+    
+    # 🗓️ TIMING & TERM (Updated with Defaults)
+    # ✅ FIX: Defaults to "Term 1" to prevent crashes
+    term: Optional[str] = "Term 1" 
+    weekNumber: Optional[int] = 1
+    weeks: Optional[int] = 13
+    days: Optional[int] = 5
+    startDate: Optional[str] = None
+    
+    # Lesson Specifics
+    date: Optional[str] = None
+    timeStart: Optional[str] = "08:00"
+    timeEnd: Optional[str] = "09:00"
+    objectives: Optional[List[str]] = []
+    teacherName: Optional[str] = "Teacher"
+    
+    # Demographics
+    boys: Optional[int] = 0
+    girls: Optional[int] = 0
+
     class Config:
-        populate_by_name = True
-        extra = "ignore" 
+        extra = "ignore" # Ignores extra fields from frontend instead of crashing
 
-class StartSessionRequest(StudentProfile):
-    mode: str = "tutor"
-
-class ToolRequest(BaseModel):
-    tool_name: str
-    context_topic: Optional[str] = ""
-    arguments: dict = {}
-    student: StudentProfile 
-
-class QuizResult(BaseModel):
-    topic: str
-    grade: str = "8"
-    score: int
-    total_questions: int
-    mistakes: List[Dict[str, str]]
-
-# -----------------------------------
-# 🍎 TEACHER / SCHEME MODELS
-# -----------------------------------
+# ==========================================
+# 🍎 SCHEME MODELS
+# ==========================================
 
 class SchemeRequest(BaseModel):
-    schoolName: str  # ✅ Used for both Old and New schemes header
-    term: str
+    schoolName: str 
+    # ✅ FIX: Defaults to "Term 1"
+    term: str = "Term 1"
     subject: str
     grade: str
     weeks: int
@@ -51,11 +60,11 @@ class SchemeRow(BaseModel):
     topic: Optional[str] = ""
     subtopic: Optional[str] = ""
     
-    # Unit/Theme support (Critical for Weekly Plans)
+    # Unit/Theme support
     unit: Optional[str] = "" 
     theme: Optional[str] = ""
 
-    # 2. COMPETENCE FIELDS (Critical for CBC)
+    # 2. COMPETENCE FIELDS
     prescribed_competences: List[str] = []
     specific_competences: List[str] = []
     
@@ -77,39 +86,36 @@ class SchemeRow(BaseModel):
     
     @validator('learning_activities', pre=True)
     def check_activities_alias(cls, v, values):
-        # If the AI sends 'activities' or 'activity' instead of 'learning_activities', fix it.
         if not v:
             return values.get('activities') or values.get('activity') or []
         return v
 
     @validator('prescribed_competences', pre=True)
     def check_prescribed_alias(cls, v, values):
-        # Map 'competences' or 'general_competences' to 'prescribed_competences'
         if not v:
             return values.get('competences') or values.get('general_competences') or []
         return v
 
     @validator('specific_competences', pre=True)
     def check_specific_alias(cls, v, values):
-        # Map 'outcomes' or 'objectives' to 'specific_competences' if needed
         if not v:
             return values.get('outcomes') or values.get('objectives') or []
         return v
 
     class Config:
         populate_by_name = True
-        # ✅ CRITICAL: "allow" ensures extra fields (like 'competencies') are saved to DB 
-        # instead of being thrown away, preventing data loss.
         extra = "allow" 
 
 class SchemeResponse(BaseModel):
-    intro: Dict[str, Any] = {} # Stores { "philosophy": "...", "goals": [...] }
+    intro: Dict[str, Any] = {} 
     rows: List[SchemeRow]
     
     class Config:
         extra = "allow"
 
-
+# ==========================================
+# 📝 WORKSHEET MODELS
+# ==========================================
 
 class WorksheetRequest(BaseModel):
     uid: Optional[str] = None
@@ -117,15 +123,16 @@ class WorksheetRequest(BaseModel):
     subject: str
     topic: str
     subtopic: Optional[str] = ""
+    # ✅ Added Term here for consistency (Optional)
+    term: Optional[str] = "Term 1"
     difficulty: Literal["easy", "medium", "hard"] = "medium"
     school_name: str
 
-# A single building block of a worksheet
 class WorksheetBlock(BaseModel):
     id: int
     type: Literal["mcq", "matching", "fill_blank", "svg_diagram", "open_question"]
     instruction: str
-    content: Any # Dynamic: can be a string (SVG), list (MCQ options), or dict (Matching pairs)
+    content: Any 
     answer_key: str 
 
 class WorksheetResponse(BaseModel):
