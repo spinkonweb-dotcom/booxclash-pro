@@ -12,3 +12,6 @@ google-genai
 pinecone
 httpx
 firebase_admin
+cloudinary
+jinja2
+python-multipart
