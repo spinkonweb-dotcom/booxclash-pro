@@ -68,7 +68,7 @@ def extract_json_string(text: str) -> str:
         return text
 
 # =====================================================
-# 1. PROFESSIONAL SCHEME GENERATOR
+# 1. PROFESSIONAL SCHEME GENERATOR (FIXED MISSING CONTENT)
 # =====================================================
 async def generate_scheme_with_ai(
     syllabus_data: Any,
@@ -76,7 +76,7 @@ async def generate_scheme_with_ai(
     grade: str,
     term: str,
     num_weeks: int,
-    start_date: str = "2026-01-13"
+    start_date: str = "2026-01-12"
 ) -> List[dict]:
     
     print(f"\n📘 [Scheme Generator] Processing {subject} Grade {grade} for Term {term}...")
@@ -84,121 +84,140 @@ async def generate_scheme_with_ai(
     # 1️⃣ ROBUST DATA EXTRACTION
     full_topic_list = []
     if isinstance(syllabus_data, dict):
-        # Scan common keys where the list might be hiding
         full_topic_list = (
             syllabus_data.get("topics") or 
-            syllabus_data.get("units") or 
             syllabus_data.get("content") or 
-            syllabus_data.get("syllabus") or 
+            syllabus_data.get("units") or 
             []
         )
     elif isinstance(syllabus_data, list):
         full_topic_list = syllabus_data
     
-    total_topics = len(full_topic_list)
-    if total_topics == 0:
-        print(f"⚠️ [Scheme Generator] CRITICAL: No topics found in syllabus data.")
+    if not full_topic_list:
         return []
 
-    # 2️⃣ TERM DIVISION LOGIC (Split by 3)
-    chunk_size = math.ceil(total_topics / 3)
-    
-    # Normalize term input
+    # 2️⃣ TERM DIVISION LOGIC
+    chunk_size = math.ceil(len(full_topic_list) / 3)
     term_int = 1
     if "2" in str(term): term_int = 2
     elif "3" in str(term): term_int = 3
 
     start_index = (term_int - 1) * chunk_size
     end_index = start_index + chunk_size
-    
-    # Get the specific slice for this term
     term_syllabus_slice = full_topic_list[start_index:end_index]
     
-    print(f"📊 Split Logic: Total {total_topics} items. Term {term_int} gets items {start_index} to {end_index}.")
-    
-    if not term_syllabus_slice:
-        print("⚠️ Warning: Term slice resulted in empty list. Using full list as fallback.")
-        term_syllabus_slice = full_topic_list
+    # --- LOOKUP MAP (The Fix for Empty Data) ---
+    syllabus_lookup = {}
+    for item in term_syllabus_slice:
+        key = str(item.get('unit', '')).strip()
+        if not key: key = str(item.get('topic_title', '')).strip()
+        if key: syllabus_lookup[key] = item
+    # -------------------------------------------
 
-    # 3️⃣ PROMPT CONSTRUCTION
+    # 3️⃣ PROMPT
     model = get_model()
-    
-    # Dump the RAW slice to JSON so the AI sees 'unit', 'page_number', etc.
     data_context = json.dumps(term_syllabus_slice)
 
     prompt = f"""
-    Act as a Senior Head Teacher in Zambia. Create a Scheme of Work for **Term {term_int}**.
+    Act as a Senior Head Teacher. Create a Scheme of Work for **Term {term_int}**.
     
     DETAILS: 
-    - Subject: {subject}, Grade: {grade}
-    - Duration: {num_weeks} Weeks
-    - Start Date: {start_date}
+    - Subject: {subject}, Grade: {grade}, Duration: {num_weeks} Weeks
     
-    STRICT DATA SOURCE:
-    The JSON data below represents the specific syllabus chunk for Term {term_int}.
-    
-    CRITICAL REQUIREMENTS:
-    1. **Mandatory Fields**: You MUST include the `unit` (e.g., "12.12") and `page_number` (e.g., 73) for every topic. Extract these EXACTLY as they appear in the data.
-    2. **No Data Loss**: Do NOT summarize. If the data lists specific outcomes like "12.12.6.6 Differentiate...", you must include them in the 'outcomes' list.
-    3. **Allocation**: Map these {len(term_syllabus_slice)} topics across {num_weeks} weeks.
-    
-    DATA SLICE: 
+    SOURCE DATA: 
     {data_context}
-    
-    OUTPUT FORMAT (JSON List):
+
+    INSTRUCTIONS:
+    1. Map the topics to weeks.
+    2. **External References**: Suggest ONE book/website in 'external_ref'.
+    3. **Methods & Resources**: You MUST generate specific methods (e.g. "Group Work") and resources (e.g. "Charts") for every week.
+    4. **CRITICAL**: Return the `unit` identifier exactly as it appears in source.
+
+    OUTPUT JSON:
     [
       {{
         "week_number": 1,
-        "unit": "12.12",             <-- MUST EXTRACT FROM DATA
-        "page_number": 73,           <-- MUST EXTRACT FROM DATA
-        "topic": "ORGANIC CHEMISTRY",
-        "content": ["12.12.6 Macromolecules (Polymers)"],
-        "outcomes": ["12.12.6.6 Differentiate between...", "12.12.6.7 Describe typical uses..."],
-        "resources": ["Textbook Page 73", "Molecule Models"] 
+        "unit": "10.1",
+        "topic": "...", 
+        "outcomes": ["..."],
+        "methods": "Group Work, Demonstration", 
+        "resources": "Charts, Realia",
+        "external_ref": "Khan Academy..."
       }}
     ]
     """
     
     try:
-        # Generate
         response = await model.generate_content_async(prompt)
         json_str = extract_json_string(response.text)
         data = json.loads(json_str)
 
         if not isinstance(data, list): return []
 
-        # 4️⃣ POST-PROCESSING
         cleaned_data = []
         for i, item in enumerate(data):
             week_num = item.get('week_number', i + 1)
-            
             if week_num > num_weeks: continue
 
-            date_info = calculate_week_dates(start_date, week_num)
+            # --- 🛠️ FIX: FORCE DATA FROM SOURCE ---
+            ai_unit_key = str(item.get('unit', '')).strip()
+            original_data = syllabus_lookup.get(ai_unit_key)
             
-            # Ensure list formatting
-            if isinstance(item.get('content'), str): item['content'] = [item['content']]
-            if isinstance(item.get('outcomes'), str): item['outcomes'] = [item['outcomes']]
+            # Fallback by index if unit missing
+            if not original_data and i < len(term_syllabus_slice):
+                original_data = term_syllabus_slice[i]
 
-            # Add display metadata
-            item['month'] = date_info['month'] 
-            item['week'] = f"Week {week_num} {date_info['range_display']}"
-            item['week_number'] = week_num
+            if original_data:
+                # 1. Force Page Number
+                official_page = str(original_data.get('page_number', 'Ref Text'))
+                
+                # 2. Force Topic Title (Don't trust AI to remember it)
+                source_topic = original_data.get('topic_title') or original_data.get('topic')
+                if source_topic:
+                    item['topic'] = source_topic
+                
+                # 3. Force Content/Subtopics
+                source_content = original_data.get('subtopics') or original_data.get('content') or original_data.get('topics')
+                if source_content:
+                    item['content'] = source_content
+
+                # 4. Force Outcomes (if AI missed them)
+                source_outcomes = original_data.get('specific_outcomes') or original_data.get('outcomes')
+                if source_outcomes and not item.get('outcomes'):
+                    item['outcomes'] = source_outcomes
+
+            # Default Methods/Resources if AI failed
+            if not item.get('methods'): item['methods'] = "Explanation, Demonstration, Group Work"
+            if not item.get('resources'): item['resources'] = "Textbook, Charts, Board"
+
+            # 5. Build Reference String
+            ai_ref = item.get('external_ref', '')
+            if ai_ref:
+                item['references'] = f"Syllabus Pg: {official_page}\nExt: {ai_ref}"
+            else:
+                item['references'] = f"Syllabus Pg: {official_page}"
+
+            # --- Formatting ---
+            date_info = calculate_week_dates(start_date, week_num)
+            item['week'] = week_num
+            item['date_range'] = date_info['range_display'] # Keep for logic, but we won't show in UI
             
-            # Fallback for unit/page if AI missed them (rare with strict prompt)
-            if 'unit' not in item: item['unit'] = "N/A"
-            if 'page_number' not in item: item['page_number'] = "-"
+            # Merge Topic/Content
+            topic_str = item.get('topic', 'Topic')
+            content_list = item.get('content', [])
+            if isinstance(content_list, list): content_str = "\n- ".join(content_list)
+            else: content_str = str(content_list)
+            item['topic_content'] = f"**{topic_str}**\n- {content_str}"
 
             cleaned_data.append(item)
 
         return cleaned_data
 
     except Exception as e:
-        print(f"❌ [Scheme Generator] Failed: {e}")
+        print(f"❌ Error: {e}")
         return []
-
 # =====================================================
-# 2. WEEKLY PLAN GENERATOR
+# 2. WEEKLY PLAN GENERATOR (ROBUST REFERENCE FIX)
 # =====================================================
 async def generate_weekly_plan_with_ai(
     grade: str, 
@@ -208,13 +227,17 @@ async def generate_weekly_plan_with_ai(
     school_name: str = "Unknown School", 
     start_date: Optional[str] = None, 
     days_count: int = 5,
-    topic: Optional[str] = None  # 👈 Accepts the topic
+    topic: Optional[str] = None,
+    references: Optional[str] = None  # 👈 Accepts the exact references string
 ) -> Dict[str, Any]:
     
-    # Smart Fallback: If topic is empty string/None, make a decent guess context
+    # Smart Fallback for Topic
     topic_context = topic if topic and len(topic) > 1 else f"Week {week_number} Syllabus Topic"
     
-    print(f"🧠 AI Generating Weekly Plan | Subject: {subject} | Week: {week_number} | Topic: {topic_context}")
+    # Smart Fallback for References
+    ref_context = references if references and len(references) > 1 else "Syllabus, Approved Textbooks"
+
+    print(f"🧠 AI Generating Weekly Plan | Subject: {subject} | Week: {week_number} | Refs: {ref_context[:30]}...")
     
     model = get_model()
 
@@ -232,8 +255,6 @@ async def generate_weekly_plan_with_ai(
     
     CRITICAL INSTRUCTIONS:
     1. **Adhere to Topic**: You MUST generate lessons specifically for the topic: "{topic_context}".
-       - Do NOT generate generic content like "Introduction to Week 1 Syllabus Topic". 
-       - If the topic is "Fractions", every day must be about Fractions.
     2. **Days**: Generate exactly {days_count} entries.
     3. **Resources**: Vary them (e.g., "Soil samples", "Clock face", "Flashcards").
     
@@ -249,10 +270,11 @@ async def generate_weekly_plan_with_ai(
       "days": [
         {{
           "day": "Monday",
-          "subtopic": "Specific subtopic of {topic_context}",
+          "subtopic": "Specific subtopic...",
           "objectives": ["..."],
           "activities": "...",
-          "resources": "..."
+          "resources": "...",
+          "references": "placeholder" 
         }}
       ]
     }}
@@ -261,7 +283,21 @@ async def generate_weekly_plan_with_ai(
     
     try:
         response = await model.generate_content_async(prompt, generation_config={"response_mime_type": "application/json"})
-        return json.loads(extract_json_string(response.text))
+        data = json.loads(extract_json_string(response.text))
+
+        # 🛠️ ROBUST FIX: FORCE OVERWRITE REFERENCES IN PYTHON
+        # We don't trust the AI to copy the string perfectly, so we do it here.
+        if "days" in data and isinstance(data["days"], list):
+            for day in data["days"]:
+                # If specific references were passed, use them. 
+                # Otherwise keep what AI generated (or default).
+                if references and len(references) > 1:
+                    day["references"] = references
+                elif not day.get("references"):
+                    day["references"] = "Syllabus, Approved Textbooks"
+
+        return data
+
     except Exception as e:
         print(f"❌ Weekly Plan Error: {e}")
         return {"meta": {"error": True}, "days": []}

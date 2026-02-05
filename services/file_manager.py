@@ -195,7 +195,38 @@ def load_lesson_plan(uid: str, subject: str, grade: str, term: str, week: int, s
         return None
 
 # ==========================================
-# 4. RESOURCES (WORKSHEETS & NOTES)
+# 4. RECORDS OF WORK (NEW)
+# ==========================================
+def save_record_of_work(
+    uid: str, subject: str, grade: str, term: str, week: int, 
+    school_name: str, topic: str, data: dict, school_id: str = None
+):
+    """
+    Saves record to 'generated_records_of_work' AND 'schools/{id}/generated_records_of_work'.
+    """
+    # --- SAFETY CHECK ---
+    if not isinstance(data, dict):
+        print(f"❌ Save Record Error: Expected dict, got {type(data)}. Aborting.")
+        return False
+
+    payload = {
+        "userId": uid,
+        "schoolName": school_name,
+        "subject": subject,
+        "grade": grade,
+        "term": term,
+        "weekNumber": int(week),
+        "topic": topic,
+        "recordData": data, # Stores the JSON structure with blank evaluations
+        "createdAt": datetime.now(),
+        "type": "Record of Work",
+        "source": "backend_auto_save"
+    }
+    
+    return save_to_firestore_dual("generated_records_of_work", payload, school_id)
+
+# ==========================================
+# 5. RESOURCES (WORKSHEETS & NOTES)
 # ==========================================
 def save_resource(uid: str, resource_type: str, data: dict, meta: dict, school_id: str = None):
     """

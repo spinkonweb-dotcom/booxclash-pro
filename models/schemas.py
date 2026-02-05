@@ -1,10 +1,9 @@
-from pydantic import BaseModel, Field, validator
-from typing import List, Optional, Any, Dict, Literal
+from pydantic import BaseModel, Field, validator, ConfigDict
+from typing import List, Optional, Any, Dict, Literal, Union
 
 # ==========================================
 # 🚀 GENERATION REQUEST (The Main Input Model)
 # ==========================================
-# This fixes the "AttributeError: 'GenerationRequest' object has no attribute 'term'"
 class GenerationRequest(BaseModel):
     # Request Meta
     type: str = "lesson"  # 'lesson', 'weekly', 'scheme'
@@ -17,8 +16,7 @@ class GenerationRequest(BaseModel):
     topic: Optional[str] = ""
     subtopic: Optional[str] = ""
     
-    # 🗓️ TIMING & TERM (Updated with Defaults)
-    # ✅ FIX: Defaults to "Term 1" to prevent crashes
+    # 🗓️ TIMING & TERM
     term: Optional[str] = "Term 1" 
     weekNumber: Optional[int] = 1
     weeks: Optional[int] = 13
@@ -36,8 +34,30 @@ class GenerationRequest(BaseModel):
     boys: Optional[int] = 0
     girls: Optional[int] = 0
 
-    class Config:
-        extra = "ignore" # Ignores extra fields from frontend instead of crashing
+    model_config = ConfigDict(extra='ignore')
+
+# ==========================================
+# 📅 WEEKLY PLAN REQUEST (CRITICAL FIX)
+# ==========================================
+class WeeklyPlanRequest(BaseModel):
+    uid: str
+    grade: str
+    subject: str
+    term: str
+    school: Optional[str] = "Unknown School"
+    weekNumber: int
+    days: Optional[int] = 5
+    startDate: Optional[str] = None
+    
+    # Allow both 'topic' and 'theme'
+    topic: Optional[str] = None 
+    theme: Optional[str] = None
+    schoolId: Optional[str] = None 
+    
+    # ✅ FIX: Added 'references' so the data is accepted from frontend
+    references: Optional[str] = None
+
+    model_config = ConfigDict(extra='ignore')
 
 # ==========================================
 # 🍎 SCHEME MODELS
@@ -45,26 +65,33 @@ class GenerationRequest(BaseModel):
 
 class SchemeRequest(BaseModel):
     schoolName: str 
-    # ✅ FIX: Defaults to "Term 1"
     term: str = "Term 1"
     subject: str
     grade: str
     weeks: int
     startDate: Optional[str] = None
     uid: Optional[str] = None
+    schoolId: Optional[str] = None 
 
 class SchemeRow(BaseModel):
     # 1. CORE IDENTIFIERS
-    week: str
+    week: Union[str, int]
     week_number: Optional[int] = None
+    
+    # ✅ NEW FIELDS (Required for the new PDF/Table format)
+    date_range: Optional[str] = "" 
+    topic_content: Optional[str] = "" 
+    
+    # Standard identifiers
     topic: Optional[str] = ""
     subtopic: Optional[str] = ""
-    
-    # Unit/Theme support
     unit: Optional[str] = "" 
     theme: Optional[str] = ""
 
-    # 2. COMPETENCE FIELDS
+    # 2. COMPETENCE & OUTCOMES
+    outcomes: List[str] = [] 
+    
+    # Legacy fields
     prescribed_competences: List[str] = []
     specific_competences: List[str] = []
     
@@ -82,8 +109,31 @@ class SchemeRow(BaseModel):
     month: Optional[str] = None
     isSpecialRow: bool = False
 
-    # 🛡️ VALIDATORS: Auto-fix common AI mapping errors
+    # 🛡️ VALIDATORS: Auto-fix AI mapping errors (String -> List conversion)
     
+    # ✅ FIX: This validator intercepts Strings and converts them to Lists
+    # before Pydantic throws a validation error.
+    @validator('methods', 'resources', 'references', 'content', 'outcomes', 'assessment', 'learning_activities', pre=True)
+    def coerce_to_list(cls, v):
+        if v is None:
+            return []
+        if isinstance(v, str):
+            # If it has newlines, split by newline (common in AI bullet points)
+            if "\n" in v:
+                return [x.strip() for x in v.split("\n") if x.strip()]
+            # If it has commas, split by comma (common in CSV style)
+            if "," in v:
+                return [x.strip() for x in v.split(",") if x.strip()]
+            # Otherwise, just wrap the single string in a list
+            return [v.strip()]
+        return v
+
+    @validator('outcomes', pre=True, always=True)
+    def populate_outcomes(cls, v, values):
+        if not v:
+            return values.get('specific_competences') or values.get('specific_outcomes') or []
+        return v
+
     @validator('learning_activities', pre=True)
     def check_activities_alias(cls, v, values):
         if not v:
@@ -96,22 +146,13 @@ class SchemeRow(BaseModel):
             return values.get('competences') or values.get('general_competences') or []
         return v
 
-    @validator('specific_competences', pre=True)
-    def check_specific_alias(cls, v, values):
-        if not v:
-            return values.get('outcomes') or values.get('objectives') or []
-        return v
-
-    class Config:
-        populate_by_name = True
-        extra = "allow" 
+    model_config = ConfigDict(populate_by_name=True, extra='allow')
 
 class SchemeResponse(BaseModel):
     intro: Dict[str, Any] = {} 
     rows: List[SchemeRow]
     
-    class Config:
-        extra = "allow"
+    model_config = ConfigDict(extra='allow')
 
 # ==========================================
 # 📝 WORKSHEET MODELS
@@ -123,10 +164,10 @@ class WorksheetRequest(BaseModel):
     subject: str
     topic: str
     subtopic: Optional[str] = ""
-    # ✅ Added Term here for consistency (Optional)
     term: Optional[str] = "Term 1"
     difficulty: Literal["easy", "medium", "hard"] = "medium"
     school_name: str
+    schoolId: Optional[str] = None
 
 class WorksheetBlock(BaseModel):
     id: int

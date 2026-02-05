@@ -23,7 +23,7 @@
     {
       "unit": "1.1",
       "topic_title": "INTRODUCTION TO CHEMISTRY",
-      "page_number": 15,
+      "page_number": 3,
       "subtopics": [
         "1.1.1 Branches of Chemistry",
         "1.1.2 Importance of Chemistry",
@@ -42,7 +42,7 @@
     {
       "unit": "1.2",
       "topic_title": "MATTER",
-      "page_number": 16,
+      "page_number": 4,
       "subtopics": [
         "1.2.1 States and Basic units of matter",
         "1.2.2 Kinetic theory of matter",
@@ -57,7 +57,7 @@
     {
       "unit": "1.3",
       "topic_title": "ELEMENTS, COMPOUNDS AND MIXTURES",
-      "page_number": 16,
+      "page_number": 5,
       "subtopics": [
         "1.3.1 Elements",
         "1.3.2 Compounds",
@@ -78,7 +78,7 @@
     {
       "unit": "1.4",
       "topic_title": "ATOMIC STRUCTURE",
-      "page_number": 18,
+      "page_number": 6,
       "subtopics": [
         "1.4.1 Structure of an Atom",
         "1.4.2 Properties of the Sub-atomic particles",

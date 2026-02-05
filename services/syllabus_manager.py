@@ -149,6 +149,9 @@ def get_subjects_for_grade(grade: str) -> list[str]:
     """
     Scans syllabus folder to see what subjects exist for a grade.
     STRICTLY separates 'Form' vs 'Grade' files.
+    
+    Robust Update: Correctly identifies subjects with numbers (e.g., "Mathematics 1")
+    by strictly stripping prefixes/suffixes rather than filtering tokens.
     """
     curr_type = get_curriculum_folder(grade)
     target_dir = SYLLABI_ROOT_DIR / curr_type
@@ -165,45 +168,63 @@ def get_subjects_for_grade(grade: str) -> list[str]:
     raw_num = grade_input.replace("grade", "").replace("form", "").replace(" ", "").strip()
     
     # ⚡️ STRICT SEARCH TAGS
+    # We define exactly what the end of the filename should look like
     search_tags = []
     
     if "form" in grade_input:
-        # If user explicitly said "Form 1", look for 'form1', 'form_1'
-        # This matches: zambia_chemistry_grade_form_1.json
-        search_tags = [f"form{raw_num}", f"form_{raw_num}"]
+        # Matches: zambia_chemistry_grade_form_1.json or zambia_history_form_1.json
+        search_tags = [f"form_{raw_num}", f"form{raw_num}"]
     else:
-        # If user explicitly said "Grade 1", look for 'grade1', 'grade_1'
-        # This matches: zambia_creative_and_technology_studies_grade_1.json
-        search_tags = [f"grade{raw_num}", f"grade_{raw_num}"]
+        # Matches: zambia_math_grade_1.json
+        search_tags = [f"grade_{raw_num}", f"grade{raw_num}"]
 
     for file_path in target_dir.glob("*.json"):
-        filename = file_path.stem.lower()
+        filename = file_path.stem.lower() # e.g. "zambia_mathematics_1_grade_10"
         
         # 1. Check if file matches our strict tags
-        if any(tag in filename for tag in search_tags):
+        matched_tag = next((tag for tag in search_tags if tag in filename), None)
+        
+        if matched_tag:
             
             # ⚡️ ANTI-COLLISION SAFETY
-            # If we want "Grade 1", reject files containing "Form" (like grade_form_1)
+            # If we want "Grade 1", reject files containing "Form"
             if "grade" in grade_input and "form" not in grade_input:
-                if "form" in filename:
-                    continue 
+                if "form" in filename: continue 
 
-            # If we want "Form 1", reject files that look like "Grade 1" but lack "Form"
-            # (Though our search_tags logic above usually handles this, this is double safety)
-            if "form" in grade_input:
-                if "form" not in filename:
-                    continue
+            # If we want "Form 1", reject files that don't have "Form"
+            if "form" in grade_input and "form" not in filename: continue
 
-            # 2. Extract Subject Name
-            parts = filename.split("_")
-            clean_parts = []
-            for part in parts:
-                if part in ["zambia", "syllabus", "curriculum", "new", "old", "ecz"]: continue
-                # Remove number, grade, form from the visible subject name
-                if "grade" in part or "form" in part or part == raw_num: continue
-                clean_parts.append(part.title())
+            # 2. STRICT EXTRACTION (The Fix)
+            # Instead of splitting by "_", we strip the known ends.
             
-            subject_name = " ".join(clean_parts)
-            if subject_name: found_subjects.add(subject_name)
+            temp_name = filename
+            
+            # Step A: Remove the matched grade suffix (e.g., remove "_grade_10")
+            # We use rsplit to ensure we cut from the right side
+            if temp_name.endswith(matched_tag):
+                temp_name = temp_name[:-len(matched_tag)]
+            
+            # Step B: Clean trailing underscores left behind (e.g. "math_")
+            temp_name = temp_name.rstrip("_")
+            
+            # Step C: Remove the "grade" word if it was stuck to the tag (e.g. "math_grade")
+            # This handles cases like "zambia_math_grade_10" -> stripped "10" -> "zambia_math_grade"
+            if temp_name.endswith("_grade"):
+                temp_name = temp_name[:-6] # remove "_grade"
+            
+            # Step D: Remove prefix "zambia_"
+            if temp_name.startswith("zambia_"):
+                temp_name = temp_name[7:] # len("zambia_") is 7
+                
+            # Step E: Formatting
+            # Now we have strict subject key (e.g. "mathematics_1")
+            # This preserves the "1" because we never filtered by isdigit()
+            subject_name = temp_name.replace("_", " ").title()
+            
+            # Edge Case: Fix "Ict" to "ICT" if needed
+            if subject_name.lower() == "ict": subject_name = "ICT"
+            
+            if subject_name: 
+                found_subjects.add(subject_name)
 
     return sorted(list(found_subjects))

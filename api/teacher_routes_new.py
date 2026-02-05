@@ -9,12 +9,13 @@ from firebase_admin import firestore
 # Models
 from models.schemas import SchemeRequest, SchemeRow, SchemeResponse
 
-# Services
+# Services (Refactored Structure)
 from services.llm_teacher_engine_new import (
     generate_scheme_with_ai, 
     generate_weekly_plan_from_scheme, 
     generate_specific_lesson_plan,
-    generate_lesson_notes
+    generate_lesson_notes,
+    generate_record_of_work  
 )
 
 # Services: Content Loading
@@ -25,7 +26,8 @@ from services.file_manager import (
     save_generated_scheme, 
     load_generated_scheme, 
     save_weekly_plan, 
-    save_lesson_plan
+    save_lesson_plan,
+    save_record_of_work 
 )
 from services.credit_manager import check_and_deduct_credit
 
@@ -52,7 +54,9 @@ class WeeklyPlanRequest(BaseModel):
     weekNumber: int
     days: int = 5
     startDate: str = "2026-01-13"
-    schoolId: Optional[str] = None # ✅ Added
+    schoolId: Optional[str] = None
+    topic: Optional[str] = None         
+    references: Optional[str] = None    
 
 class LessonPlanRequest(BaseModel):
     uid: Optional[str] = None
@@ -70,7 +74,22 @@ class LessonPlanRequest(BaseModel):
     boys: int = 0
     girls: int = 0
     objectives: List[str] = []
-    schoolId: Optional[str] = None # ✅ Added
+    schoolId: Optional[str] = None
+
+class RecordOfWorkRequest(BaseModel): 
+    uid: Optional[str] = None
+    grade: str
+    subject: str
+    term: str
+    school: str
+    teacherName: str
+    year: str
+    weekNumber: int
+    days: int
+    startDate: str
+    topic: str
+    references: Optional[str] = None
+    schoolId: Optional[str] = None
 
 # ==========================================
 # 🛠️ HELPERS
@@ -98,18 +117,29 @@ def resolve_user_id(x_user_id: str | None, payload_uid: str | None) -> str:
     return x_user_id or payload_uid or "default_user"
 
 def get_best_available_scheme(user_id: str, subject: str, grade: str, term: str):
+    """
+    Attempts to load a generated scheme from Firestore to provide context 
+    (Topics, References) to other generators.
+    """
+    # 1. Try file system cache (if implemented)
     user_scheme = load_generated_scheme(user_id, subject, grade, term)
     if user_scheme: return user_scheme
     
+    # 2. Try Firestore Query
     try:
         docs = db.collection("generated_schemes")\
+            .where("userId", "==", user_id)\
             .where("subject", "==", subject)\
             .where("grade", "==", grade)\
             .where("term", "==", term)\
+            .order_by("createdAt", direction=firestore.Query.DESCENDING)\
             .limit(1)\
             .stream()
-        for doc in docs: return doc.to_dict()
-    except: pass
+            
+        for doc in docs: 
+            return doc.to_dict()
+    except Exception as e: 
+        print(f"⚠️ Warning: Could not fetch scheme context: {e}")
     return None
 
 # ==========================================
@@ -157,12 +187,14 @@ async def generate_scheme(
             week_display = item.get("week", fallback_week_str)
 
             refs = item.get("references", [])
+            # Fallback refs if empty
             if not refs:
                 refs = [f"Syllabus Grade {request.grade}", f"Pupil's Book Grade {request.grade}"]
             
             unit_val = item.get("unit", "N/A")
             topic_text = item.get("topic", "")
 
+            # Try extract unit number from topic if missing
             if unit_val == "N/A" or not unit_val:
                 match = re.search(r"\b(\d+\.\d+)\b", topic_text)
                 if match: unit_val = match.group(1)
@@ -170,6 +202,7 @@ async def generate_scheme(
             row = SchemeRow(
                 month=month_name,
                 week=week_display,
+                week_number=item.get("week_number", i+1), # Ensure week number is saved
                 unit=unit_val,  
                 topic=topic_text if not is_last_week else "End of Term",
                 prescribed_competences=item.get("prescribed_competences", []),
@@ -193,7 +226,7 @@ async def generate_scheme(
             term=request.term, 
             school_name=request.schoolName,
             data=final_response.dict(),
-            school_id=school_id # 👈 FIX 1: Passed School ID here
+            school_id=school_id 
         )
 
         return final_response
@@ -213,6 +246,7 @@ async def generate_weekly(
 
     print(f"📅 WEEKLY PLAN | User: {user_id} | School: {school_id} | Week {request.weekNumber}")
 
+    # 1. Try to get context from Scheme
     scheme_context = get_best_available_scheme(user_id, request.subject, request.grade, request.term)
     
     scheme_rows = []
@@ -220,8 +254,12 @@ async def generate_weekly(
         if isinstance(scheme_context, list):
             scheme_rows = scheme_context
         elif isinstance(scheme_context, dict):
-            scheme_rows = scheme_context.get("rows") or scheme_context.get("schemeData") or []
+            # Handle standard Firestore structure
+            scheme_rows = scheme_context.get("schemeData", {}).get("rows", []) or \
+                          scheme_context.get("rows", []) or \
+                          scheme_context.get("weeks", [])
 
+    # 2. Get Module Data
     module_data = load_module(country="Zambia", grade=request.grade, subject=request.subject)
 
     try:
@@ -239,6 +277,11 @@ async def generate_weekly(
             module_data=module_data
         )
 
+        # 3. Inject Manual Overrides if Scheme didn't provide them but User did
+        if request.topic:
+            plan["meta"] = plan.get("meta", {})
+            plan["meta"]["main_topic"] = request.topic 
+        
         save_weekly_plan(
             uid=user_id, 
             subject=request.subject, 
@@ -247,7 +290,7 @@ async def generate_weekly(
             week=request.weekNumber, 
             school_name=request.school, 
             data=plan,
-            school_id=school_id # 👈 FIX 2: Passed School ID here
+            school_id=school_id 
         )
         return {"data": plan}
     except Exception as e:
@@ -279,17 +322,120 @@ async def generate_lesson(
             module_data=module_data
         )
 
+        # 🛠️ FLATTEN DATA FOR FRONTEND COMPATIBILITY
+        if isinstance(lesson, dict):
+            if "header" in lesson and isinstance(lesson["header"], dict):
+                lesson.update(lesson.pop("header"))
+            if "meta" in lesson and isinstance(lesson["meta"], dict):
+                lesson.update(lesson.pop("meta"))
+            if "steps" in lesson and "lesson_steps" not in lesson:
+                lesson["lesson_steps"] = lesson["steps"]
+
+        # ✅ FIX: Explicitly extract topic and subtopic from the GENERATED lesson
+        # This prevents "General Lesson" from showing up in the database list
+        generated_topic = lesson.get("topic") or request.topic or "General Topic"
+        generated_subtopic = lesson.get("subtopic") or request.subtopic or generated_topic
+
         save_lesson_plan(
             uid=user_id, 
             subject=request.subject, 
-            grade=request.grade,
+            grade=request.grade, 
             term=request.term, 
             week=request.weekNumber, 
             school_name=request.school, 
             data=lesson,
-            school_id=school_id # 👈 FIX 3: Passed School ID here
+            school_id=school_id,
+            # 👇 THIS WAS MISSING
+            topic=generated_topic 
         )
         return {"data": lesson}
+    except Exception as e:
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
+
+# ==========================================
+# 📋 GENERATE RECORD OF WORK (NEW)
+# ==========================================
+@router.post("/generate-record-of-work")
+async def generate_record_route(
+    request: RecordOfWorkRequest,
+    x_user_id: str = Header(None, alias="X-User-ID"),
+    x_school_id: str = Header(None, alias="X-School-ID")
+):
+    user_id = resolve_user_id(x_user_id, request.uid)
+    school_id = x_school_id or request.schoolId
+
+    print(f"🔔 [API] Generating Record of Work for Week {request.weekNumber}...")
+    
+    try:
+        # 1. Fetch Context (Scheme of Work)
+        scheme_context = get_best_available_scheme(user_id, request.subject, request.grade, request.term)
+        scheme_rows = []
+        
+        if scheme_context:
+            if isinstance(scheme_context, list):
+                scheme_rows = scheme_context
+            elif isinstance(scheme_context, dict):
+                scheme_rows = scheme_context.get("schemeData", {}).get("rows", []) or \
+                              scheme_context.get("rows", []) or \
+                              scheme_context.get("weeks", [])
+
+        # Filter for the specific week
+        filtered_scheme_data = []
+        target_week = request.weekNumber
+        
+        for row in scheme_rows:
+            w_num = row.get("week_number")
+            if not w_num and row.get("week"):
+                 try:
+                     w_num = int(str(row["week"]).lower().replace("week", "").strip().split()[0])
+                 except: pass
+            
+            if w_num == target_week:
+                filtered_scheme_data.append(row)
+                break 
+        
+        # Fallback if Scheme data is missing
+        if not filtered_scheme_data:
+            print(f"⚠️ Scheme not found for Week {target_week}. Using inputs as fallback.")
+            filtered_scheme_data = [{
+                "week_number": target_week,
+                "topic": request.topic,
+                "content": ["As per syllabus"],
+                "references": [request.references] if request.references else ["Syllabus"],
+                "methods": ["Discussion, Teacher Exposition"],
+                "resources": ["Chalkboard"]
+            }]
+
+        # 2. Generate with AI
+        check_and_deduct_credit(user_id, cost=1, school_id=school_id)
+
+        record_data = await generate_record_of_work(
+            teacher_name=request.teacherName,
+            school_name=request.school,
+            grade=request.grade,
+            subject=request.subject,
+            term=request.term,
+            year=request.year,
+            start_date=request.startDate,
+            scheme_data=filtered_scheme_data
+        )
+
+        # 3. Save to Firestore (Using Dual Save Helper)
+        save_record_of_work(
+            uid=user_id,
+            subject=request.subject,
+            grade=request.grade,
+            term=request.term,
+            week=request.weekNumber,
+            school_name=request.school,
+            topic=request.topic,
+            data=record_data,
+            school_id=school_id
+        )
+        
+        return {"status": "success", "data": record_data}
+
     except Exception as e:
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))

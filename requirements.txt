@@ -15,3 +15,4 @@ firebase_admin
 cloudinary
 jinja2
 python-multipart
+fuzzywuzzy

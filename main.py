@@ -1,11 +1,13 @@
 import logging
 import os
 import glob
+import sys
 import cloudinary
 import cloudinary.uploader
 from pathlib import Path
-from fastapi import FastAPI, Request, UploadFile, File, HTTPException
+from fastapi import FastAPI, Request, UploadFile, File, HTTPException, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 from dotenv import load_dotenv
 
 # 1. Load Environment Variables
@@ -20,14 +22,18 @@ cloudinary.config(
 )
 
 # --- IMPORTS ---
+# Ensure we can import from the services folder by adding root to path
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
 from api.routes import router as api_router
 from api.teacher_routes_new import router as teacher_router_new
 from api.teacher_routes_old import router as teacher_router_old
 from api.admin_routes import router as admin_router
 from api.schemes import router as schemes_router 
 from api.school_settings import router as settings_router 
-from api.relay_routes import router as relay_router # 👈 1. NEW IMPORT
+from api.relay_routes import router as relay_router 
 from api.school_routes import router as school_engine_router
+from services.notification_service import send_whatsapp_invite # 👈 IMPORT SERVICE
 
 # 2. Setup Logging
 logging.basicConfig(
@@ -44,6 +50,8 @@ origins = [
     "http://localhost:5173", 
     "http://localhost:3000",
     "https://booxclash-pro.onrender.com", 
+    "https://www.booxclash.com",
+    "https://booxclash.com",
     "*"
 ]
 
@@ -113,6 +121,11 @@ def get_subjects_for_grade(grade_input: str):
 
     return list(sorted(found_subjects))
 
+# === 📝 DATA MODELS ===
+class WelcomeRequest(BaseModel):
+    email: str
+    name: str
+
 # === ☁️ ENDPOINT: CLOUDINARY UPLOAD ===
 @app.post("/api/upload")
 async def upload_to_cloudinary(file: UploadFile = File(...)):
@@ -145,10 +158,9 @@ app.include_router(teacher_router_new, prefix="/api/v1/new", tags=["Teacher (New
 app.include_router(teacher_router_old, prefix="/api/v1/old", tags=["Teacher (Old Curriculum)"])
 app.include_router(schemes_router, prefix="/api/v1", tags=["Schemes"])
 app.include_router(admin_router, prefix="/api/v1/admin", tags=["Admin"]) 
-# ✅ School Engine (e.g. /api/school/generate) <-- ADD THIS
 app.include_router(school_engine_router, prefix="/api/school", tags=["School Engine"])
 app.include_router(settings_router, prefix="/api/school", tags=["School Settings"]) 
-app.include_router(relay_router, prefix="/api/relay", tags=["Smart Dispatcher"]) # 👈 2. REGISTERED HERE
+app.include_router(relay_router, prefix="/api/relay", tags=["Smart Dispatcher"]) 
 
 # 7. Startup Event & Health Check
 @app.on_event("startup")
@@ -172,7 +184,8 @@ def health_check():
         "registered_routes": [
             "/api/v1/teacher/new", 
             "/api/school/update-settings", 
-            "/api/relay/dispatch/generate" # This will now work
+            "/api/relay/dispatch/generate",
+            "/api/welcome-email" # ✅ Added to list
         ] 
     }
 

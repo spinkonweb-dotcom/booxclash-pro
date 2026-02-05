@@ -5,6 +5,8 @@ from fastapi import APIRouter, Header, HTTPException
 from pydantic import BaseModel
 
 # 1. Import Shared Models
+# ⚠️ MAKE SURE SchemeRow IN models/schemas.py HAS FIELDS: 
+# topic_content, methods, resources, date_range
 from models.schemas import SchemeRequest, SchemeRow, WorksheetResponse, WorksheetRequest
 
 # 2. Import Services
@@ -39,11 +41,11 @@ class WeeklyPlanRequest(BaseModel):
     weekNumber: int
     days: Optional[int] = 5
     startDate: Optional[str] = None
-    
+    references: Optional[str] = None
     # Allow both 'topic' and 'theme'
     topic: Optional[str] = None 
     theme: Optional[str] = None
-    schoolId: Optional[str] = None  # 👈 Added schoolId
+    schoolId: Optional[str] = None 
 
 class LessonPlanRequest(BaseModel):
     uid: str
@@ -61,7 +63,8 @@ class LessonPlanRequest(BaseModel):
     boys: Optional[int] = 0
     girls: Optional[int] = 0
     objectives: List[str] = []
-    schoolId: Optional[str] = None  # 👈 Added schoolId
+    references: Optional[str] = None
+    schoolId: Optional[str] = None
 
 
 # ------------------------------------------------------------------
@@ -89,10 +92,9 @@ def resolve_user_id(x_user_id: Optional[str], payload_uid: Optional[str]) -> str
 async def generate_scheme(
     request: SchemeRequest,
     x_user_id: Optional[str] = Header(None, alias="X-User-ID"),
-    x_school_id: Optional[str] = Header(None, alias="X-School-ID")  # 👈 Added Header
+    x_school_id: Optional[str] = Header(None, alias="X-School-ID")
 ):
     uid = resolve_user_id(x_user_id, request.uid)
-    # Fallback to body schoolId if header missing
     school_id = x_school_id or getattr(request, "schoolId", None)
 
     print(f"📅 Generating Scheme: {request.subject} | Grade {request.grade} | School: {school_id}")
@@ -105,7 +107,6 @@ async def generate_scheme(
     else:
         # 2️⃣ DEDUCT CREDIT (Only if generating new)
         try:
-            # ✅ Updated to use school_id
             check_and_deduct_credit(uid, cost=1, school_id=school_id)
         except Exception as e:
             raise HTTPException(status_code=402, detail=str(e)) # 402 Payment Required
@@ -121,6 +122,7 @@ async def generate_scheme(
                 num_weeks=request.weeks,
             )
 
+            # Handle response wrapper if present
             if isinstance(ai_scheme, dict):
                 ai_scheme = ai_scheme.get("scheme", [])
 
@@ -138,30 +140,56 @@ async def generate_scheme(
             print(f"❌ Scheme generation failed: {e}")
             return []
 
-    # 4️⃣ Normalize for frontend
+    # 4️⃣ Normalize for frontend (CRITICAL UPDATES HERE)
     rows: List[SchemeRow] = []
+    
+    # ✅ Helper to fix validation errors (String -> List)
+    def ensure_list(val: Any) -> List[str]:
+        if isinstance(val, list):
+            return [str(v) for v in val]
+        if isinstance(val, str):
+            # Split comma-separated strings if they look like a list
+            if "," in val:
+                return [v.strip() for v in val.split(",") if v.strip()]
+            return [val]
+        return []
+
     for item in ai_scheme or []:
         week_num = extract_week_number(item.get("week_number") or item.get("week"))
         
-        # --- 🛠️ FIX STARTS HERE: Force references to be a List ---
-        raw_refs = item.get("references")
-        if isinstance(raw_refs, str):
-            final_refs = [raw_refs]  # Convert string to list
-        elif isinstance(raw_refs, list):
-            final_refs = raw_refs    # Keep as list
-        else:
-            final_refs = ["Syllabus Ref"] # Default
-        # --------------------------------------------------------
+        # --- Handle References ---
+        raw_refs = item.get("references", "")
+        final_refs = ensure_list(raw_refs)
+        if not final_refs: final_refs = ["Syllabus Ref"]
+
+        # --- Handle Content ---
+        t_content = item.get("topic_content")
+        if not t_content:
+            raw_topic = item.get("topic", "")
+            raw_content = item.get("content", [])
+            c_str = "\n- ".join(raw_content) if isinstance(raw_content, list) else str(raw_content)
+            t_content = f"**{raw_topic}**\n- {c_str}"
 
         rows.append(
             SchemeRow(
-                month=item.get("month") or get_month_name(week_num),
-                week=str(item.get("week", f"Week {week_num}")),
-                topic=item.get("topic", ""),
-                content=item.get("content", []),
-                outcomes=item.get("outcomes", []),
-                references=final_refs, # ✅ Use the sanitized list
+                week=str(item.get("week", week_num)),
+                
+                # ✅ NEW: Map the specific fields created by your new service
+                date_range=item.get("date_range", ""),
+                topic_content=t_content, 
+                
+                # ✅ FIX: Use ensure_list to prevent Pydantic 500 Errors
+                methods=ensure_list(item.get("methods", "Discussion")),
+                resources=ensure_list(item.get("resources", "Textbook")),
+                outcomes=ensure_list(item.get("outcomes", [])),
+                
+                references=final_refs,
                 isSpecialRow=item.get("isSpecialRow", False),
+                
+                # Legacy support
+                month=item.get("month") or get_month_name(week_num),
+                topic=item.get("topic", ""),
+                content=ensure_list(item.get("content", []))
             )
         )
 
@@ -169,13 +197,13 @@ async def generate_scheme(
 
 
 # ------------------------------------------------------------------
-# 2. Generate Weekly Plan
+# 2. Generate Weekly Plan (Updated with References)
 # ------------------------------------------------------------------
 @router.post("/generate-weekly-plan")
 async def generate_weekly_plan(
     request: WeeklyPlanRequest,
     x_user_id: Optional[str] = Header(None, alias="X-User-ID"),
-    x_school_id: Optional[str] = Header(None, alias="X-School-ID") # 👈 Added Header
+    x_school_id: Optional[str] = Header(None, alias="X-School-ID")
 ):
     uid = resolve_user_id(x_user_id, request.uid)
     school_id = x_school_id or request.schoolId
@@ -183,7 +211,7 @@ async def generate_weekly_plan(
     # 1️⃣ VALIDATE TOPIC BEFORE CREDITS
     clean_topic = request.topic or request.theme
     
-    # 🛑 GUARD CLAUSE: Stop here if no topic
+    # 🛑 GUARD CLAUSE
     if not clean_topic or clean_topic.strip() == "":
         print("⚠️ ABORTING: No Topic provided. Preventing Credit Deduction.")
         raise HTTPException(
@@ -191,11 +219,18 @@ async def generate_weekly_plan(
             detail="Topic is required. Please ensure a Scheme of Work exists for this week, or retry."
         )
     
-    print(f"📅 Generating Weekly Plan: {request.subject} | Week {request.weekNumber} | Topic: {clean_topic} | School: {school_id}")
+    # Extract references if provided (passed from the frontend scheme row)
+    # Ensure it's a string; if it's a list, join it.
+    raw_refs = getattr(request, "references", "")
+    if isinstance(raw_refs, list):
+        clean_refs = "\n".join([str(r) for r in raw_refs])
+    else:
+        clean_refs = str(raw_refs) if raw_refs else None
 
-    # 2️⃣ DEDUCT CREDIT (Only reached if topic exists)
+    print(f"📅 Generating Weekly Plan: {request.subject} | Week {request.weekNumber} | Topic: {clean_topic} | Refs: {clean_refs}")
+
+    # 2️⃣ DEDUCT CREDIT
     try:
-        # ✅ Updated to use school_id
         check_and_deduct_credit(uid, cost=1, school_id=school_id)
     except Exception as e:
         raise HTTPException(status_code=402, detail=str(e))
@@ -210,7 +245,8 @@ async def generate_weekly_plan(
             school_name=request.school,
             start_date=request.startDate,
             days_count=request.days,
-            topic=clean_topic
+            topic=clean_topic,
+            references=clean_refs  # 👈 PASSED HERE
         )
 
         if not plan_data:
@@ -242,7 +278,7 @@ async def generate_weekly_plan(
 async def generate_lesson_plan(
     request: LessonPlanRequest,
     x_user_id: Optional[str] = Header(None, alias="X-User-ID"),
-    x_school_id: Optional[str] = Header(None, alias="X-School-ID") # 👈 Added Header
+    x_school_id: Optional[str] = Header(None, alias="X-School-ID")
 ):
     uid = resolve_user_id(x_user_id, request.uid)
     school_id = x_school_id or request.schoolId
@@ -251,7 +287,6 @@ async def generate_lesson_plan(
 
     # 1️⃣ DEDUCT CREDIT
     try:
-        # ✅ Updated to use school_id
         check_and_deduct_credit(uid, cost=1, school_id=school_id)
     except Exception as e:
         raise HTTPException(status_code=402, detail=str(e))
@@ -307,14 +342,13 @@ async def generate_lesson_plan(
 async def api_generate_structured_worksheet(
     request: WorksheetRequest, 
     x_user_id: Optional[str] = Header(None, alias="X-User-ID"),
-    x_school_id: Optional[str] = Header(None, alias="X-School-ID") # 👈 Added Header
+    x_school_id: Optional[str] = Header(None, alias="X-School-ID")
 ):
     uid = resolve_user_id(x_user_id, request.uid)
     school_id = x_school_id or getattr(request, "schoolId", None)
 
     # Check Credits
     try: 
-        # ✅ Updated to use school_id
         check_and_deduct_credit(uid, cost=1, school_id=school_id)
     except Exception as e: 
         raise HTTPException(status_code=402, detail=str(e))

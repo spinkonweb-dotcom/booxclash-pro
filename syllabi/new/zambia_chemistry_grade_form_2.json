@@ -19,7 +19,7 @@
     {
       "unit": "2.1",
       "topic_title": "BONDING",
-      "page_number": 22,
+      "page_number": 10,
       "subtopics": [
         "2.1.1 Chemical Bonding",
         "2.1.2 Ions",
@@ -46,7 +46,7 @@
     {
       "unit": "2.2",
       "topic_title": "CHEMICAL REACTIONS",
-      "page_number": 24,
+      "page_number": 12,
       "subtopics": [
         "2.2.1 Chemical Reactions",
         "2.2.2 Chemical Equations"
@@ -59,7 +59,7 @@
     {
       "unit": "2.3",
       "topic_title": "CHEMICAL KINETICS",
-      "page_number": 25,
+      "page_number": 13,
       "subtopics": [
         "2.3.1 Rates of Chemical Reactions"
       ],
@@ -71,7 +71,7 @@
     {
       "unit": "2.4",
       "topic_title": "REDOX REACTIONS",
-      "page_number": 25,
+      "page_number": 13,
       "subtopics": [
         "2.4.1 Oxidation and Reduction"
       ],
@@ -82,7 +82,7 @@
     {
       "unit": "2.5",
       "topic_title": "ACIDS, BASES AND SALTS",
-      "page_number": 26,
+      "page_number": 14,
       "subtopics": [
         "2.5.1 Composition of Acids, Bases and Salts",
         "2.5.2 Acids",

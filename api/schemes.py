@@ -14,7 +14,7 @@ from services.credit_manager import check_and_deduct_credit
 router = APIRouter()
 
 # -----------------------------------
-# HELPERS
+# HELPER
 # -----------------------------------
 
 def get_week_metadata(start_date_str: str | None, week_index: int):
