@@ -2,10 +2,11 @@ import json
 import logging
 from typing import List, Dict, Any, Optional
 from datetime import datetime
+# Ensure you are importing from the correct shared location
 from .teacher_shared import get_model, extract_json_string, find_structured_module_content
 
 # ==============================================================================
-# 1. GENERATE SPECIFIC LESSON PLAN
+# 1. GENERATE SPECIFIC LESSON PLAN (Dynamic References + Bloom's Taxonomy)
 # ==============================================================================
 async def generate_specific_lesson_plan(
     grade: str, 
@@ -20,81 +21,87 @@ async def generate_specific_lesson_plan(
     teacher_name: str = "Class Teacher", 
     school_name: str = "Primary School",
     module_data: Optional[Dict[str, Any]] = None,
-    scheme_references: str = "Standard Zambian Syllabus" 
+    scheme_references: str = "Standard Zambian Syllabus",
+    blooms_level: str = "" # ✅ ADDED: New Parameter
 ) -> Dict[str, Any]:
     
-    print(f"\n🔍 [Lesson Generator] Processing: {theme} - {subtopic}")
+    print(f"\n🔍 [Lesson Generator] Processing: {theme} - {subtopic} | Bloom's: {blooms_level}")
 
-    # 1. Try to find module content
+    # 1. SMART MODULE SEARCH
     module_info = find_structured_module_content(module_data, subtopic)
     if not module_info:
         module_info = find_structured_module_content(module_data, theme)
 
-    # Calculations
+    # 2. CALCULATE CONTEXT
     boys = attendance.get('boys', 0)
     girls = attendance.get('girls', 0)
     total_students = boys + girls
 
+    # 3. DETERMINE SOURCE MATERIAL & REFERENCES
     module_prompt_insert = ""
-    final_reference = scheme_references
+    
+    # We use this to decide if we should overwrite the AI's output later
+    strict_ref_override = False 
+    final_reference_string = scheme_references
 
-    # ----------------------------------------------------------------------
     # ✅ SCENARIO A: OFFICIAL MODULE FOUND
-    # ----------------------------------------------------------------------
     if module_info:
-
-        unit_id = module_info.get("topic_id", "N/A")
+        unit_id = module_info.get("topic_id", module_info.get("unit_id", "N/A"))
         pages = module_info.get("pages", "N/A")
         module_text = module_info.get("context_text", "")
 
-        # Ensure page numbers exist
-        if not pages or pages == "N/A":
-            print("⚠️ WARNING: Module found but NO PAGE NUMBER detected.")
+        if pages and pages != "N/A":
+            final_reference_string = f"Official Module Unit {unit_id}, Page {pages}"
+            strict_ref_override = True # Force this exact string
+            print(f"   ↳ ✅ OFFICIAL MODULE FOUND: {final_reference_string}")
         else:
-            print(f"  ↳ 📘 Module Page Identified: {pages}")
-
-        final_reference = f"Official Module Sub-Topic {unit_id}, Page {pages}"
-
-        print(f"  ↳ ✅ OFFICIAL MODULE FOUND: {final_reference}")
+            print("   ↳ ⚠️ Module found but missing page numbers.")
 
         module_prompt_insert = f"""
         🔥🔥 **SOURCE MATERIAL: OFFICIAL GOVERNMENT MODULE** 🔥🔥
         **STRICT RULES**:
-        1. Only use the instructional blocks below.
-        2. Rebuild the 'Development' stage using EXACT teacher_steps and learner_tasks.
-        3. You MUST cite Activity IDs exactly as written (e.g. "Activity 1.2").
-        4. Page number must appear in references and nowhere else.
+        1. **TEACHER ACTIVITY**: You MUST derive the steps EXACTLY from the text below.
+        2. **INTERNAL CITATIONS**: When describing a step, cite the specific Activity Number (e.g., "Activity 1.2").
+        3. **REFERENCE FIELD**: In the JSON output, you MUST set "references" to exactly: "{final_reference_string}".
 
-        **MODULE CONTENT START**  
-        {module_text}  
+        **MODULE CONTENT START** {module_text}  
         **MODULE CONTENT END**
         """
 
-    # ----------------------------------------------------------------------
-    # ❌ SCENARIO B: FALLBACK TO SYLLABUS
-    # ----------------------------------------------------------------------
+    # ❌ SCENARIO B: FALLBACK (EXTERNAL RESOURCES)
     else:
-        print("  ↳ ⚠️ No Module Match. Using Syllabus.")
-
-        final_reference = f"Zambian Syllabus: {subject} {grade}"
-        if scheme_references and scheme_references != "Standard Zambian Syllabus":
-            final_reference += f" | Refs: {scheme_references}"
+        print(f"   ↳ ⚠️ No Module Match. Enabling External Resource Search.")
+        strict_ref_override = False # Let AI generate the list
 
         module_prompt_insert = f"""
-        🔥🔥 **SOURCE MATERIAL: ZAMBIAN SYLLABUS ({grade})** 🔥🔥
-        Strict Requirements:
-        1. Use ONLY syllabus learning outcomes for {theme}.
-        2. NO module activities are available — DO NOT invent any.
-        3. Include 1–2 external MoE-approved educational links.
+        🔥🔥 **SOURCE MATERIAL: EXTERNAL RESEARCH REQUIRED** 🔥🔥
+        **STRICT RULES**:
+        1. **CONTENT SOURCE**: Since no official module is available, you MUST incorporate content from reputable **external journals, educational websites, and standard textbooks**.
+        2. **ACTIVITIES**: Create engaging activities and **explicitly reference these external materials** inside the steps (e.g., "Using resources from Khan Academy...", "Referencing [Journal Name] activity...").
+        3. **REFERENCE FIELD**: 
+           - DO NOT just write "Standard Zambian Syllabus".
+           - **LIST the specific sources** you used for this lesson.
+           - Example: "Zambian Syllabus, Khan Academy (Algebra), Oxford Mathematics Book 9".
         """
 
     model = get_model()
+    
+    # Decide what to show in the prompt example
+    ref_placeholder = final_reference_string if strict_ref_override else "List specific external sources used (Websites, Books, Journals)..."
 
-    # ----------------------------------------------------------------------
-    # PROMPT (Do NOT alter format)
-    # ----------------------------------------------------------------------
+    # ✅ BLOOM'S TAXONOMY INSTRUCTION
+    blooms_instruction = ""
+    if blooms_level:
+        blooms_instruction = f"""
+        🧠 **PEDAGOGICAL FOCUS**: 
+        This lesson MUST differ from a standard lesson by focusing on the **{blooms_level}** level of Bloom's Taxonomy.
+        - Ensure the **Specific Outcomes** use verbs associated with {blooms_level} (e.g., if Analyzing, use 'Differentiate', 'Compare').
+        - Ensure **Learner Activities** challenge students at this cognitive level.
+        """
+
+    # 4. PROMPT (Strict Structure)
     prompt = f"""
-    Act as a professional teacher in Zambia. Create a **CBC Lesson Plan**.
+    Act as a professional teacher in Zambia. Create a **Competence Based Curriculum (CBC)** Lesson Plan.
 
     CONTEXT:
     - School: "{school_name}"
@@ -103,6 +110,8 @@ async def generate_specific_lesson_plan(
     - Topic: "{theme}"
     - Subtopic: "{subtopic}"
     - Objectives: {json.dumps(objectives)}
+    
+    {blooms_instruction}
 
     {module_prompt_insert}
 
@@ -126,8 +135,8 @@ async def generate_specific_lesson_plan(
           "artificial": "Desks/Chalkboard"
       }},
 
-      "materials": "List specific aids from the module if available.",
-      "references": "{final_reference}",
+      "materials": "List specific aids from the module OR external materials used (websites, journals, realia).",
+      "references": "{ref_placeholder}",
 
       "steps": [
         {{
@@ -140,8 +149,8 @@ async def generate_specific_lesson_plan(
         {{
             "stage": "DEVELOPMENT",
             "time": "30 min",
-            "teacherActivity": "Use EXACT steps from module activities.",
-            "learnerActivity": "Perform module learner tasks.",
+            "teacherActivity": "Step-by-step instructions. IF MODULE FOUND: Cite Activity #. IF NOT: Cite external resource.",
+            "learnerActivity": "Corresponding learner tasks.",
             "assessment_criteria": "..."
         }},
         {{
@@ -157,9 +166,7 @@ async def generate_specific_lesson_plan(
     }}
     """
 
-    # ----------------------------------------------------------------------
-    # EXECUTE
-    # ----------------------------------------------------------------------
+    # 5. EXECUTE AND CLEAN
     try:
         response = await model.generate_content_async(
             prompt,
@@ -167,9 +174,11 @@ async def generate_specific_lesson_plan(
         )
         data = json.loads(extract_json_string(response.text))
 
-        # Force reference correctness
-        data["references"] = final_reference
-
+        # ✅ LOGIC UPDATE: Only overwrite references if we found an Official Module
+        if strict_ref_override:
+            data["references"] = final_reference_string
+        
+        # Add Footer for printing
         data["evaluation_footer"] = "LESSON EVALUATION:\n" + ("." * 200)
 
         return data
@@ -179,13 +188,14 @@ async def generate_specific_lesson_plan(
         return {
             "topic": theme,
             "subtopic": subtopic,
-            "references": final_reference,
+            "references": scheme_references, # Fallback on error
             "steps": [],
             "error": "Failed to generate lesson plan."
         }
 
+
 # ==============================================================================
-# 2. GENERATE LESSON NOTES (BLACKBOARD CONTENT)
+# 2. GENERATE LESSON NOTES (Blackboard Content)
 # ==============================================================================
 async def generate_lesson_notes(
     grade: str, 
@@ -203,20 +213,21 @@ async def generate_lesson_notes(
         module_info = find_structured_module_content(module_data, topic)
 
     reference_str = f"Zambian Syllabus: {subject} {grade}"
-    module_context_str = f"⚠️ No module data found. STRICTLY use the Zambian Syllabus content for {topic}."
+    module_context_str = f"⚠️ No module data found. Search for standard definitions and examples from reputable educational sources."
 
     if module_info:
-        unit_id = module_info.get("topic_id", "N/A")
+        unit_id = module_info.get("topic_id", module_info.get("unit_id", "N/A"))
         pages = module_info.get("pages", "N/A")
-        reference_str = f"Official Module Unit {unit_id}, Page {pages}"
         
-        print(f"  ↳ ✅ Module Context Found for Notes")
-        
-        module_context_str = f"""
-        🔥🔥 **OFFICIAL CONTENT SOURCE** 🔥🔥
-        **Use ONLY the following text to extract definitions and examples:**
-        {module_info.get('context_text', '')}
-        """
+        if pages and pages != "N/A":
+            reference_str = f"Official Module Unit {unit_id}, Page {pages}"
+            print(f"   ↳ ✅ Module Context Found for Notes")
+            
+            module_context_str = f"""
+            🔥🔥 **OFFICIAL CONTENT SOURCE** 🔥🔥
+            **Use ONLY the following text to extract definitions and examples:**
+            {module_info.get('context_text', '')}
+            """
 
     # 2. Build Prompt
     model = get_model()
@@ -233,9 +244,10 @@ async def generate_lesson_notes(
 
     **INSTRUCTIONS:**
     1. **Format**: Use clear **bullet points** for explanations.
-    2. **Diagrams**: If a concept (like the Heart, Map of Zambia, Circuit, etc.) usually requires a diagram, include a text description: "[DIAGRAM: Draw a labeled diagram of...]"
-    3. **Content**: No general knowledge. Summarize the provided text or standard syllabus definitions only.
-    4. **Activities**: Include a class exercise and homework derived from the module/syllabus.
+    2. **Diagrams**: If a concept requires a diagram, include a text description: "[DIAGRAM: Draw...]"
+    3. **Content**: If Module is present, summarize it. If not, use standard syllabus definitions.
+    4. **Activities**: Include a class exercise.
+    5. **Reference**: You MUST set the reference to: "{reference_str}".
 
     **OUTPUT JSON:**
     {{
@@ -244,7 +256,6 @@ async def generate_lesson_notes(
       "explanation_points": [
         "Definition: ...",
         "Key Point 1...",
-        "Key Point 2...",
         "[DIAGRAM: Description of diagram if needed]" 
       ],
       "examples": ["Example A", "Example B"],
@@ -259,7 +270,12 @@ async def generate_lesson_notes(
             prompt, 
             generation_config={"response_mime_type": "application/json"}
         )
-        return json.loads(extract_json_string(response.text))
+        data = json.loads(extract_json_string(response.text))
+        
+        # Notes usually need strict references, but you can relax this if needed
+        data["reference"] = reference_str 
+        
+        return data
 
     except Exception as e:
         print(f"❌ [Notes Generator] Error: {e}")

@@ -2,162 +2,190 @@ from pydantic import BaseModel, Field, validator, ConfigDict
 from typing import List, Optional, Any, Dict, Literal, Union
 
 # ==========================================
-# 🚀 GENERATION REQUEST (The Main Input Model)
+# 🚀 SHARED CONFIG
 # ==========================================
-class GenerationRequest(BaseModel):
-    # Request Meta
-    type: str = "lesson"  # 'lesson', 'weekly', 'scheme'
-    uid: Optional[str] = None
-    school_id: Optional[str] = None
-    
-    # Curriculum Data
-    grade: Optional[str] = "Grade 9"
-    subject: Optional[str] = "Mathematics"
-    topic: Optional[str] = ""
-    subtopic: Optional[str] = ""
-    
-    # 🗓️ TIMING & TERM
-    term: Optional[str] = "Term 1" 
-    weekNumber: Optional[int] = 1
-    weeks: Optional[int] = 13
-    days: Optional[int] = 5
-    startDate: Optional[str] = None
-    
-    # Lesson Specifics
-    date: Optional[str] = None
-    timeStart: Optional[str] = "08:00"
-    timeEnd: Optional[str] = "09:00"
-    objectives: Optional[List[str]] = []
-    teacherName: Optional[str] = "Teacher"
-    
-    # Demographics
-    boys: Optional[int] = 0
-    girls: Optional[int] = 0
-
-    model_config = ConfigDict(extra='ignore')
+# This config allows the frontend to send extra fields (like 'school' vs 'schoolName')
+# without crashing the server.
+STRICT_IGNORE_EXTRA = ConfigDict(extra='ignore')
 
 # ==========================================
-# 📅 WEEKLY PLAN REQUEST (CRITICAL FIX)
-# ==========================================
-class WeeklyPlanRequest(BaseModel):
-    uid: str
-    grade: str
-    subject: str
-    term: str
-    school: Optional[str] = "Unknown School"
-    weekNumber: int
-    days: Optional[int] = 5
-    startDate: Optional[str] = None
-    
-    # Allow both 'topic' and 'theme'
-    topic: Optional[str] = None 
-    theme: Optional[str] = None
-    schoolId: Optional[str] = None 
-    
-    # ✅ FIX: Added 'references' so the data is accepted from frontend
-    references: Optional[str] = None
-
-    model_config = ConfigDict(extra='ignore')
-
-# ==========================================
-# 🍎 SCHEME MODELS
+# 🍎 SCHEME MODELS (The Source of your Error)
 # ==========================================
 
 class SchemeRequest(BaseModel):
-    schoolName: str 
-    term: str = "Term 1"
+    # Core Fields
     subject: str
     grade: str
+    term: str = "Term 1"
     weeks: int
+    
+    # Optional / Context Fields
     startDate: Optional[str] = None
     uid: Optional[str] = None
-    schoolId: Optional[str] = None 
+    schoolId: Optional[str] = None
+    schoolName: Optional[str] = None # Added to catch frontend mapping
+    
+    # ✅ FIX 1: Robust Validators to handle Strings vs Ints
+    @validator('weeks', pre=True)
+    def parse_weeks(cls, v):
+        if isinstance(v, str):
+            return int(v) if v.strip() else 13
+        return v
+
+    @validator('startDate', pre=True)
+    def parse_start_date(cls, v):
+        if not v or (isinstance(v, str) and not v.strip()):
+            return None
+        return v
+
+    # ✅ FIX 2: Ignore extra fields (like 'school' if passed instead of 'schoolName')
+    model_config = STRICT_IGNORE_EXTRA
+
 
 class SchemeRow(BaseModel):
-    # 1. CORE IDENTIFIERS
+    # 1. Identifiers
     week: Union[str, int]
     week_number: Optional[int] = None
-    
-    # ✅ NEW FIELDS (Required for the new PDF/Table format)
     date_range: Optional[str] = "" 
-    topic_content: Optional[str] = "" 
     
-    # Standard identifiers
+    # 2. Content
     topic: Optional[str] = ""
     subtopic: Optional[str] = ""
     unit: Optional[str] = "" 
     theme: Optional[str] = ""
+    topic_content: Optional[str] = "" 
 
-    # 2. COMPETENCE & OUTCOMES
+    # 3. Competences & Outcomes
     outcomes: List[str] = [] 
-    
-    # Legacy fields
     prescribed_competences: List[str] = []
     specific_competences: List[str] = []
     
-    # 3. CONTENT & ACTIVITIES
+    # 4. Activities & Methods
     content: List[str] = []
     learning_activities: List[str] = [] 
-    
-    # 4. PEDAGOGY & RESOURCES
     methods: List[str] = []
     assessment: List[str] = []
     resources: List[str] = []
     references: List[str] = []
 
-    # 5. METADATA
+    # 5. Meta
     month: Optional[str] = None
     isSpecialRow: bool = False
 
     # 🛡️ VALIDATORS: Auto-fix AI mapping errors (String -> List conversion)
-    
-    # ✅ FIX: This validator intercepts Strings and converts them to Lists
-    # before Pydantic throws a validation error.
-    @validator('methods', 'resources', 'references', 'content', 'outcomes', 'assessment', 'learning_activities', pre=True)
+    @validator('methods', 'resources', 'references', 'content', 'outcomes', 'assessment', 'learning_activities', 'prescribed_competences', 'specific_competences', pre=True)
     def coerce_to_list(cls, v):
-        if v is None:
-            return []
+        if v is None: return []
         if isinstance(v, str):
-            # If it has newlines, split by newline (common in AI bullet points)
-            if "\n" in v:
-                return [x.strip() for x in v.split("\n") if x.strip()]
-            # If it has commas, split by comma (common in CSV style)
-            if "," in v:
-                return [x.strip() for x in v.split(",") if x.strip()]
-            # Otherwise, just wrap the single string in a list
+            if "\n" in v: return [x.strip() for x in v.split("\n") if x.strip()]
             return [v.strip()]
-        return v
-
-    @validator('outcomes', pre=True, always=True)
-    def populate_outcomes(cls, v, values):
-        if not v:
-            return values.get('specific_competences') or values.get('specific_outcomes') or []
-        return v
-
-    @validator('learning_activities', pre=True)
-    def check_activities_alias(cls, v, values):
-        if not v:
-            return values.get('activities') or values.get('activity') or []
-        return v
-
-    @validator('prescribed_competences', pre=True)
-    def check_prescribed_alias(cls, v, values):
-        if not v:
-            return values.get('competences') or values.get('general_competences') or []
         return v
 
     model_config = ConfigDict(populate_by_name=True, extra='allow')
 
+
 class SchemeResponse(BaseModel):
     intro: Dict[str, Any] = {} 
     rows: List[SchemeRow]
-    
     model_config = ConfigDict(extra='allow')
 
-# ==========================================
-# 📝 WORKSHEET MODELS
-# ==========================================
 
+# ==========================================
+# 📅 WEEKLY PLAN REQUEST
+# ==========================================
+class WeeklyPlanRequest(BaseModel):
+    uid: Optional[str] = None
+    grade: str
+    subject: str
+    term: str
+    weekNumber: int
+    
+    # Flexible Fields
+    school: Optional[str] = "Unknown School"
+    schoolId: Optional[str] = None
+    days: Optional[int] = 5
+    startDate: Optional[str] = None
+    
+    # Content Overrides
+    topic: Optional[str] = None 
+    theme: Optional[str] = None
+    references: Optional[str] = None # Added to match frontend
+
+    # Validator for weekNumber (handle string input)
+    @validator('weekNumber', 'days', pre=True)
+    def parse_ints(cls, v):
+        if isinstance(v, str): return int(v) if v.strip() else 0
+        return v
+
+    model_config = STRICT_IGNORE_EXTRA
+
+
+# ==========================================
+# 📝 LESSON PLAN REQUEST (ROBUST)
+# ==========================================
+class LessonPlanRequest(BaseModel):
+    uid: Optional[str] = None
+    grade: str
+    subject: str
+    term: str
+    weekNumber: int
+    date: str
+    
+    # Topic Data
+    topic: str
+    subtopic: Optional[str] = ""
+    
+    # Context
+    school: Optional[str] = "Unknown School"
+    schoolId: Optional[str] = None
+    teacherName: Optional[str] = "Teacher"
+    
+    # Details
+    timeStart: Optional[str] = "08:00"
+    timeEnd: Optional[str] = "08:40"
+    
+    # ✅ FIX: Use Optional so they default to 0 if missing
+    boys: Optional[int] = 0
+    girls: Optional[int] = 0
+    objectives: List[str] = []
+
+    # ✅ CRITICAL VALIDATOR: This converts strings like "1" or "" into integers 1 or 0
+    @validator('weekNumber', 'boys', 'girls', pre=True)
+    def parse_ints(cls, v):
+        if isinstance(v, str):
+            # If string is empty, return 0. If it has numbers, convert to int.
+            return int(v) if v.strip() else 0
+        return v
+
+    model_config = STRICT_IGNORE_EXTRA
+
+
+# ==========================================
+# 📋 RECORD OF WORK REQUEST
+# ==========================================
+class RecordOfWorkRequest(BaseModel): 
+    uid: Optional[str] = None
+    grade: str
+    subject: str
+    term: str
+    weekNumber: int
+    
+    school: Optional[str] = "Unknown School"
+    schoolId: Optional[str] = None
+    teacherName: Optional[str] = "Teacher"
+    
+    year: Optional[str] = "2024"
+    days: Optional[int] = 5
+    startDate: Optional[str] = None
+    topic: Optional[str] = ""
+    references: Optional[str] = None
+
+    model_config = STRICT_IGNORE_EXTRA
+
+
+# ==========================================
+# 🧩 WORKSHEET MODELS
+# ==========================================
 class WorksheetRequest(BaseModel):
     uid: Optional[str] = None
     grade: str
@@ -166,8 +194,10 @@ class WorksheetRequest(BaseModel):
     subtopic: Optional[str] = ""
     term: Optional[str] = "Term 1"
     difficulty: Literal["easy", "medium", "hard"] = "medium"
-    school_name: str
+    school_name: Optional[str] = "School"
     schoolId: Optional[str] = None
+    
+    model_config = STRICT_IGNORE_EXTRA
 
 class WorksheetBlock(BaseModel):
     id: int
@@ -180,3 +210,21 @@ class WorksheetResponse(BaseModel):
     title: str
     grade: str
     blocks: List[WorksheetBlock]
+
+# ==========================================
+# ⚙️ GENERIC GENERATION REQUEST (If used)
+# ==========================================
+class GenerationRequest(BaseModel):
+    type: str = "lesson"
+    uid: Optional[str] = None
+    school_id: Optional[str] = None
+    grade: Optional[str] = "Grade 9"
+    subject: Optional[str] = "Mathematics"
+    topic: Optional[str] = ""
+    subtopic: Optional[str] = ""
+    term: Optional[str] = "Term 1" 
+    weekNumber: Optional[int] = 1
+    weeks: Optional[int] = 13
+    days: Optional[int] = 5
+    startDate: Optional[str] = None
+    model_config = STRICT_IGNORE_EXTRA

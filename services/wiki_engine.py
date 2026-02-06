@@ -7,7 +7,7 @@ async def get_wiki_content_with_images(topic: str):
     
     try:
         async with httpx.AsyncClient(headers=headers, follow_redirects=True) as client:
-            # 1. Parse the page content
+            # 1. Parse 
             params = {
                 "action": "parse", 
                 "page": topic, 

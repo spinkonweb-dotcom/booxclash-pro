@@ -7,9 +7,13 @@ from typing import List, Optional, Dict, Any
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
 import google.generativeai as genai
+from .new.teacher_shared import get_model, extract_json_string, find_structured_module_content
 
 load_dotenv()
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+
+# ✅ DEFAULT LOGO CONSTANT
+DEFAULT_LOGO = "https://res.cloudinary.com/dchkrvf4b/image/upload/v1727734157/coat_of_arms_zambia.png"
 
 def get_model():
     return genai.GenerativeModel("gemini-2.5-flash")
@@ -68,7 +72,7 @@ def extract_json_string(text: str) -> str:
         return text
 
 # =====================================================
-# 1. PROFESSIONAL SCHEME GENERATOR (FIXED MISSING CONTENT)
+# 1. PROFESSIONAL SCHEME GENERATOR
 # =====================================================
 async def generate_scheme_with_ai(
     syllabus_data: Any,
@@ -216,8 +220,9 @@ async def generate_scheme_with_ai(
     except Exception as e:
         print(f"❌ Error: {e}")
         return []
+
 # =====================================================
-# 2. WEEKLY PLAN GENERATOR (ROBUST REFERENCE FIX)
+# 2. WEEKLY PLAN GENERATOR (UPDATED FOR LOGO)
 # =====================================================
 async def generate_weekly_plan_with_ai(
     grade: str, 
@@ -228,8 +233,12 @@ async def generate_weekly_plan_with_ai(
     start_date: Optional[str] = None, 
     days_count: int = 5,
     topic: Optional[str] = None,
-    references: Optional[str] = None  # 👈 Accepts the exact references string
+    references: Optional[str] = None,
+    school_logo: Optional[str] = None # ✅ ADDED PARAMETER
 ) -> Dict[str, Any]:
+    
+    # 1. Determine Logo
+    final_logo = school_logo if school_logo else DEFAULT_LOGO
     
     # Smart Fallback for Topic
     topic_context = topic if topic and len(topic) > 1 else f"Week {week_number} Syllabus Topic"
@@ -237,7 +246,7 @@ async def generate_weekly_plan_with_ai(
     # Smart Fallback for References
     ref_context = references if references and len(references) > 1 else "Syllabus, Approved Textbooks"
 
-    print(f"🧠 AI Generating Weekly Plan | Subject: {subject} | Week: {week_number} | Refs: {ref_context[:30]}...")
+    print(f"🧠 AI Generating Weekly Plan | Subject: {subject} | Week: {week_number} | Logo: {'Yes' if school_logo else 'No'}")
     
     model = get_model()
 
@@ -262,6 +271,7 @@ async def generate_weekly_plan_with_ai(
     {{
       "meta": {{ 
         "school": "{school_name}", 
+        "logo_url": "{final_logo}",
         "grade": "{grade}", 
         "subject": "{subject}", 
         "week": {week_number},
@@ -286,71 +296,239 @@ async def generate_weekly_plan_with_ai(
         data = json.loads(extract_json_string(response.text))
 
         # 🛠️ ROBUST FIX: FORCE OVERWRITE REFERENCES IN PYTHON
-        # We don't trust the AI to copy the string perfectly, so we do it here.
         if "days" in data and isinstance(data["days"], list):
             for day in data["days"]:
-                # If specific references were passed, use them. 
-                # Otherwise keep what AI generated (or default).
                 if references and len(references) > 1:
                     day["references"] = references
                 elif not day.get("references"):
                     day["references"] = "Syllabus, Approved Textbooks"
+        
+        # 🚨 FORCE OVERRIDE LOGO
+        if "meta" not in data: data["meta"] = {}
+        data["meta"]["logo_url"] = final_logo
+        data["meta"]["school"] = school_name
 
         return data
 
     except Exception as e:
         print(f"❌ Weekly Plan Error: {e}")
-        return {"meta": {"error": True}, "days": []}
+        return {"meta": {"error": True, "logo_url": final_logo}, "days": []}
 
 # =====================================================
-# 3. LESSON PLAN GENERATOR
+# 3. LESSON PLAN GENERATOR (UPDATED FOR LOGO)
 # =====================================================
 async def generate_specific_lesson_plan(
-    grade: str, subject: str, theme: str, subtopic: str, objectives: List[str], 
-    date: str, time_start: str, time_end: str, attendance: Dict[str, int], 
-    teacher_name: str = "Class Teacher", school_name: str = "Primary School"
+    grade: str, 
+    subject: str, 
+    theme: str, 
+    subtopic: str, 
+    objectives: List[str], 
+    date: str, 
+    time_start: str, 
+    time_end: str, 
+    attendance: Dict[str, int], 
+    teacher_name: str = "Class Teacher", 
+    school_name: str = "Primary School",
+    module_data: Optional[Dict[str, Any]] = None,
+    scheme_references: str = "Standard Zambian Syllabus",
+    blooms_level: str = "",
+    school_logo: Optional[str] = None # ✅ ADDED PARAMETER
 ) -> Dict[str, Any]:
-    print(f"\n📝 [Lesson Generator] {theme} - {subtopic}")
-    model = get_model()
+    
+    # 1. Determine Logo
+    final_logo = school_logo if school_logo else DEFAULT_LOGO
 
+    print(f"\n📝 [Old Curr Lesson] Processing: {theme} - {subtopic} | Bloom's: {blooms_level} | Logo: {'Yes' if school_logo else 'No'}")
+    
+    # 2. SMART MODULE SEARCH
+    module_info = find_structured_module_content(module_data, subtopic)
+    if not module_info:
+        module_info = find_structured_module_content(module_data, theme)
+
+    # 3. CALCULATE ENROLMENT
+    boys = attendance.get('boys', 0)
+    girls = attendance.get('girls', 0)
+    total = boys + girls
+
+    # 4. DETERMINE SOURCES
+    module_prompt_insert = ""
+    strict_ref_override = False
+    final_reference = scheme_references
+
+    # ✅ SCENARIO A: MODULE FOUND
+    if module_info:
+        unit_id = module_info.get("topic_id", module_info.get("unit_id", "N/A"))
+        pages = module_info.get("pages", "N/A")
+        module_text = module_info.get("context_text", "")
+
+        if pages and pages != "N/A":
+            final_reference = f"Official Module Unit {unit_id}, Page {pages}"
+            strict_ref_override = True
+            print(f"   ↳ ✅ OFFICIAL MODULE FOUND: {final_reference}")
+        
+        module_prompt_insert = f"""
+        🔥 **SOURCE MATERIAL: OFFICIAL GOVERNMENT MODULE** 🔥
+        **STRICT RULES**:
+        1. **TEACHER ACTIVITY**: Derive steps EXACTLY from the text below.
+        2. **CITATIONS**: Cite "Activity {unit_id}.X" inside the lesson steps.
+        3. **REFERENCE**: You MUST set the "references" field to: "{final_reference}".
+
+        **MODULE TEXT**:
+        {module_text}
+        """
+
+    # ❌ SCENARIO B: NO MODULE (EXTERNAL RESOURCING)
+    else:
+        print(f"   ↳ ⚠️ No Module. Enabling External Research.")
+        strict_ref_override = False 
+        
+        module_prompt_insert = f"""
+        🔥 **SOURCE MATERIAL: EXTERNAL RESEARCH REQUIRED** 🔥
+        **STRICT RULES**:
+        1. **CONTENT**: Since no module is available, you MUST use reputable **External Journals, Websites, or Standard Textbooks**.
+        2. **ACTIVITIES**: Create standard activities and **reference the source** in the method column.
+        3. **REFERENCE FIELD**: List the specific external sources you used (e.g., "MK Mathematics Bk 5, Khan Academy").
+        """
+
+    model = get_model()
+    
+    ref_placeholder = final_reference if strict_ref_override else "List specific external sources used..."
+
+    # ✅ BLOOM'S TAXONOMY INSTRUCTION
+    blooms_instruction = ""
+    if blooms_level:
+        blooms_instruction = f"""
+        🧠 **PEDAGOGICAL FOCUS**: 
+        This lesson MUST differ from a standard lesson by focusing on the **{blooms_level}** level of Bloom's Taxonomy.
+        - Ensure the **Rationale** explains why this cognitive level fits the topic.
+        - Ensure **Learner Activities** challenge students at this cognitive level.
+        """
+
+    # 5. PROMPT (Old Curriculum Structure)
     prompt = f"""
-    Create a Zambian Learner-Centered Lesson Plan.
+    Act as a Zambian Teacher. Create a **Learner-Centered Lesson Plan** (Old Curriculum Format).
     Teacher: {teacher_name}, School: {school_name}
     Topic: {theme}, Subtopic: {subtopic}
     Objectives: {json.dumps(objectives)}
     
-    OUTPUT JSON:
+    {blooms_instruction}
+
+    {module_prompt_insert}
+
+    OUTPUT JSON (Strict):
     {{
       "teacherName": "{teacher_name}",
       "schoolName": "{school_name}",
+      "logo_url": "{final_logo}",
       "topic": "{theme}", 
       "subtopic": "{subtopic}",
       "time": "{time_start} - {time_end}", 
-      "rationale": "...", 
-      "specific": "...", 
-      "standard": "...", 
-      "prerequisite": "...", 
-      "materials": "...", 
-      "references": "...",
-      "enrolment": {{ "boys": {attendance.get('boys', 0)}, "girls": {attendance.get('girls', 0)}, "total": {attendance.get('boys', 0) + attendance.get('girls', 0)} }},
+      "rationale": "Why this lesson is important...", 
+      "specific": "Learners should be able to...", 
+      "standard": "Clear statement of the expected standard.", 
+      "prerequisite": "What learners already know.", 
+      "materials": "List specific aids (Module, Realia, or External).", 
+      "references": "{ref_placeholder}",
+      "enrolment": {{ "boys": {boys}, "girls": {girls}, "total": {total} }},
       "steps": [
         {{ "stage": "INTRODUCTION", "time": "5 min", "teacherActivity": "...", "learnerActivity": "...", "method": "..." }},
-        {{ "stage": "DEVELOPMENT", "time": "30 min", "teacherActivity": "...", "learnerActivity": "...", "method": "..." }},
+        {{ "stage": "DEVELOPMENT", "time": "30 min", "teacherActivity": "Step-by-step from Source Material.", "learnerActivity": "...", "method": "..." }},
         {{ "stage": "CONCLUSION", "time": "5 min", "teacherActivity": "...", "learnerActivity": "...", "method": "..." }}
       ]
     }}
     """
+    
     try:
-        response = await model.generate_content_async(prompt)
-        return json.loads(extract_json_string(response.text), strict=False)
-    except Exception:
-        return {}
+        response = await model.generate_content_async(
+            prompt,
+            generation_config={"response_mime_type": "application/json"}
+        )
+        data = json.loads(extract_json_string(response.text))
+        
+        # ✅ FORCE OVERRIDES
+        if strict_ref_override:
+            data["references"] = final_reference
+        
+        # Force Logo and School Name
+        data["logo_url"] = final_logo
+        data["schoolName"] = school_name
+            
+        return data
 
-async def generate_structured_worksheet(grade: str, subject: str, topic: str):
+    except Exception as e:
+        print(f"❌ [Old Curr Generator] Failed: {e}")
+        return {
+            "topic": theme, 
+            "subtopic": subtopic, 
+            "references": final_reference,
+            "logo_url": final_logo,
+            "steps": [],
+            "error": "Failed to generate lesson plan."
+        }
+
+# =====================================================
+# 4. RECORD OF WORK GENERATOR (ADDED)
+# =====================================================
+async def generate_record_of_work(
+    teacher_name: str,
+    school_name: str,
+    grade: str,
+    subject: str,
+    term: str,
+    year: str,
+    start_date: str,
+    scheme_data: List[Dict],
+    school_logo: Optional[str] = None
+) -> Dict[str, Any]:
+
+    final_logo = school_logo if school_logo else DEFAULT_LOGO
+    
+    # Flatten scheme data for prompt
+    scheme_text = json.dumps(scheme_data[:5]) # Pass relevant week data
+
+    print(f"📋 Generating Record of Work | Teacher: {teacher_name} | Logo: {'Yes' if school_logo else 'No'}")
+
     model = get_model()
-    prompt = f"""Create a worksheet for {grade} {subject}: {topic}. Output JSON with 'blocks' (mcq, matching, svg_diagram)."""
+    
+    prompt = f"""
+    Act as a Zambian Teacher. Generate a Record of Work (Log Book) entry.
+    School: {school_name}
+    Teacher: {teacher_name}
+    Term: {term} | Year: {year}
+    
+    Scheme Data Context: {scheme_text}
+    
+    OUTPUT JSON:
+    {{
+      "header": {{
+         "school_name": "{school_name}",
+         "logo_url": "{final_logo}",
+         "teacher": "{teacher_name}",
+         "term": "{term}",
+         "year": "{year}"
+      }},
+      "records": [
+         {{ 
+            "date": "YYYY-MM-DD", 
+            "week": 1,
+            "work_covered": "Brief summary of work done...", 
+            "remarks": "Achieved objectives..." 
+         }}
+      ]
+    }}
+    """
+    
     try:
         response = await model.generate_content_async(prompt, generation_config={"response_mime_type": "application/json"})
-        return json.loads(extract_json_string(response.text))
-    except Exception:
-        return {"title": topic, "grade": grade, "blocks": []}
+        data = json.loads(extract_json_string(response.text))
+        
+        # 🚨 FORCE LOGO
+        if "header" not in data: data["header"] = {}
+        data["header"]["logo_url"] = final_logo
+        data["header"]["school_name"] = school_name
+        
+        return data
+
+    except Exception as e:
+        print(f"❌ ROW Error: {e}")
+        return {"header": {"logo_url": final_logo, "school_name": school_name}, "records": []}

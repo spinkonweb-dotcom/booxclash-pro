@@ -5,8 +5,6 @@ from fastapi import APIRouter, Header, HTTPException
 from pydantic import BaseModel
 
 # 1. Import Shared Models
-# ⚠️ MAKE SURE SchemeRow IN models/schemas.py HAS FIELDS: 
-# topic_content, methods, resources, date_range
 from models.schemas import SchemeRequest, SchemeRow, WorksheetResponse, WorksheetRequest
 
 # 2. Import Services
@@ -14,9 +12,8 @@ from services.llm_teacher_engine_old import (
     generate_scheme_with_ai,
     generate_weekly_plan_with_ai,
     generate_specific_lesson_plan,
-    generate_structured_worksheet
 )
-from services.syllabus_manager import load_syllabus
+from services.syllabus_manager import load_syllabus, load_module 
 from services.file_manager import (
     save_generated_scheme,
     load_generated_scheme,
@@ -45,7 +42,8 @@ class WeeklyPlanRequest(BaseModel):
     # Allow both 'topic' and 'theme'
     topic: Optional[str] = None 
     theme: Optional[str] = None
-    schoolId: Optional[str] = None 
+    schoolId: Optional[str] = None
+    schoolLogo: Optional[str] = None  # ✅ ADDED: Logo URL Support
 
 class LessonPlanRequest(BaseModel):
     uid: str
@@ -65,6 +63,9 @@ class LessonPlanRequest(BaseModel):
     objectives: List[str] = []
     references: Optional[str] = None
     schoolId: Optional[str] = None
+    schoolLogo: Optional[str] = None # ✅ ADDED: Logo URL Support
+    # Bloom's Taxonomy Support
+    bloomsLevel: Optional[str] = "" 
 
 
 # ------------------------------------------------------------------
@@ -140,15 +141,13 @@ async def generate_scheme(
             print(f"❌ Scheme generation failed: {e}")
             return []
 
-    # 4️⃣ Normalize for frontend (CRITICAL UPDATES HERE)
+    # 4️⃣ Normalize for frontend
     rows: List[SchemeRow] = []
     
-    # ✅ Helper to fix validation errors (String -> List)
     def ensure_list(val: Any) -> List[str]:
         if isinstance(val, list):
             return [str(v) for v in val]
         if isinstance(val, str):
-            # Split comma-separated strings if they look like a list
             if "," in val:
                 return [v.strip() for v in val.split(",") if v.strip()]
             return [val]
@@ -173,20 +172,13 @@ async def generate_scheme(
         rows.append(
             SchemeRow(
                 week=str(item.get("week", week_num)),
-                
-                # ✅ NEW: Map the specific fields created by your new service
                 date_range=item.get("date_range", ""),
                 topic_content=t_content, 
-                
-                # ✅ FIX: Use ensure_list to prevent Pydantic 500 Errors
                 methods=ensure_list(item.get("methods", "Discussion")),
                 resources=ensure_list(item.get("resources", "Textbook")),
                 outcomes=ensure_list(item.get("outcomes", [])),
-                
                 references=final_refs,
                 isSpecialRow=item.get("isSpecialRow", False),
-                
-                # Legacy support
                 month=item.get("month") or get_month_name(week_num),
                 topic=item.get("topic", ""),
                 content=ensure_list(item.get("content", []))
@@ -197,7 +189,7 @@ async def generate_scheme(
 
 
 # ------------------------------------------------------------------
-# 2. Generate Weekly Plan (Updated with References)
+# 2. Generate Weekly Plan
 # ------------------------------------------------------------------
 @router.post("/generate-weekly-plan")
 async def generate_weekly_plan(
@@ -211,7 +203,6 @@ async def generate_weekly_plan(
     # 1️⃣ VALIDATE TOPIC BEFORE CREDITS
     clean_topic = request.topic or request.theme
     
-    # 🛑 GUARD CLAUSE
     if not clean_topic or clean_topic.strip() == "":
         print("⚠️ ABORTING: No Topic provided. Preventing Credit Deduction.")
         raise HTTPException(
@@ -219,15 +210,13 @@ async def generate_weekly_plan(
             detail="Topic is required. Please ensure a Scheme of Work exists for this week, or retry."
         )
     
-    # Extract references if provided (passed from the frontend scheme row)
-    # Ensure it's a string; if it's a list, join it.
     raw_refs = getattr(request, "references", "")
     if isinstance(raw_refs, list):
         clean_refs = "\n".join([str(r) for r in raw_refs])
     else:
         clean_refs = str(raw_refs) if raw_refs else None
 
-    print(f"📅 Generating Weekly Plan: {request.subject} | Week {request.weekNumber} | Topic: {clean_topic} | Refs: {clean_refs}")
+    print(f"📅 Generating Weekly Plan: {request.subject} | Week {request.weekNumber} | Topic: {clean_topic} | Logo: {'Yes' if request.schoolLogo else 'No'}")
 
     # 2️⃣ DEDUCT CREDIT
     try:
@@ -246,7 +235,8 @@ async def generate_weekly_plan(
             start_date=request.startDate,
             days_count=request.days,
             topic=clean_topic,
-            references=clean_refs  # 👈 PASSED HERE
+            references=clean_refs,
+            school_logo=request.schoolLogo # ✅ PASS LOGO
         )
 
         if not plan_data:
@@ -272,7 +262,7 @@ async def generate_weekly_plan(
 
 
 # ------------------------------------------------------------------
-# 3. Generate Lesson Plan
+# 3. Generate Lesson Plan (Updated)
 # ------------------------------------------------------------------
 @router.post("/generate-lesson-plan")
 async def generate_lesson_plan(
@@ -283,7 +273,8 @@ async def generate_lesson_plan(
     uid = resolve_user_id(x_user_id, request.uid)
     school_id = x_school_id or request.schoolId
 
-    print(f"📝 Generating Lesson Plan: {request.subject} | {request.topic} | School: {school_id}")
+    # ✅ LOG: Bloom's Level visibility
+    print(f"📝 Generating Lesson Plan (Old): {request.subject} | {request.topic} | Bloom's: {request.bloomsLevel} | Logo: {'Yes' if request.schoolLogo else 'No'}")
 
     # 1️⃣ DEDUCT CREDIT
     try:
@@ -292,6 +283,9 @@ async def generate_lesson_plan(
         raise HTTPException(status_code=402, detail=str(e))
 
     try:
+        # ✅ LOAD MODULE: Load data for Old Curriculum too
+        module_data = load_module(country="Zambia", grade=request.grade, subject=request.subject)
+
         plan_data = await generate_specific_lesson_plan(
             grade=request.grade,
             subject=request.subject,
@@ -303,7 +297,11 @@ async def generate_lesson_plan(
             time_end=request.timeEnd,
             attendance={"boys": request.boys, "girls": request.girls},
             teacher_name=request.teacherName,
-            school_name=request.school
+            school_name=request.school,
+            module_data=module_data,
+            blooms_level=request.bloomsLevel,
+            scheme_references=request.references or "Standard Syllabus",
+            school_logo=request.schoolLogo # ✅ PASS LOGO
         )
 
         if not plan_data:
@@ -333,30 +331,3 @@ async def generate_lesson_plan(
     except Exception as e:
         print(f"❌ Lesson plan error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
-
-
-# ------------------------------------------------------------------
-# 4. Generate Worksheet (Structured)
-# ------------------------------------------------------------------
-@router.post("/generate-worksheet-structured", response_model=WorksheetResponse)
-async def api_generate_structured_worksheet(
-    request: WorksheetRequest, 
-    x_user_id: Optional[str] = Header(None, alias="X-User-ID"),
-    x_school_id: Optional[str] = Header(None, alias="X-School-ID")
-):
-    uid = resolve_user_id(x_user_id, request.uid)
-    school_id = x_school_id or getattr(request, "schoolId", None)
-
-    # Check Credits
-    try: 
-        check_and_deduct_credit(uid, cost=1, school_id=school_id)
-    except Exception as e: 
-        raise HTTPException(status_code=402, detail=str(e))
-
-    # Generate
-    data = await generate_structured_worksheet(request.grade, request.subject, request.topic)
-    
-    # Save to Firebase
-    save_resource(uid, "worksheet", data, request.dict())
-    
-    return data

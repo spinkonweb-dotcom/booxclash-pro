@@ -1,5 +1,5 @@
-import traceback
 import re
+import traceback
 from datetime import datetime, timedelta
 from fastapi import APIRouter, Header, HTTPException
 from typing import List, Dict, Any, Optional
@@ -56,7 +56,8 @@ class WeeklyPlanRequest(BaseModel):
     startDate: str = "2026-01-13"
     schoolId: Optional[str] = None
     topic: Optional[str] = None         
-    references: Optional[str] = None    
+    references: Optional[str] = None
+    schoolLogo: Optional[str] = None  # ✅ ADDED: Logo URL Support
 
 class LessonPlanRequest(BaseModel):
     uid: Optional[str] = None
@@ -75,6 +76,9 @@ class LessonPlanRequest(BaseModel):
     girls: int = 0
     objectives: List[str] = []
     schoolId: Optional[str] = None
+    schoolLogo: Optional[str] = None # ✅ ADDED: Logo URL Support
+    # Bloom's Level from Frontend
+    bloomsLevel: Optional[str] = "" 
 
 class RecordOfWorkRequest(BaseModel): 
     uid: Optional[str] = None
@@ -90,6 +94,7 @@ class RecordOfWorkRequest(BaseModel):
     topic: str
     references: Optional[str] = None
     schoolId: Optional[str] = None
+    schoolLogo: Optional[str] = None # ✅ ADDED: Logo URL Support
 
 # ==========================================
 # 🛠️ HELPERS
@@ -244,7 +249,7 @@ async def generate_weekly(
     user_id = resolve_user_id(x_user_id, request.uid)
     school_id = x_school_id or request.schoolId 
 
-    print(f"📅 WEEKLY PLAN | User: {user_id} | School: {school_id} | Week {request.weekNumber}")
+    print(f"📅 WEEKLY PLAN | User: {user_id} | Week {request.weekNumber} | Logo: {'Yes' if request.schoolLogo else 'No'}")
 
     # 1. Try to get context from Scheme
     scheme_context = get_best_available_scheme(user_id, request.subject, request.grade, request.term)
@@ -274,7 +279,8 @@ async def generate_weekly(
             days=request.days,
             start_date=request.startDate,
             scheme_data=scheme_rows,
-            module_data=module_data
+            module_data=module_data,
+            school_logo=request.schoolLogo # ✅ PASS LOGO
         )
 
         # 3. Inject Manual Overrides if Scheme didn't provide them but User did
@@ -285,7 +291,7 @@ async def generate_weekly(
         save_weekly_plan(
             uid=user_id, 
             subject=request.subject, 
-            grade=request.grade,
+            grade=request.grade, 
             term=request.term, 
             week=request.weekNumber, 
             school_name=request.school, 
@@ -306,7 +312,8 @@ async def generate_lesson(
     user_id = resolve_user_id(x_user_id, request.uid)
     school_id = x_school_id or request.schoolId
 
-    print(f"📝 LESSON PLAN | User: {user_id} | School: {school_id} | Topic: {request.topic}")
+    # ✅ UPDATED LOG: Bloom's Level & Logo visibility
+    print(f"📝 LESSON PLAN | User: {user_id} | Topic: {request.topic} | Bloom's: {request.bloomsLevel} | Logo: {'Yes' if request.schoolLogo else 'No'}")
     
     try:
         check_and_deduct_credit(user_id, cost=1, school_id=school_id)
@@ -319,7 +326,10 @@ async def generate_lesson(
             subtopic=request.subtopic, objectives=request.objectives,
             date=request.date, time_start=request.timeStart, time_end=request.timeEnd,
             attendance=attendance, teacher_name=request.teacherName, school_name=request.school,
-            module_data=module_data
+            module_data=module_data,
+            # ✅ PASS PARAM: Send Bloom's Level to the generator
+            blooms_level=request.bloomsLevel,
+            school_logo=request.schoolLogo # ✅ PASS LOGO
         )
 
         # 🛠️ FLATTEN DATA FOR FRONTEND COMPATIBILITY
@@ -332,7 +342,6 @@ async def generate_lesson(
                 lesson["lesson_steps"] = lesson["steps"]
 
         # ✅ FIX: Explicitly extract topic and subtopic from the GENERATED lesson
-        # This prevents "General Lesson" from showing up in the database list
         generated_topic = lesson.get("topic") or request.topic or "General Topic"
         generated_subtopic = lesson.get("subtopic") or request.subtopic or generated_topic
 
@@ -345,7 +354,6 @@ async def generate_lesson(
             school_name=request.school, 
             data=lesson,
             school_id=school_id,
-            # 👇 THIS WAS MISSING
             topic=generated_topic 
         )
         return {"data": lesson}
@@ -365,7 +373,7 @@ async def generate_record_route(
     user_id = resolve_user_id(x_user_id, request.uid)
     school_id = x_school_id or request.schoolId
 
-    print(f"🔔 [API] Generating Record of Work for Week {request.weekNumber}...")
+    print(f"🔔 [API] Generating Record of Work for Week {request.weekNumber} | Logo: {'Yes' if request.schoolLogo else 'No'}")
     
     try:
         # 1. Fetch Context (Scheme of Work)
@@ -418,7 +426,8 @@ async def generate_record_route(
             term=request.term,
             year=request.year,
             start_date=request.startDate,
-            scheme_data=filtered_scheme_data
+            scheme_data=filtered_scheme_data,
+            school_logo=request.schoolLogo # ✅ PASS LOGO
         )
 
         # 3. Save to Firestore (Using Dual Save Helper)

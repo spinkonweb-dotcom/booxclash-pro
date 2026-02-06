@@ -1,35 +1,66 @@
-import traceback  # 👈 Added this for error printing
-from fastapi import APIRouter, Header, HTTPException, Body
+import os  # 👈 Import OS to read env variables
+import traceback
+import cloudinary
+import cloudinary.uploader
+from fastapi import APIRouter, Header, HTTPException, UploadFile, File
 from pydantic import BaseModel
-from typing import Optional, Dict, Any
+from typing import Optional
 from firebase_admin import firestore
 
-# Initialize Router
+# --- 1. CONFIGURATION ---
+# Safely load credentials from environment variables
+cloudinary.config( 
+  cloud_name = os.getenv("CLOUDINARY_CLOUD_NAME"), 
+  api_key    = os.getenv("CLOUDINARY_API_KEY"), 
+  api_secret = os.getenv("CLOUDINARY_API_SECRET"),
+  secure = True
+)
+
 router = APIRouter()
 db = firestore.client()
 
-# ==========================================
-# 📦 DATA MODELS
-# ==========================================
-
-class TemplateConfig(BaseModel):
+# --- 2. UPLOAD ENDPOINT (With Auto-Resizing) ---
+@router.post("/upload")
+async def upload_to_cloudinary(file: UploadFile = File(...)):
     """
-    Stores URLs to uploaded templates or specific text instructions for the AI.
+    Receives a file, sends it to Cloudinary with auto-resizing, and returns the public URL.
     """
-    scheme_url: Optional[str] = None
-    lesson_plan_url: Optional[str] = None
-    weekly_plan_url: Optional[str] = None
-    
-    # Optional: specific text instructions extracted or typed by admin
-    # e.g., "Always include a 'Core Values' section."
-    custom_instructions: Optional[str] = "" 
+    try:
+        # Validate that config loaded correctly
+        if not os.getenv("CLOUDINARY_CLOUD_NAME"):
+            print("❌ Error: Cloudinary credentials missing from .env")
+            raise HTTPException(status_code=500, detail="Server misconfiguration: Missing Cloudinary keys")
 
+        # Upload the file directly from the request stream
+        # 'transformation' resizes the image to fit within 400x400px without cropping/cutting parts off
+        result = cloudinary.uploader.upload(
+            file.file, 
+            folder="school_assets",
+            transformation=[
+                {"width": 400, "height": 400, "crop": "limit", "quality": "auto"}
+            ]
+        )
+        
+        return {"url": result.get("secure_url")}
+        
+    except Exception as e:
+        print(f"Upload Error: {e}")
+        traceback.print_exc() # Print full error to console for debugging
+        raise HTTPException(status_code=500, detail="Image upload failed")
+
+# --- 3. DATA MODELS ---
 class BrandingConfig(BaseModel):
     logo_url: Optional[str] = None
     motto: Optional[str] = None
     address: Optional[str] = None
     phone: Optional[str] = None
-    primary_color: Optional[str] = "#000000" # Default black
+    primary_color: Optional[str] = "#4f46e5"
+
+class TemplateConfig(BaseModel):
+    scheme_url: Optional[str] = None
+    lesson_plan_url: Optional[str] = None
+    weekly_plan_url: Optional[str] = None
+    custom_instructions: Optional[str] = ""
 
 class SchoolSettingsRequest(BaseModel):
     school_id: str
@@ -37,117 +68,28 @@ class SchoolSettingsRequest(BaseModel):
     branding: BrandingConfig
     templates: Optional[TemplateConfig] = None
 
-# ==========================================
-# 🛠️ HELPERS
-# ==========================================
-
-def verify_school_admin(uid: str, school_id: str):
-    """
-    Security Check: Ensure the user requesting the change is actually 
-    an Admin of that school.
-    """
-    if not uid:
-        return False
-        
-    # 1. Fetch User Profile
-    user_ref = db.collection("users").document(uid).get()
-    if not user_ref.exists:
-        return False
-    
-    user_data = user_ref.to_dict()
-    
-    # 2. Check Role and School ID match
-    # Adjust field names based on your actual user schema
-    user_school = user_data.get("schoolId")
-    user_role = user_data.get("role") # e.g., 'admin', 'head_teacher'
-    
-    if user_school == school_id and user_role in ["admin", "head_teacher", "principal", "school_admin"]:
-        return True
-        
-    return False
-
-# ==========================================
-# 🚀 ROUTES
-# ==========================================
-
-@router.post("/update-settings")
+# --- 4. UPDATE SETTINGS ENDPOINT ---
+@router.post("/school/update-settings")
 async def update_school_settings(
     settings: SchoolSettingsRequest,
     x_user_id: str = Header(None, alias="X-User-ID")
 ):
-    """
-    Saves school branding and custom template preferences.
-    """
-    print(f"⚙️ UPDATING SETTINGS | School: {settings.school_id} | User: {x_user_id}")
-
-    if not settings.school_id:
-        raise HTTPException(status_code=400, detail="School ID is required")
-
-    # 🔐 Security Check (Uncomment when ready)
-    # if not verify_school_admin(x_user_id, settings.school_id):
-    #     raise HTTPException(status_code=403, detail="Unauthorized: Only school admins can update settings.")
+    print(f"⚙️ SAVING | School: {settings.school_id}")
 
     try:
         school_ref = db.collection("schools").document(settings.school_id)
         
-        # Prepare Update Payload
-        # We use merge=True so we don't accidentally wipe credits or teacher lists
-        update_data = {
+        # Merge=True updates only the fields we send, keeping others safe
+        school_ref.set({
             "schoolName": settings.school_name,
             "branding": settings.branding.dict(),
             "customTemplates": settings.templates.dict() if settings.templates else {},
             "updatedAt": firestore.SERVER_TIMESTAMP,
-            "updatedBy": x_user_id
-        }
+            "lastEditedBy": x_user_id
+        }, merge=True)
 
-        school_ref.set(update_data, merge=True)
-
-        return {"status": "success", "message": "School settings updated successfully"}
+        return {"status": "success", "message": "Settings saved successfully"}
 
     except Exception as e:
-        traceback.print_exc() # 👈 This will now work
-        raise HTTPException(status_code=500, detail=f"Failed to update settings: {str(e)}")
-
-
-@router.get("/get-settings/{school_id}")
-async def get_school_settings(
-    school_id: str,
-    x_user_id: str = Header(None, alias="X-User-ID")
-):
-    """
-    Fetches the current settings to populate the frontend form.
-    """
-    try:
-        doc = db.collection("schools").document(school_id).get()
-        
-        if not doc.exists:
-            # Return defaults if new school
-            return {
-                "schoolName": "",
-                "branding": {},
-                "customTemplates": {}
-            }
-
-        data = doc.to_dict()
-
-        # Sanitize response (ensure keys exist)
-        return {
-            "schoolName": data.get("schoolName", ""),
-            "branding": data.get("branding", {
-                "logo_url": None,
-                "motto": "",
-                "address": "",
-                "phone": ""
-            }),
-            "customTemplates": data.get("customTemplates", {
-                "scheme_url": None,
-                "lesson_plan_url": None,
-                "weekly_plan_url": None,
-                "custom_instructions": ""
-            })
-        }
-
-    except Exception as e:
-        print(f"❌ Error fetching settings: {e}")
         traceback.print_exc()
-        raise HTTPException(status_code=500, detail="Could not load settings")
+        raise HTTPException(status_code=500, detail=str(e))
