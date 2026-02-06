@@ -242,3 +242,178 @@ async def generate_lesson_notes_endpoint(request: NotesRequest):
     except Exception as e:
         print(f"❌ Error generating notes: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+# ==========================================
+# 📈 ANALYTICS & DASHBOARD IMPORTS
+# ==========================================
+from collections import Counter, defaultdict
+from datetime import timedelta, datetime
+
+# --- Response Models for Analytics ---
+class AnalyticsStat(BaseModel):
+    title: str
+    value: str | int
+    trend: Optional[str] = None
+    sub: Optional[str] = None
+
+class ChartData(BaseModel):
+    name: str
+    value: int
+    color: Optional[str] = None
+
+class ActivityLog(BaseModel):
+    id: str
+    teacher: str
+    type: str
+    grade: str
+    subject: str
+    school: str
+    date: str
+    time: str
+
+class DashboardResponse(BaseModel):
+    stats: List[AnalyticsStat]
+    chart_data: List[Dict[str, Any]]  # For Bar Chart (Daily Activity)
+    type_distribution: List[ChartData] # For Pie Chart
+    recent_activity: List[ActivityLog] # For Data Table
+
+# ==========================================
+# 📊 UPDATED ANALYTICS ENDPOINT (Multi-Collection)
+# ==========================================
+import asyncio 
+
+@router.get("/analytics/dashboard", response_model=DashboardResponse)
+async def get_analytics_dashboard(
+    x_school_id: Optional[str] = Header(None, alias="X-School-ID"),
+    time_range: str = "week"
+):
+    print(f"📊 Fetching Analytics for School: {x_school_id}")
+
+    try:
+        # 1. Setup Date Range
+        now = datetime.now()
+        if time_range == "week":
+            start_date = now - timedelta(days=7)
+        elif time_range == "month":
+            start_date = now - timedelta(days=30)
+        else:
+            start_date = now - timedelta(days=365)
+
+        # 2. Helper function to fetch from a specific collection
+        async def fetch_collection(collection_name, doc_type_label):
+            ref = db.collection(collection_name)
+            query = ref.where('timestamp', '>=', start_date)
+            
+            # Filter by School ID if provided
+            if x_school_id:
+                query = query.where('schoolId', '==', x_school_id)
+            
+            # Execute Query
+            # Note: In synchronous Python with Firebase Admin, .stream() is blocking.
+            # We run it in a thread or just execute linearly for simplicity.
+            docs = query.stream()
+            
+            results = []
+            for doc in docs:
+                data = doc.to_dict()
+                data['id'] = doc.id
+                data['type'] = doc_type_label # Manually tag the type based on collection
+                
+                # Fix Timestamp
+                if isinstance(data.get('timestamp'), str):
+                    try:
+                        data['timestamp'] = datetime.fromisoformat(data['timestamp'].replace('Z', ''))
+                    except:
+                        continue
+                elif not data.get('timestamp'):
+                    continue # Skip if no timestamp
+                
+                results.append(data)
+            return results
+
+        # 3. Fetch Data from ALL 3 Collections
+        # We assume your collections are named exactly as shown in your screenshot
+        plans_task = fetch_collection('generated_lesson_plans', 'lesson')
+        schemes_task = fetch_collection('generated_schemes', 'scheme')
+        weekly_task = fetch_collection('generated_weekly_plans', 'weekly')
+
+        # Run them (Linear execution is safer for Firebase Admin SDK threads)
+        raw_logs = []
+        raw_logs.extend(await plans_task)
+        raw_logs.extend(await schemes_task)
+        raw_logs.extend(await weekly_task)
+
+        # 4. Fetch School Credits (New!)
+        current_credits = "N/A"
+        if x_school_id:
+            school_doc = db.collection('schools').document(x_school_id).get()
+            if school_doc.exists:
+                current_credits = school_doc.to_dict().get('credits', 0)
+
+        # --- AGGREGATION LOGIC (Same as before) ---
+        
+        # Sort combined logs by timestamp (descending)
+        raw_logs.sort(key=lambda x: x['timestamp'], reverse=True)
+
+        total_docs = len(raw_logs)
+        unique_teachers = set(d.get('teacherName', 'Unknown') for d in raw_logs)
+        
+        # Calculate Top Subject
+        subjects = [d.get('subject', 'General') for d in raw_logs]
+        top_subject = Counter(subjects).most_common(1)
+        top_subject_name = top_subject[0][0] if top_subject else "None"
+
+        # Chart Data
+        activity_map = defaultdict(int)
+        for log in raw_logs:
+            day_key = log['timestamp'].strftime("%a") 
+            activity_map[day_key] += 1
+        
+        chart_data = []
+        for i in range(6, -1, -1):
+            d = now - timedelta(days=i)
+            day_name = d.strftime("%a")
+            chart_data.append({
+                "name": day_name,
+                "docs": activity_map.get(day_name, 0)
+            })
+
+        # Type Distribution
+        doc_types = [d.get('type') for d in raw_logs]
+        type_counts = Counter(doc_types)
+        type_colors = {"lesson": "#3b82f6", "scheme": "#10b981", "weekly": "#a855f7"}
+        
+        pie_data = [
+            {"name": k.title(), "value": v, "color": type_colors.get(k, "#94a3b8")} 
+            for k, v in type_counts.items()
+        ]
+
+        # Recent Activity
+        recent_activity = []
+        for log in raw_logs[:20]: # Top 20
+            recent_activity.append(ActivityLog(
+                id=log['id'],
+                teacher=log.get('teacherName', 'Unknown'),
+                type=log.get('type'),
+                grade=log.get('grade', 'N/A'),
+                subject=log.get('subject', 'N/A'),
+                school=log.get('schoolName', 'N/A'),
+                date=log['timestamp'].strftime("%Y-%m-%d"),
+                time=log['timestamp'].strftime("%I:%M %p")
+            ))
+
+        return DashboardResponse(
+            stats=[
+                AnalyticsStat(title="Total Documents", value=total_docs, trend="---"),
+                AnalyticsStat(title="Active Teachers", value=len(unique_teachers), trend="---"),
+                AnalyticsStat(title="Credits Remaining", value=current_credits, sub="Balance"),
+                AnalyticsStat(title="Top Subject", value=top_subject_name, sub=f"{top_subject[0][1] if top_subject else 0} generated"),
+            ],
+            chart_data=chart_data,
+            type_distribution=pie_data,
+            recent_activity=recent_activity
+        )
+
+    except Exception as e:
+        print(f"❌ Analytics Error: {e}")
+        # Return empty data so frontend doesn't crash
+        return DashboardResponse(stats=[], chart_data=[], type_distribution=[], recent_activity=[])
