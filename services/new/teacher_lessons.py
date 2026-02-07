@@ -6,7 +6,7 @@ from datetime import datetime
 from .teacher_shared import get_model, extract_json_string, find_structured_module_content
 
 # ==============================================================================
-# 1. GENERATE SPECIFIC LESSON PLAN (Dynamic References + Bloom's Taxonomy)
+# 1. GENERATE SPECIFIC LESSON PLAN (Dynamic References + Bloom's Taxonomy + Logo)
 # ==============================================================================
 async def generate_specific_lesson_plan(
     grade: str, 
@@ -20,9 +20,10 @@ async def generate_specific_lesson_plan(
     attendance: Dict[str, int],
     teacher_name: str = "Class Teacher", 
     school_name: str = "Primary School",
+    school_logo: Optional[str] = None,  # ✅ ADDED THIS ARGUMENT
     module_data: Optional[Dict[str, Any]] = None,
     scheme_references: str = "Standard Zambian Syllabus",
-    blooms_level: str = "" # ✅ ADDED: New Parameter
+    blooms_level: str = "" 
 ) -> Dict[str, Any]:
     
     print(f"\n🔍 [Lesson Generator] Processing: {theme} - {subtopic} | Bloom's: {blooms_level}")
@@ -178,6 +179,10 @@ async def generate_specific_lesson_plan(
         if strict_ref_override:
             data["references"] = final_reference_string
         
+        # ✅ INJECT LOGO IF PROVIDED
+        if school_logo:
+            data["schoolLogo"] = school_logo
+
         # Add Footer for printing
         data["evaluation_footer"] = "LESSON EVALUATION:\n" + ("." * 200)
 
@@ -190,7 +195,8 @@ async def generate_specific_lesson_plan(
             "subtopic": subtopic,
             "references": scheme_references, # Fallback on error
             "steps": [],
-            "error": "Failed to generate lesson plan."
+            "error": "Failed to generate lesson plan.",
+            "schoolLogo": school_logo # Return logo even on error
         }
 
 
@@ -244,7 +250,7 @@ async def generate_lesson_notes(
 
     **INSTRUCTIONS:**
     1. **Format**: Use clear **bullet points** for explanations.
-    2. **Diagrams**: If a concept requires a diagram, include a text description: "[DIAGRAM: Draw...]"
+    2. **Diagrams**: If a concept requires a diagram, include a text description: "[DIAGRAM: Description of diagram if needed]"
     3. **Content**: If Module is present, summarize it. If not, use standard syllabus definitions.
     4. **Activities**: Include a class exercise.
     5. **Reference**: You MUST set the reference to: "{reference_str}".
