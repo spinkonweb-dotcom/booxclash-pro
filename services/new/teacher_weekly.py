@@ -11,7 +11,8 @@ async def generate_weekly_plan_from_scheme(
     school: str, subject: str, grade: str, term: str, 
     week_number: int, days: int, start_date: str, 
     scheme_data: List[dict] = None,
-    module_data: Optional[Dict[str, Any]] = None
+    module_data: Optional[Dict[str, Any]] = None,
+    school_logo: Optional[str] = None  # <--- ADDED THIS ARGUMENT TO FIX THE ERROR
 ) -> Dict[str, Any]:
     
     print(f"\n🗓️ [Weekly Generator] Request: Week {week_number}...")
