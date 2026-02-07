@@ -12,9 +12,6 @@ db = firestore.client()
 # 📦 MODELS
 # ==========================================
 
-class AdminAction(BaseModel):
-    target_uid: str
-
 class UserTopUpRequest(BaseModel):
     target_uid: str
     amount_paid: int
@@ -66,25 +63,16 @@ async def get_all_schools(x_user_id: str = Header(None, alias="X-User-ID")):
         docs = db.collection("schools").stream()
         for doc in docs:
             data = doc.to_dict()
-            
-            # Count teachers for this school
             teacher_count = len(list(db.collection("teachers").where("schoolId", "==", doc.id).stream()))
+            
+            created_at = data.get("createdAt", "")
+            if hasattr(created_at, 'strftime'): created_at = created_at.strftime("%Y-%m-%d %H:%M:%S")
+            else: created_at = str(created_at)
 
-            # Format createdAt
-            created_at = data.get("createdAt")
-            if hasattr(created_at, 'strftime'):
-                created_at = created_at.strftime("%Y-%m-%d %H:%M:%S")
-            else:
-                created_at = str(created_at) if created_at else ""
-
-            # Prepare Pending Request Data
             pending = data.get("pendingRequest")
             if pending and pending.get("requestedAt"):
                 ts = pending["requestedAt"]
-                if hasattr(ts, 'strftime'):
-                    pending["requestedAt"] = ts.strftime("%Y-%m-%d %H:%M:%S")
-                else:
-                    pending["requestedAt"] = str(ts)
+                pending["requestedAt"] = ts.strftime("%Y-%m-%d %H:%M:%S") if hasattr(ts, 'strftime') else str(ts)
 
             schools.append({
                 "id": doc.id,
@@ -103,27 +91,7 @@ async def get_all_schools(x_user_id: str = Header(None, alias="X-User-ID")):
             })
         return {"status": "success", "data": schools}
     except Exception as e:
-        print("ADMIN /schools ERROR:", e)
         raise HTTPException(500, f"Failed to load schools: {str(e)}")
-
-@router.post("/schools/approve")
-async def approve_school(action: SchoolApproveRequest, x_user_id: str = Header(None, alias="X-User-ID")):
-    await verify_admin(x_user_id)
-    school_ref = db.collection("schools").document(action.school_id)
-    if not school_ref.get().exists:
-        query = db.collection("schools").where("adminId", "==", action.school_id).stream()
-        found = list(query)
-        if found:
-            school_ref = db.collection("schools").document(found[0].id)
-        else:
-            raise HTTPException(404, "School not found")
-
-    school_ref.update({
-        "isApproved": True,
-        "subscriptionStatus": True,
-        "credits": firestore.Increment(50)
-    })
-    return {"status": "success"}
 
 @router.post("/schools/topup")
 async def top_up_school(action: SchoolTopUpRequest, x_user_id: str = Header(None, alias="X-User-ID")):
@@ -160,77 +128,19 @@ async def top_up_school(action: SchoolTopUpRequest, x_user_id: str = Header(None
     school_ref.update(update_data)
     
     s_data = doc_snap.to_dict()
+    # Return receipt data compatible with new frontend
     return {
         "status": "success",
         "receipt_no": f"SCH-{doc_snap.id[:6].upper()}-{int(datetime.now().timestamp())}",
         "date": datetime.now().strftime('%Y-%m-%d'),
-        "user_name": s_data.get("schoolName", "Valued School"),
+        "receipt_user_name": s_data.get("schoolName", "Valued School"), # Standardized key
         "plan_name": plan_name,
         "credits": action.credits_to_add,
         "amount": action.amount_paid
     }
 
 # ==========================================
-# 🍎 TEACHERS (Added Section)
-# ==========================================
-
-@router.get("/teachers")
-async def get_all_teachers(
-    school_id: Optional[str] = None, 
-    x_user_id: str = Header(None, alias="X-User-ID")
-):
-    """
-    Fetches all teachers. Optionally filters by school_id if provided.
-    """
-    await verify_admin(x_user_id)
-    
-    try:
-        teachers_ref = db.collection("users")
-        
-        if school_id:
-            query = teachers_ref.where("schoolId", "==", school_id).stream()
-        else:
-            query = teachers_ref.stream()
-
-        teachers = []
-        for doc in query:
-            data = doc.to_dict()
-            teachers.append({
-                "id": doc.id,
-                "name": data.get("name", "Unknown"),
-                "email": data.get("email", ""),
-                "schoolId": data.get("schoolId", "N/A"),
-                "joinedAt": str(data.get("joinedAt", "")),
-                "role": data.get("role", "teacher"),
-                "loginCode": data.get("loginCode", "")
-            })
-            
-        return {"status": "success", "data": teachers}
-    except Exception as e:
-        raise HTTPException(500, f"Failed to load teachers: {str(e)}")
-
-@router.delete("/teachers/delete")
-async def delete_teacher(
-    action: TeacherAction,
-    x_user_id: str = Header(None, alias="X-User-ID")
-):
-    await verify_admin(x_user_id)
-    try:
-        # Delete from Firestore
-        db.collection("teachers").document(action.teacher_id).delete()
-        
-        # Optional: Delete from Auth if the UID matches the document ID
-        try:
-            auth.delete_user(action.teacher_id)
-        except:
-            pass # User might not exist in Auth or ID mismatch
-
-        return {"status": "success", "message": "Teacher deleted"}
-    except Exception as e:
-        raise HTTPException(500, f"Error deleting teacher: {str(e)}")
-
-# ==========================================
-# 👥 USERS
+# 👥 USERS (UPDATED TO FETCH NAME)
 # ==========================================
 
 @router.get("/users")
@@ -263,12 +173,14 @@ async def top_up_user(action: UserTopUpRequest, x_user_id: str = Header(None, al
     credits, plan = (80, "Individual Monthly (K50)") if action.amount_paid == 50 else (300, "Individual Termly (K120)") if action.amount_paid == 120 else (int(action.amount_paid * 1.5), "Custom Top-up")
 
     user_ref = db.collection("users").document(action.target_uid)
-    if not user_ref.get().exists:
-        try:
-            auth_user = auth.get_user(action.target_uid)
-            user_ref.set({"email": auth_user.email, "role": "user", "joined_at": firestore.SERVER_TIMESTAMP, "credits": 0})
-        except: pass
-
+    user_doc = user_ref.get()
+    
+    # 1. GET NAME FROM DB (This matches your data structure)
+    user_name = "Valued Teacher"
+    if user_doc.exists:
+        user_name = user_doc.to_dict().get("name", "Valued Teacher")
+    
+    # 2. UPDATE CREDITS
     user_ref.update({
         "credits": firestore.Increment(credits),
         "is_approved": True,
@@ -276,10 +188,31 @@ async def top_up_user(action: UserTopUpRequest, x_user_id: str = Header(None, al
         "last_payment_amount": action.amount_paid,
         "last_payment_date": firestore.SERVER_TIMESTAMP
     })
-    return {"status": "success", "credits_added": credits}
+
+    # 3. RETURN DATA FOR RECEIPT
+    return {
+        "status": "success",
+        "receipt_no": f"IND-{action.target_uid[:5].upper()}-{int(datetime.now().timestamp())}",
+        "date": datetime.now().strftime('%Y-%m-%d'),
+        "receipt_user_name": user_name,  # Matches variable used in frontend logic
+        "plan_name": plan,
+        "credits": credits,
+        "amount": action.amount_paid
+    }
+
+@router.delete("/users/{uid}")
+async def delete_user(uid: str, x_user_id: str = Header(None, alias="X-User-ID")):
+    await verify_admin(x_user_id)
+    try:
+        db.collection("users").document(uid).delete()
+        try: auth.delete_user(uid)
+        except: pass
+        return {"status": "success"}
+    except Exception as e:
+        raise HTTPException(500, str(e))
 
 # ==========================================
-# 📚 CONTENT
+# 📊 STATS & CONTENT (UNCHANGED)
 # ==========================================
 
 @router.get("/content/all")
@@ -287,7 +220,6 @@ async def get_all_content(type: str = Query(...), x_user_id: str = Header(None, 
     await verify_admin(x_user_id)
     cmap = {"scheme": "generated_schemes", "weekly": "generated_weekly_plans", "lesson": "generated_lesson_plans"}
     if type not in cmap: raise HTTPException(400, "Invalid content type")
-    
     docs = db.collection(cmap[type]).order_by("createdAt", direction=firestore.Query.DESCENDING).limit(50).stream()
     return [{**d.to_dict(), "id": d.id, "createdAt": str(d.to_dict().get("createdAt"))} for d in docs]
 
@@ -297,15 +229,10 @@ async def delete_content(action: ContentAction, x_user_id: str = Header(None, al
     db.collection(action.collection_name).document(action.doc_id).delete()
     return {"status": "success"}
 
-# ==========================================
-# 📊 STATS
-# ==========================================
-
 @router.get("/stats")
 async def get_stats(x_user_id: str = Header(None, alias="X-User-ID")):
     await verify_admin(x_user_id)
     def count_collection(name): return len(list(db.collection(name).stream()))
-    
     return {
         "total_users": count_collection("users"),
         "total_schools": count_collection("schools"),
