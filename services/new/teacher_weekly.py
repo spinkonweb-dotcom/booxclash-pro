@@ -5,7 +5,7 @@ from .teacher_shared import get_model, extract_json_string, find_structured_modu
 from .teacher_schemes import extract_scheme_details
 
 # =====================================================
-# 2. WEEKLY PLAN GENERATOR (UPDATED FOR MANUAL OVERRIDES)
+# WEEKLY PLAN GENERATOR (MERGED: MANUAL INPUTS + ROBUST REFERENCES)
 # =====================================================
 async def generate_weekly_plan_from_scheme(
     school: str, subject: str, grade: str, term: str, 
@@ -13,51 +13,50 @@ async def generate_weekly_plan_from_scheme(
     scheme_data: List[dict] = None,
     module_data: Optional[Dict[str, Any]] = None,
     school_logo: Optional[str] = None,
-    manual_topic: Optional[str] = None,     # ⚡️ Added manual override
-    manual_subtopic: Optional[str] = None   # ⚡️ Added manual override
+    manual_topic: Optional[str] = None,
+    manual_subtopic: Optional[str] = None
 ) -> Dict[str, Any]:
     
     print(f"\n🗓️ [Weekly Generator] Request: Week {week_number}...")
     
-    # 1. DETERMINE THE TARGET TOPIC (Manual vs Scheme)
-    # If a teacher selected a topic from a different week in the UI, use that.
+    # 1. ALWAYS EXTRACT SCHEME DATA FIRST
+    # We do this first so we can grab the 'refs' (References) from the database
+    # regardless of whether the user provided a manual topic name or not.
+    details = extract_scheme_details(scheme_data, week_number)
+
+    # 2. APPLY MANUAL OVERRIDES (If provided)
+    # Instead of creating a new 'details' dict, we just update the existing one.
     if manual_topic and manual_topic.strip():
         print(f"  🎯 [Override] Using Manually Selected Topic: {manual_topic}")
-        details = {
-            "found": True,
-            "topic": manual_topic,
-            "specific_competences": [], # AI will generate these based on topic
-            "refs": ["Syllabus"],
-            "component": subject,
-            "methods": ["Inquiry based learning"],
-            "resources": ["Textbook", "Local environment"]
-        }
-        # If we have a subtopic, inject it into the prompt context later
-        target_topic_for_module = manual_subtopic if manual_subtopic else manual_topic
-    else:
-        # Standard lookup: Find what is scheduled for this week in the Scheme
-        details = extract_scheme_details(scheme_data, week_number)
-        target_topic_for_module = details['topic']
+        details["topic"] = manual_topic
+        details["found"] = True # Force found since we have user input
+        
+        # NOTE: We do NOT overwrite details['refs'] here. 
+        # We keep the references found in step 1.
 
+    # If still not found (no scheme data AND no manual input), use fallbacks
     if not details["found"]:
         print(f"   ⚠️ Week {week_number} not found in Scheme. Using generic fallback.")
         details["topic"] = f"General {subject} Concepts"
         details["refs"] = ["Standard Syllabus"]
 
-    # 2. FETCH STRUCTURED MODULE CONTENT
-    # Use the specific topic (manual or scheme-derived) to find textbook content
+    # 3. DETERMINE TARGET FOR MODULE SEARCH
+    # If a subtopic is provided (lessonTitle), use that for the specific content search
+    target_topic_for_module = manual_subtopic if manual_subtopic else details['topic']
+
+    # 4. FETCH STRUCTURED MODULE CONTENT
     module_info = find_structured_module_content(module_data, target_topic_for_module)
     
     module_prompt_insert = ""
     
-    # 3. ROBUST REFERENCE LOGIC
+    # 5. CONSTRUCT REFERENCE LOGIC
     if module_info:
         print(f"   ↳ ✅ Module Found: Unit {module_info['unit_id']}, Pages: {module_info['pages']}")
         module_prompt_insert = f"""
         🔥🔥 **OFFICIAL MODULE DATA FOUND** 🔥🔥
         1. **UNIT ID**: {module_info['unit_id']}
         2. **PAGE NUMBERS**: {module_info['pages']}
-        3. **CONTENT SOURCE**: Use the specific content below to fill 'scope_of_lesson' and 'learning_activity'.
+        3. **CONTENT SOURCE**: Use the specific activities below.
         
         --- MODULE CONTENT START ---
         {module_info['context_text']}
@@ -67,14 +66,26 @@ async def generate_weekly_plan_from_scheme(
         In the 'reference' field of the JSON, you MUST write: "Module Unit {module_info['unit_id']}, Page {module_info['pages']}".
         """
     else:
-        print(f"   ↳ ⚠️ Module not found for Topic: '{details['topic']}'. Falling back to Scheme References.")
+        # FALLBACK TO SCHEME REFERENCES
+        # Now this works because we preserved 'details["refs"]' in Step 2
+        print(f"   ↳ ⚠️ Module not found for '{target_topic_for_module}'. Falling back to Scheme References.")
+        
         scheme_refs = details.get('refs', [])
-        scheme_refs_str = ", ".join(scheme_refs) if isinstance(scheme_refs, list) else str(scheme_refs)
-        if not scheme_refs_str or scheme_refs_str == "None": 
-            scheme_refs_str = "Syllabus"
+        
+        # Handle list vs string
+        if isinstance(scheme_refs, list):
+            # Filter out empty strings/None
+            valid_refs = [str(r) for r in scheme_refs if r]
+            scheme_refs_str = ", ".join(valid_refs)
+        else:
+            scheme_refs_str = str(scheme_refs)
+
+        if not scheme_refs_str or scheme_refs_str.lower() in ["none", ""]: 
+            scheme_refs_str = "Approved Syllabus"
 
         module_prompt_insert = f"""
         ⚠️ **MODULE DATA NOT FOUND**
+        
         **MANDATORY INSTRUCTION**:
         You MUST use the 'REFERENCES' from the Scheme: "{scheme_refs_str}".
         In the 'reference' field of the JSON output, write exactly: "{scheme_refs_str}".
@@ -82,7 +93,7 @@ async def generate_weekly_plan_from_scheme(
 
     model = get_model() 
     
-    # 4. PROMPT (Refined to prioritize manual subtopic)
+    # 6. PROMPT
     subtopic_instruction = f"Break the topic into {days} logical daily lessons."
     if manual_subtopic:
         subtopic_instruction = f"Focus heavily on the subtopic: '{manual_subtopic}' and break it into {days} detailed daily lessons."
@@ -93,7 +104,6 @@ async def generate_weekly_plan_from_scheme(
     CONTEXT:
     - Subject: {subject}, Grade: {grade}, Term: {term}, Week: {week_number}
     - Main Topic: {details['topic']}
-    {"- Specific Sub-topic: " + manual_subtopic if manual_subtopic else ""}
     - Competencies: {", ".join(details.get('specific_competences', []))}
     
     {module_prompt_insert}
@@ -101,8 +111,8 @@ async def generate_weekly_plan_from_scheme(
     INSTRUCTIONS:
     - **Topic**: Use "{details['topic']}".
     - **Subtopic**: {subtopic_instruction}
-    - **Scope of Lesson**: Provide clear teacher notes. If Module Data is present, use it.
-    - **Language**: Use Zambian English educational terminology.
+    - **Scope of Lesson**: Clear teacher notes.
+    - **Reference**: STRICTLY follow the 'MANDATORY INSTRUCTION' above. 
 
     OUTPUT JSON ONLY:
     {{
@@ -136,11 +146,10 @@ async def generate_weekly_plan_from_scheme(
         )
         plan_json = json.loads(extract_json_string(response.text))
         
-        # Self-Healing: Ensure meta topic matches what we requested
         if "meta" in plan_json:
             plan_json["meta"]["main_topic"] = details['topic']
             
         return plan_json
     except Exception as e:
         print(f"❌ [Weekly Generator] Error: {e}")
-        return {"days": [], "meta": {"week_number": week_number, "main_topic": details['topic']}}
+        return {"days": [], "meta": {"week_number": week_number, "main_topic": details.get('topic', 'Unknown')}}
