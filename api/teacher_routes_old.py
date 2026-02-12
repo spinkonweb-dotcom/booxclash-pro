@@ -38,6 +38,7 @@ class WeeklyPlanRequest(BaseModel):
     weekNumber: int
     days: Optional[int] = 5
     startDate: Optional[str] = None
+    lessonTitle: Optional[str] = None
     references: Optional[str] = None
     # Allow both 'topic' and 'theme'
     topic: Optional[str] = None 
@@ -189,7 +190,7 @@ async def generate_scheme(
 
 
 # ------------------------------------------------------------------
-# 2. Generate Weekly Plan
+# 2. Generate Weekly Plan (Updated for Manual Content Overrides)
 # ------------------------------------------------------------------
 @router.post("/generate-weekly-plan")
 async def generate_weekly_plan(
@@ -201,13 +202,16 @@ async def generate_weekly_plan(
     school_id = x_school_id or request.schoolId
 
     # 1️⃣ VALIDATE TOPIC BEFORE CREDITS
+    # We prioritize the topic and lessonTitle (sub-topic) from the request.
+    # This allows a teacher to generate Week 3 content while physically in Week 5.
     clean_topic = request.topic or request.theme
+    clean_subtopic = request.lessonTitle # Ensure your WeeklyPlanRequest model has this field
     
     if not clean_topic or clean_topic.strip() == "":
         print("⚠️ ABORTING: No Topic provided. Preventing Credit Deduction.")
         raise HTTPException(
             status_code=400, 
-            detail="Topic is required. Please ensure a Scheme of Work exists for this week, or retry."
+            detail="Topic is required. Please select a topic from your scheme or enter one manually."
         )
     
     raw_refs = getattr(request, "references", "")
@@ -216,7 +220,8 @@ async def generate_weekly_plan(
     else:
         clean_refs = str(raw_refs) if raw_refs else None
 
-    print(f"📅 Generating Weekly Plan: {request.subject} | Week {request.weekNumber} | Topic: {clean_topic} | Logo: {'Yes' if request.schoolLogo else 'No'}")
+    print(f"📅 Generating Weekly Plan: {request.subject} | Week {request.weekNumber}")
+    print(f"🎯 Manual Override -> Topic: {clean_topic} | Subtopic: {clean_subtopic}")
 
     # 2️⃣ DEDUCT CREDIT
     try:
@@ -226,6 +231,9 @@ async def generate_weekly_plan(
 
     # 3️⃣ GENERATE
     try:
+        # Pass the specific topic and subtopic to the AI function.
+        # This tells the AI: "Ignore the default scheme for this week number, 
+        # use these specific strings instead."
         plan_data = await generate_weekly_plan_with_ai(
             grade=request.grade,
             subject=request.subject,
@@ -234,13 +242,20 @@ async def generate_weekly_plan(
             school_name=request.school,
             start_date=request.startDate,
             days_count=request.days,
-            topic=clean_topic,
+            topic=clean_topic,        # source of truth
+            subtopic=clean_subtopic, # source of truth
             references=clean_refs,
-            school_logo=request.schoolLogo # ✅ PASS LOGO
+            school_logo=request.schoolLogo
         )
 
         if not plan_data:
             raise HTTPException(status_code=500, detail="AI failed to generate weekly plan")
+
+        # Ensure the returned metadata matches what the teacher actually selected
+        plan_data["meta"] = plan_data.get("meta", {})
+        plan_data["meta"]["main_topic"] = clean_topic
+        if clean_subtopic:
+            plan_data["meta"]["sub_topic"] = clean_subtopic
 
         save_weekly_plan(
             uid=uid,
@@ -250,6 +265,7 @@ async def generate_weekly_plan(
             term=request.term,
             week=request.weekNumber,
             data=plan_data,
+            school_id=school_id # Added to ensure it saves to the correct school context
         )
 
         return {"status": "success", "data": plan_data}
@@ -257,9 +273,10 @@ async def generate_weekly_plan(
     except HTTPException:
         raise
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         print(f"❌ Weekly plan error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
-
 
 # ------------------------------------------------------------------
 # 3. Generate Lesson Plan (Updated)

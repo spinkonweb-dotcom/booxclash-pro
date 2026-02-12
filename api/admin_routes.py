@@ -1,9 +1,13 @@
 import os
+import google.generativeai as genai
 from datetime import datetime
 from fastapi import APIRouter, HTTPException, Header, Query
 from firebase_admin import firestore, auth
 from typing import List, Optional
 from pydantic import BaseModel
+
+# ✅ CONFIGURE GEMINI (Make sure to set your API Key)
+# genai.configure(api_key="YOUR_GEMINI_API_KEY") 
 
 router = APIRouter()
 db = firestore.client()
@@ -31,6 +35,11 @@ class ContentAction(BaseModel):
 
 class TeacherAction(BaseModel):
     teacher_id: str
+
+# ✅ NEW: Campaign Model for AI Emails
+class CampaignRequest(BaseModel):
+    target_uids: List[str]
+    goal: str
 
 # ==========================================
 # 🛡️ ADMIN VERIFICATION
@@ -140,7 +149,7 @@ async def top_up_school(action: SchoolTopUpRequest, x_user_id: str = Header(None
     }
 
 # ==========================================
-# 👥 USERS (UPDATED TO FETCH NAME)
+# 👥 USERS (UPDATED TO FETCH NAME & DATE)
 # ==========================================
 
 @router.get("/users")
@@ -149,22 +158,35 @@ async def get_all_users(x_user_id: str = Header(None, alias="X-User-ID")):
     db_docs = {d.id: d.to_dict() for d in db.collection("users").stream()}
     auth_users = auth.list_users().iterate_all()
     users = []
+    
     for u in auth_users:
         uid = u.uid
         data = db_docs.get(uid, {})
         role = data.get("role", "user")
+        
         if role in ["school_admin", "admin", "super_admin"]:
             continue
+            
+        # ✅ FIX: Handle 'createdAt' vs 'joined_at' based on your data structure
+        raw_date = data.get("createdAt") or data.get("joined_at")
+        joined_str = ""
+        if raw_date:
+            if hasattr(raw_date, 'strftime'):
+                joined_str = raw_date.strftime("%Y-%m-%d")
+            else:
+                joined_str = str(raw_date)
+
         users.append({
             "uid": uid,
-            "email": u.email or "No Email",
+            "email": u.email or data.get("email", "No Email"),
             "name": data.get("name") or u.display_name or "Unknown",
             "role": role,
             "credits": data.get("credits", 0),
             "subscriptionPlan": data.get("subscriptionPlan", "None"),
-            "joined_at": str(data.get("joined_at", "")),
+            "joined_at": joined_str, 
             "is_approved": data.get("is_approved", False),
         })
+        
     return sorted(users, key=lambda x: x["joined_at"], reverse=True)
 
 @router.post("/users/topup")
@@ -175,12 +197,10 @@ async def top_up_user(action: UserTopUpRequest, x_user_id: str = Header(None, al
     user_ref = db.collection("users").document(action.target_uid)
     user_doc = user_ref.get()
     
-    # 1. GET NAME FROM DB (This matches your data structure)
     user_name = "Valued Teacher"
     if user_doc.exists:
         user_name = user_doc.to_dict().get("name", "Valued Teacher")
     
-    # 2. UPDATE CREDITS
     user_ref.update({
         "credits": firestore.Increment(credits),
         "is_approved": True,
@@ -189,12 +209,11 @@ async def top_up_user(action: UserTopUpRequest, x_user_id: str = Header(None, al
         "last_payment_date": firestore.SERVER_TIMESTAMP
     })
 
-    # 3. RETURN DATA FOR RECEIPT
     return {
         "status": "success",
         "receipt_no": f"IND-{action.target_uid[:5].upper()}-{int(datetime.now().timestamp())}",
         "date": datetime.now().strftime('%Y-%m-%d'),
-        "receipt_user_name": user_name,  # Matches variable used in frontend logic
+        "receipt_user_name": user_name,  
         "plan_name": plan,
         "credits": credits,
         "amount": action.amount_paid
@@ -210,6 +229,70 @@ async def delete_user(uid: str, x_user_id: str = Header(None, alias="X-User-ID")
         return {"status": "success"}
     except Exception as e:
         raise HTTPException(500, str(e))
+
+# ==========================================
+# 📧 AI CAMPAIGN LOGIC (NEW)
+# ==========================================
+
+async def generate_email_content(user_name: str, goal: str):
+    try:
+        model = genai.GenerativeModel("gemini-2.5-flash")
+        prompt = f"""
+        Act as a Customer Success Manager for 'BooxClash' (Education Platform).
+        Write a short email to a user named '{user_name}'.
+        
+        CONTEXT: The user hasn't been active or has low credits.
+        CAMPAIGN GOAL: {goal}
+        
+        REQUIREMENTS:
+        - Professional but warm tone.
+        - Under 70 words.
+        - Include a Subject line at the top.
+        """
+        response = model.generate_content(prompt)
+        return response.text
+    except Exception as e:
+        print(f"AI Gen Error: {e}")
+        return f"Subject: We miss you!\n\nHi {user_name},\n\nWe noticed you haven't been active lately. {goal}\n\nBest,\nBooxClash Team"
+
+async def send_mock_email(to: str, content: str):
+    """STUB: Prints email to console. Connect SMTP later."""
+    print(f"\n📨 [SENDING EMAIL] -> {to}")
+    print(f"{content}")
+    print("-" * 30)
+    return True
+
+@router.post("/campaign/start")
+async def start_campaign(action: CampaignRequest, x_user_id: str = Header(None, alias="X-User-ID")):
+    await verify_admin(x_user_id)
+    
+    success = 0
+    failed = 0
+    print(f"🚀 Starting Campaign: '{action.goal}' for {len(action.target_uids)} users.")
+
+    for uid in action.target_uids:
+        try:
+            doc = db.collection("users").document(uid).get()
+            if not doc.exists: continue
+            
+            data = doc.to_dict()
+            email = data.get("email")
+            name = data.get("name", "Educator")
+            
+            if not email: continue
+
+            email_text = await generate_email_content(name, action.goal)
+            await send_mock_email(email, email_text)
+            success += 1
+            
+        except Exception as e:
+            print(f"Failed to process {uid}: {e}")
+            failed += 1
+
+    return {
+        "status": "success",
+        "message": f"Campaign complete. Sent: {success}, Failed: {failed}"
+    }
 
 # ==========================================
 # 📊 STATS & CONTENT (UNCHANGED)

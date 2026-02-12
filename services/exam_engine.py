@@ -10,7 +10,7 @@ def generate_exam(subject: str, grade: str):
     file_path = PAPERS_DIR / filename
 
     if not file_path.exists():
-        return {"error": "Paper not found", "questions": []}
+        return {"error": "Paper not", "questions": []}
 
     questions = []
     current_q = {}

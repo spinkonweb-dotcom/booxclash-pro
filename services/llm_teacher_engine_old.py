@@ -222,7 +222,7 @@ async def generate_scheme_with_ai(
         return []
 
 # =====================================================
-# 2. WEEKLY PLAN GENERATOR (UPDATED FOR LOGO)
+# 2. WEEKLY PLAN GENERATOR (UPDATED FOR LOGO & MANUAL OVERRIDES)
 # =====================================================
 async def generate_weekly_plan_with_ai(
     grade: str, 
@@ -233,11 +233,13 @@ async def generate_weekly_plan_with_ai(
     start_date: Optional[str] = None, 
     days_count: int = 5,
     topic: Optional[str] = None,
+    subtopic: Optional[str] = None,      # ✅ ADDED PARAMETER
     references: Optional[str] = None,
-    school_logo: Optional[str] = None # ✅ ADDED PARAMETER
+    school_logo: Optional[str] = None 
 ) -> Dict[str, Any]:
     
     # 1. Determine Logo
+    DEFAULT_LOGO = "https://your-default-logo-url.com/logo.png" # Ensure this is defined
     final_logo = school_logo if school_logo else DEFAULT_LOGO
     
     # Smart Fallback for Topic
@@ -246,9 +248,17 @@ async def generate_weekly_plan_with_ai(
     # Smart Fallback for References
     ref_context = references if references and len(references) > 1 else "Syllabus, Approved Textbooks"
 
-    print(f"🧠 AI Generating Weekly Plan | Subject: {subject} | Week: {week_number} | Logo: {'Yes' if school_logo else 'No'}")
+    print(f"🧠 AI Generating Weekly Plan | Subject: {subject} | Week: {week_number}")
+    if subtopic:
+        print(f"🎯 Specific Focus: {subtopic}")
     
     model = get_model()
+
+    # ⚡️ ENHANCED PROMPT: We tell the AI that if a subtopic is provided, 
+    # it must anchor the entire week's lessons around that specific theme.
+    subtopic_instruction = ""
+    if subtopic and len(subtopic) > 1:
+        subtopic_instruction = f"The teacher has specifically selected the sub-topic: '{subtopic}'. Ensure all {days_count} daily lessons are logical steps within this specific sub-topic."
 
     prompt = f"""
     Act as a Senior Teacher in Zambia. Create a Weekly Lesson Forecast.
@@ -260,12 +270,14 @@ async def generate_weekly_plan_with_ai(
     - Term: {term}
     - Week: {week_number}
     - Duration: {days_count} Days
-    - TOPIC FOCUS: "{topic_context}" 
+    - MAIN TOPIC: "{topic_context}" 
+    {"- FOCUS SUB-TOPIC: " + subtopic if subtopic else ""}
     
     CRITICAL INSTRUCTIONS:
-    1. **Adhere to Topic**: You MUST generate lessons specifically for the topic: "{topic_context}".
-    2. **Days**: Generate exactly {days_count} entries.
-    3. **Resources**: Vary them (e.g., "Soil samples", "Clock face", "Flashcards").
+    1. **Content Priority**: {subtopic_instruction if subtopic_instruction else "Break the main topic into logical daily lessons."}
+    2. **Adhere to Topic**: You MUST generate lessons specifically for the provided topic context, ignoring the default syllabus for week {week_number} if it conflicts.
+    3. **Days**: Generate exactly {days_count} entries.
+    4. **Resources**: Vary them (e.g., "Soil samples", "Clock face", "Charts").
     
     STRICT JSON OUTPUT FORMAT:
     {{
@@ -275,16 +287,17 @@ async def generate_weekly_plan_with_ai(
         "grade": "{grade}", 
         "subject": "{subject}", 
         "week": {week_number},
-        "main_topic": "{topic_context}"
+        "main_topic": "{topic_context}",
+        "sub_topic": "{subtopic if subtopic else ''}"
       }},
       "days": [
         {{
           "day": "Monday",
-          "subtopic": "Specific subtopic...",
-          "objectives": ["..."],
-          "activities": "...",
-          "resources": "...",
-          "references": "placeholder" 
+          "subtopic": "Detailed sub-lesson title",
+          "objectives": ["Learner should be able to..."],
+          "activities": "Teacher and Learner activities...",
+          "resources": "Specific materials used...",
+          "references": "{ref_context}" 
         }}
       ]
     }}
@@ -292,27 +305,40 @@ async def generate_weekly_plan_with_ai(
     """
     
     try:
-        response = await model.generate_content_async(prompt, generation_config={"response_mime_type": "application/json"})
+        response = await model.generate_content_async(
+            prompt, 
+            generation_config={"response_mime_type": "application/json"}
+        )
         data = json.loads(extract_json_string(response.text))
 
-        # 🛠️ ROBUST FIX: FORCE OVERWRITE REFERENCES IN PYTHON
+        # 🛠️ ROBUST FIX: FORCE OVERWRITE REFERENCES & META
         if "days" in data and isinstance(data["days"], list):
             for day in data["days"]:
-                if references and len(references) > 1:
-                    day["references"] = references
-                elif not day.get("references"):
-                    day["references"] = "Syllabus, Approved Textbooks"
+                # Ensure the manual references provided by the user are used in every row
+                day["references"] = ref_context
         
-        # 🚨 FORCE OVERRIDE LOGO
+        # 🚨 FORCE OVERRIDE META DATA (Self-Healing)
         if "meta" not in data: data["meta"] = {}
         data["meta"]["logo_url"] = final_logo
         data["meta"]["school"] = school_name
+        data["meta"]["main_topic"] = topic_context
+        if subtopic:
+            data["meta"]["sub_topic"] = subtopic
 
         return data
 
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         print(f"❌ Weekly Plan Error: {e}")
-        return {"meta": {"error": True, "logo_url": final_logo}, "days": []}
+        return {
+            "meta": {
+                "error": True, 
+                "logo_url": final_logo, 
+                "main_topic": topic_context
+            }, 
+            "days": []
+        }
 
 # =====================================================
 # 3. LESSON PLAN GENERATOR (UPDATED FOR LOGO)

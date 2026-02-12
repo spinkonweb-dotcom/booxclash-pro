@@ -53,8 +53,9 @@ class WeeklyPlanRequest(BaseModel):
     school: str
     weekNumber: int
     days: int = 5
-    startDate: str = "2026-01-13"
+    startDate: str = "2026-01-12"
     schoolId: Optional[str] = None
+    lessonTitle: Optional[str] = None # ✅ ADDED: Subtopic Override
     topic: Optional[str] = None         
     references: Optional[str] = None
     schoolLogo: Optional[str] = None  # ✅ ADDED: Logo URL Support
@@ -249,7 +250,7 @@ async def generate_weekly(
     user_id = resolve_user_id(x_user_id, request.uid)
     school_id = x_school_id or request.schoolId 
 
-    print(f"📅 WEEKLY PLAN | User: {user_id} | Week {request.weekNumber} | Logo: {'Yes' if request.schoolLogo else 'No'}")
+    print(f"📅 WEEKLY PLAN | User: {user_id} | Week {request.weekNumber} | Topic: {request.topic}")
 
     # 1. Try to get context from Scheme
     scheme_context = get_best_available_scheme(user_id, request.subject, request.grade, request.term)
@@ -259,7 +260,6 @@ async def generate_weekly(
         if isinstance(scheme_context, list):
             scheme_rows = scheme_context
         elif isinstance(scheme_context, dict):
-            # Handle standard Firestore structure
             scheme_rows = scheme_context.get("schemeData", {}).get("rows", []) or \
                           scheme_context.get("rows", []) or \
                           scheme_context.get("weeks", [])
@@ -270,6 +270,9 @@ async def generate_weekly(
     try:
         check_and_deduct_credit(user_id, cost=1, school_id=school_id)
         
+        # ⚡️ ENHANCEMENT: 
+        # If the user selected a topic/subtopic from the dropdown, we want the LLM 
+        # to focus on THAT specific content, regardless of the 'weekNumber' digits.
         plan = await generate_weekly_plan_from_scheme(
             school=request.school,
             subject=request.subject,
@@ -280,13 +283,19 @@ async def generate_weekly(
             start_date=request.startDate,
             scheme_data=scheme_rows,
             module_data=module_data,
-            school_logo=request.schoolLogo # ✅ PASS LOGO
+            school_logo=request.schoolLogo,
+            # Pass these as overrides if your engine supports them, 
+            # or ensure they are injected into the prompt context
+            manual_topic=request.topic, 
+            manual_subtopic=request.lessonTitle 
         )
 
-        # 3. Inject Manual Overrides if Scheme didn't provide them but User did
+        # 3. Inject Manual Overrides into the final plan metadata
         if request.topic:
             plan["meta"] = plan.get("meta", {})
             plan["meta"]["main_topic"] = request.topic 
+        if request.lessonTitle:
+            plan["meta"]["sub_topic"] = request.lessonTitle
         
         save_weekly_plan(
             uid=user_id, 
@@ -300,9 +309,9 @@ async def generate_weekly(
         )
         return {"data": plan}
     except Exception as e:
+        import traceback
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
-
 @router.post("/generate-lesson-plan")
 async def generate_lesson(
     request: LessonPlanRequest,
