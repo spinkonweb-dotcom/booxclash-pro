@@ -3,6 +3,7 @@ from typing import List, Optional, Dict, Any
 
 from fastapi import APIRouter, Header, HTTPException
 from pydantic import BaseModel
+from firebase_admin import firestore
 
 # 1. Import Shared Models
 from models.schemas import SchemeRequest, SchemeRow, WorksheetResponse, WorksheetRequest
@@ -13,6 +14,7 @@ from services.llm_teacher_engine_old import (
     generate_weekly_plan_with_ai,
     generate_specific_lesson_plan,
 )
+from services.llm_teacher_engine_new import generate_lesson_notes # Import notes engine
 from services.syllabus_manager import load_syllabus, load_module 
 from services.file_manager import (
     save_generated_scheme,
@@ -24,11 +26,19 @@ from services.file_manager import (
 from services.credit_manager import check_and_deduct_credit
 
 router = APIRouter()
-
+db = firestore.client()
 
 # ------------------------------------------------------------------
 # Schemas
 # ------------------------------------------------------------------
+class LessonNotesRequest(BaseModel):
+    uid: Optional[str] = None
+    grade: str
+    subject: str
+    topic: str
+    subtopic: str
+    schoolId: Optional[str] = None
+
 class WeeklyPlanRequest(BaseModel):
     uid: str
     grade: str
@@ -40,7 +50,6 @@ class WeeklyPlanRequest(BaseModel):
     startDate: Optional[str] = None
     lessonTitle: Optional[str] = None
     references: Optional[str] = None
-    # Allow both 'topic' and 'theme'
     topic: Optional[str] = None 
     theme: Optional[str] = None
     schoolId: Optional[str] = None
@@ -65,7 +74,6 @@ class LessonPlanRequest(BaseModel):
     references: Optional[str] = None
     schoolId: Optional[str] = None
     schoolLogo: Optional[str] = None # ✅ ADDED: Logo URL Support
-    # Bloom's Taxonomy Support
     bloomsLevel: Optional[str] = "" 
 
 class TeacherEditRequest(BaseModel):
@@ -76,8 +84,8 @@ class TeacherEditRequest(BaseModel):
     term: str
     weekNumber: int
     schoolId: Optional[str] = None
-    # This is the goldmine: the final, human-approved data
     finalEditedData: Dict[str, Any]
+
 # ------------------------------------------------------------------
 # Helpers
 # ------------------------------------------------------------------
@@ -95,6 +103,34 @@ def extract_week_number(week_value) -> int:
 def resolve_user_id(x_user_id: Optional[str], payload_uid: Optional[str]) -> str:
     return x_user_id or payload_uid or "default_user"
 
+# 🆕 THE MAGIC HELPER: Fetches locked custom layouts and template content
+def get_locked_template_context(uid: str, plan_type: str, grade: str, subject: str) -> Optional[Dict[str, Any]]:
+    try:
+        flywheel_ref = db.collection("ai_training_flywheel")
+        query = (flywheel_ref
+                 .where("uid", "==", uid)
+                 .where("plan_type", "==", plan_type)
+                 .where("grade", "==", grade)
+                 .where("subject", "==", subject))
+        
+        docs = query.stream()
+        
+        for doc in docs:
+            data = doc.to_dict()
+            human_data = data.get("final_human_data", {})
+            
+            # Check if this specific document was locked by the teacher
+            if human_data.get("isLocked") is True:
+                print(f"🔒 FOUND LOCKED TEMPLATE for {uid} -> {plan_type} ({subject})")
+                return {
+                    "customColumns": human_data.get("columns", []),
+                    "templateRows": human_data.get("rows", human_data.get("days", human_data.get("steps", [])))
+                }
+                
+        return None
+    except Exception as e:
+        print(f"⚠️ Error fetching locked template: {e}")
+        return None
 
 # ------------------------------------------------------------------
 # 1. Generate Scheme of Work
@@ -122,7 +158,10 @@ async def generate_scheme(
         except Exception as e:
             raise HTTPException(status_code=402, detail=str(e)) # 402 Payment Required
 
-        # 3️⃣ Generate
+        # 3️⃣ Fetch Locked Template context if it exists
+        locked_context = get_locked_template_context(uid, "scheme_old_format", request.grade, request.subject)
+        
+        # 4️⃣ Generate
         syllabus_data = load_syllabus("Zambia", request.grade, request.subject)
         try:
             ai_scheme = await generate_scheme_with_ai(
@@ -131,6 +170,7 @@ async def generate_scheme(
                 grade=request.grade,
                 term=request.term,
                 num_weeks=request.weeks,
+                locked_context=locked_context # <--- NEW INJECTION
             )
 
             # Handle response wrapper if present
@@ -151,7 +191,7 @@ async def generate_scheme(
             print(f"❌ Scheme generation failed: {e}")
             return []
 
-    # 4️⃣ Normalize for frontend
+    # 5️⃣ Normalize for frontend
     rows: List[SchemeRow] = []
     
     def ensure_list(val: Any) -> List[str]:
@@ -179,21 +219,27 @@ async def generate_scheme(
             c_str = "\n- ".join(raw_content) if isinstance(raw_content, list) else str(raw_content)
             t_content = f"**{raw_topic}**\n- {c_str}"
 
-        rows.append(
-            SchemeRow(
-                week=str(item.get("week", week_num)),
-                date_range=item.get("date_range", ""),
-                topic_content=t_content, 
-                methods=ensure_list(item.get("methods", "Discussion")),
-                resources=ensure_list(item.get("resources", "Textbook")),
-                outcomes=ensure_list(item.get("outcomes", [])),
-                references=final_refs,
-                isSpecialRow=item.get("isSpecialRow", False),
-                month=item.get("month") or get_month_name(week_num),
-                topic=item.get("topic", ""),
-                content=ensure_list(item.get("content", []))
-            )
-        )
+        # Initialize base data
+        row_data = {
+            "week": str(item.get("week", week_num)),
+            "date_range": item.get("date_range", ""),
+            "topic_content": t_content, 
+            "methods": ensure_list(item.get("methods", "Discussion")),
+            "resources": ensure_list(item.get("resources", "Textbook")),
+            "outcomes": ensure_list(item.get("outcomes", [])),
+            "references": final_refs,
+            "isSpecialRow": item.get("isSpecialRow", False),
+            "month": item.get("month") or get_month_name(week_num),
+            "topic": item.get("topic", ""),
+            "content": ensure_list(item.get("content", []))
+        }
+
+        # Dynamically append custom columns generated by AI based on Locked context
+        for key, val in item.items():
+            if key.startswith("custom_") and key not in row_data:
+                row_data[key] = val
+
+        rows.append(SchemeRow(**row_data))
 
     return rows
 
@@ -210,11 +256,8 @@ async def generate_weekly_plan(
     uid = resolve_user_id(x_user_id, request.uid)
     school_id = x_school_id or request.schoolId
 
-    # 1️⃣ VALIDATE TOPIC BEFORE CREDITS
-    # We prioritize the topic and lessonTitle (sub-topic) from the request.
-    # This allows a teacher to generate Week 3 content while physically in Week 5.
     clean_topic = request.topic or request.theme
-    clean_subtopic = request.lessonTitle # Ensure your WeeklyPlanRequest model has this field
+    clean_subtopic = request.lessonTitle 
     
     if not clean_topic or clean_topic.strip() == "":
         print("⚠️ ABORTING: No Topic provided. Preventing Credit Deduction.")
@@ -230,19 +273,17 @@ async def generate_weekly_plan(
         clean_refs = str(raw_refs) if raw_refs else None
 
     print(f"📅 Generating Weekly Plan: {request.subject} | Week {request.weekNumber}")
-    print(f"🎯 Manual Override -> Topic: {clean_topic} | Subtopic: {clean_subtopic}")
 
-    # 2️⃣ DEDUCT CREDIT
     try:
         check_and_deduct_credit(uid, cost=1, school_id=school_id)
     except Exception as e:
         raise HTTPException(status_code=402, detail=str(e))
 
-    # 3️⃣ GENERATE
+    # 1. 🔒 Look for locked template
+    locked_context = get_locked_template_context(uid, "weekly_forecast", request.grade, request.subject)
+
     try:
-        # Pass the specific topic and subtopic to the AI function.
-        # This tells the AI: "Ignore the default scheme for this week number, 
-        # use these specific strings instead."
+        # 2. 🤖 Pass it to AI
         plan_data = await generate_weekly_plan_with_ai(
             grade=request.grade,
             subject=request.subject,
@@ -251,16 +292,16 @@ async def generate_weekly_plan(
             school_name=request.school,
             start_date=request.startDate,
             days_count=request.days,
-            topic=clean_topic,        # source of truth
-            subtopic=clean_subtopic, # source of truth
+            topic=clean_topic,        
+            subtopic=clean_subtopic, 
             references=clean_refs,
-            school_logo=request.schoolLogo
+            school_logo=request.schoolLogo,
+            locked_context=locked_context # <--- NEW INJECTION
         )
 
         if not plan_data:
             raise HTTPException(status_code=500, detail="AI failed to generate weekly plan")
 
-        # Ensure the returned metadata matches what the teacher actually selected
         plan_data["meta"] = plan_data.get("meta", {})
         plan_data["meta"]["main_topic"] = clean_topic
         if clean_subtopic:
@@ -274,7 +315,7 @@ async def generate_weekly_plan(
             term=request.term,
             week=request.weekNumber,
             data=plan_data,
-            school_id=school_id # Added to ensure it saves to the correct school context
+            school_id=school_id 
         )
 
         return {"status": "success", "data": plan_data}
@@ -299,19 +340,20 @@ async def generate_lesson_plan(
     uid = resolve_user_id(x_user_id, request.uid)
     school_id = x_school_id or request.schoolId
 
-    # ✅ LOG: Bloom's Level visibility
-    print(f"📝 Generating Lesson Plan (Old): {request.subject} | {request.topic} | Bloom's: {request.bloomsLevel} | Logo: {'Yes' if request.schoolLogo else 'No'}")
+    print(f"📝 Generating Lesson Plan (Old): {request.subject} | {request.topic} | Bloom's: {request.bloomsLevel}")
 
-    # 1️⃣ DEDUCT CREDIT
     try:
         check_and_deduct_credit(uid, cost=1, school_id=school_id)
     except Exception as e:
         raise HTTPException(status_code=402, detail=str(e))
 
+    # 1. 🔒 Look for locked template
+    locked_context = get_locked_template_context(uid, "lesson_plan", request.grade, request.subject)
+
     try:
-        # ✅ LOAD MODULE: Load data for Old Curriculum too
         module_data = load_module(country="Zambia", grade=request.grade, subject=request.subject)
 
+        # 2. 🤖 Pass it to AI
         plan_data = await generate_specific_lesson_plan(
             grade=request.grade,
             subject=request.subject,
@@ -327,7 +369,8 @@ async def generate_lesson_plan(
             module_data=module_data,
             blooms_level=request.bloomsLevel,
             scheme_references=request.references or "Standard Syllabus",
-            school_logo=request.schoolLogo # ✅ PASS LOGO
+            school_logo=request.schoolLogo, 
+            locked_context=locked_context # <--- NEW INJECTION
         )
 
         if not plan_data:
@@ -358,32 +401,45 @@ async def generate_lesson_plan(
         print(f"❌ Lesson plan error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+# ------------------------------------------------------------------
+# 4. Generate Lesson Notes
+# ------------------------------------------------------------------
+@router.post("/generate-lesson-notes")
+async def generate_notes(
+    request: LessonNotesRequest, 
+    x_user_id: str = Header(None, alias="X-User-ID")
+):
+    user_id = resolve_user_id(x_user_id, request.uid)
+    print(f"📝 GENERATING NOTES | Subject: {request.subject} | Topic: {request.topic}")
+    
+    try:
+        notes_data = await generate_lesson_notes(
+            grade=request.grade,
+            subject=request.subject,
+            topic=request.topic,
+            subtopic=request.subtopic
+        )
+        return {"status": "success", "data": notes_data}
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
 
+# ------------------------------------------------------------------
+# 5. Capture Edits
+# ------------------------------------------------------------------
 @router.post("/capture-teacher-edits")
 async def capture_teacher_edits(
     request: TeacherEditRequest,
     x_user_id: Optional[str] = Header(None, alias="X-User-ID"),
     x_school_id: Optional[str] = Header(None, alias="X-School-ID")
 ):
-    """
-    🛡️ THE MOAT BUILDER 🛡️
-    Captures the final, human-edited version of a plan.
-    We save this alongside the raw AI version to build a fine-tuning dataset.
-    """
     uid = resolve_user_id(x_user_id, request.uid)
     school_id = x_school_id or request.schoolId
 
     print(f"🛡️ Moat Capture: {uid} edited a {request.planType} for {request.subject}")
 
     try:
-        # 1. We store this in a dedicated "training_data" collection, 
-        # OR we update the existing document to include an "edited_by_human" flag.
-        
-        # Example using firestore directly (you can move this to file_manager.py):
-        from firebase_admin import firestore
-        db = firestore.client()
-        
-        # We create a record of the diff
         training_record = {
             "uid": uid,
             "school_id": school_id,
@@ -397,12 +453,8 @@ async def capture_teacher_edits(
             "is_human_verified": True
         }
         
-        # Save to a dedicated dataset collection
         db.collection("ai_training_flywheel").add(training_record)
 
-        # 2. You would also update the actual user's saved document here
-        # so they see their changes next time they log in.
-        
         return {"status": "success", "message": "Edits captured for fine-tuning"}
 
     except Exception as e:

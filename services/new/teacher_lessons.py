@@ -6,7 +6,7 @@ from datetime import datetime
 from .teacher_shared import get_model, extract_json_string, find_structured_module_content
 
 # ==============================================================================
-# 1. GENERATE SPECIFIC LESSON PLAN (Dynamic References + Bloom's Taxonomy + Logo)
+# 1. GENERATE SPECIFIC LESSON PLAN (Dynamic References + Bloom's Taxonomy + Logo + Template Lock)
 # ==============================================================================
 async def generate_specific_lesson_plan(
     grade: str, 
@@ -23,7 +23,8 @@ async def generate_specific_lesson_plan(
     school_logo: Optional[str] = None,  # ✅ ADDED THIS ARGUMENT
     module_data: Optional[Dict[str, Any]] = None,
     scheme_references: str = "Standard Zambian Syllabus",
-    blooms_level: str = "" 
+    blooms_level: str = "",
+    locked_context: Optional[Dict[str, Any]] = None # 🆕 TEMPLATE LOCK SUPPORT
 ) -> Dict[str, Any]:
     
     print(f"\n🔍 [Lesson Generator] Processing: {theme} - {subtopic} | Bloom's: {blooms_level}")
@@ -100,6 +101,44 @@ async def generate_specific_lesson_plan(
         - Ensure **Learner Activities** challenge students at this cognitive level.
         """
 
+    # ⚡️ DYNAMIC TEMPLATE INJECTION
+    steps_format = """
+      "steps": [
+        {
+            "stage": "INTRODUCTION",
+            "time": "5 min",
+            "teacherActivity": "Hook learners using the subtopic.",
+            "learnerActivity": "...",
+            "assessment_criteria": "..."
+        },
+        {
+            "stage": "DEVELOPMENT",
+            "time": "30 min",
+            "teacherActivity": "Step-by-step instructions. IF MODULE FOUND: Cite Activity #. IF NOT: Cite external resource.",
+            "learnerActivity": "Corresponding learner tasks.",
+            "assessment_criteria": "..."
+        },
+        {
+            "stage": "CONCLUSION",
+            "time": "5 min",
+            "teacherActivity": "Summarise key ideas.",
+            "learnerActivity": "...",
+            "assessment_criteria": "..."
+        }
+      ]
+    """
+    
+    if locked_context and locked_context.get("customColumns"):
+        custom_keys = [c["key"] for c in locked_context["customColumns"]]
+        steps_format = f"""
+      "steps": [
+        {{
+            // 🚨 CRITICAL LOCK: YOU MUST USE THESE EXACT KEYS FOR EACH LESSON STEP:
+            {', '.join([f'"{k}": "..."' for k in custom_keys])}
+        }}
+      ]
+        """
+
     # 4. PROMPT (Strict Structure)
     prompt = f"""
     Act as a professional teacher in Zambia. Create a **Competence Based Curriculum (CBC)** Lesson Plan.
@@ -139,29 +178,7 @@ async def generate_specific_lesson_plan(
       "materials": "List specific aids from the module OR external materials used (websites, journals, realia).",
       "references": "{ref_placeholder}",
 
-      "steps": [
-        {{
-            "stage": "INTRODUCTION",
-            "time": "5 min",
-            "teacherActivity": "Hook learners using the subtopic.",
-            "learnerActivity": "...",
-            "assessment_criteria": "..."
-        }},
-        {{
-            "stage": "DEVELOPMENT",
-            "time": "30 min",
-            "teacherActivity": "Step-by-step instructions. IF MODULE FOUND: Cite Activity #. IF NOT: Cite external resource.",
-            "learnerActivity": "Corresponding learner tasks.",
-            "assessment_criteria": "..."
-        }},
-        {{
-            "stage": "CONCLUSION",
-            "time": "5 min",
-            "teacherActivity": "Summarise key ideas.",
-            "learnerActivity": "...",
-            "assessment_criteria": "..."
-        }}
-      ],
+      {steps_format},
 
       "homework_content": "A short task."
     }}

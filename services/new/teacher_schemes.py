@@ -1,6 +1,6 @@
 import json
 import math
-from typing import List, Dict, Any, Union
+from typing import List, Dict, Any, Union, Optional
 # Ensure teacher_shared is accessible. 
 from .teacher_shared import get_model, extract_json_string, calculate_week_dates
 
@@ -13,7 +13,8 @@ async def generate_scheme_with_ai(
     grade: str,
     term: str,
     num_weeks: int,
-    start_date: str = "2026-01-13" 
+    start_date: str = "2026-01-13",
+    locked_context: Optional[Dict[str, Any]] = None # 🆕 TEMPLATE LOCK SUPPORT
 ) -> Dict[str, Any]:
     
     print(f"\n📘 [Scheme Generator] Processing for {subject} Grade {grade}...")
@@ -88,6 +89,41 @@ async def generate_scheme_with_ai(
 
     model = get_model()
 
+    # ⚡️ DYNAMIC TEMPLATE INJECTION
+    format_instruction = f"""
+    OUTPUT JSON FORMAT (Strict):
+    {{
+      "intro_info": {{
+        "philosophy": "Text...",
+        "competence_learning": "Text...",
+        "goals": ["Goal 1...", "Goal 2..."]
+      }},
+      "scheme_weeks": [
+        {{
+          "week_number": 1,
+          "topic": "Unit 4.1: Sets", 
+          "prescribed_competences": ["Critical Thinking", "Communication"],
+          "specific_competences": ["4.1.1 Learners should be able to describe sets..."],
+          "content": ["Grouping objects", "Set notation"],
+          "learning_activities": ["Group work on sorting..."],
+          "methods": ["Demonstration", "Inquiry"],
+          "assessment": ["Written Quiz"],
+          "resources": ["Chart", "Real objects"],
+          "references": ["{syllabus_book} Pg 5"] 
+        }}
+      ]
+    }}
+    """
+
+    if locked_context and locked_context.get("customColumns"):
+        custom_keys = [c["key"] for c in locked_context["customColumns"]]
+        format_instruction = f"""
+        🚨 CRITICAL TEMPLATE LOCK: The teacher uses a custom spreadsheet. 
+        Instead of the standard format, the objects inside the `scheme_weeks` array MUST use EXACTLY these keys:
+        {json.dumps(custom_keys)}
+        Map your generated content logically to these keys. Also ensure to output "intro_info" as standard.
+        """
+
     # 4. PROMPT (The "Robust" Version)
     prompt = f"""
     Act as a Senior Head Teacher in Zambia. Create a professional Scheme of Work matching the Ministry Standard.
@@ -111,28 +147,7 @@ async def generate_scheme_with_ai(
        - **REFERENCES**: You MUST include the book name AND page number. Use the 'forced_references' provided in the data.
        - **COMPETENCES**: Differentiate between 'prescribed' (broad) and 'specific' (detailed).
 
-    OUTPUT JSON FORMAT (Strict):
-    {{
-      "intro_info": {{
-        "philosophy": "Text...",
-        "competence_learning": "Text...",
-        "goals": ["Goal 1...", "Goal 2..."]
-      }},
-      "scheme_weeks": [
-        {{
-          "week": "Week 1",
-          "topic": "Unit 4.1: Sets", 
-          "prescribed_competences": ["Critical Thinking", "Communication"],
-          "specific_competences": ["4.1.1 Learners should be able to describe sets..."],
-          "content": ["Grouping objects", "Set notation"],
-          "learning_activities": ["Group work on sorting..."],
-          "methods": ["Demonstration", "Inquiry"],
-          "assessment": ["Written Quiz"],
-          "resources": ["Chart", "Real objects"],
-          "references": ["{syllabus_book} Pg 5"] 
-        }}
-      ]
-    }}
+    {format_instruction}
     """
     
     response_text = ""
@@ -154,15 +169,19 @@ async def generate_scheme_with_ai(
 
         # 5. POST-PROCESSING & CLEANUP
         for i, item in enumerate(raw_weeks):
-            week_num = i + 1
+            week_num = int(item.get("week_number", i + 1))
             if week_num > num_weeks: break 
 
             date_info = calculate_week_dates(start_date, week_num)
             
-            item['week'] = f"Week {week_num} ({date_info['month']}) ({date_info['range_display']})"
+            # Map dynamic custom keys or fallbacks
             item['week_number'] = week_num
             item['date_start'] = date_info['start_iso']
             item['date_end'] = date_info['end_iso']
+            if 'week' in item:
+                 item['week'] = f"Week {week_num} ({date_info['month']}) ({date_info['range_display']})"
+            else:
+                 item['week_display'] = f"Week {week_num}" # For custom column mapping
             
             # ✅ ROBUST FALLBACKS: Ensure no empty arrays
             if not item.get("topic"): item["topic"] = "Topic To Be Announced"
