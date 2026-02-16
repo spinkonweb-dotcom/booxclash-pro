@@ -29,23 +29,27 @@ def send_whatsapp_invite(user_email: str, user_name: str = None):
 
     try:
         msg = MIMEMultipart()
-        msg['From'] = SENDER_EMAIL
+        msg['From'] = f"BooxClash Team <{SENDER_EMAIL}>"
         msg['To'] = user_email
-        msg['Subject'] = f"Hi {greeting_name}! Join our Exclusive Teachers' Community 🚀"
+        msg['Subject'] = f"Hi {greeting_name}! Claim your Free Credits & Join our Community 🚀"
 
-        # Note: Using plain text formatting inside f-string for better email compatibility
+        # --- 2. THE UPDATED EMAIL BODY ---
         body = f"""Hi {greeting_name},
 
 Thank you for joining BooxClash! We are thrilled to have you.
 
-We have a VIP WhatsApp group where we share:
+🎁 We have free credits for those joining our platform for the first time!
+
+We teach you how to generate the lesson plans, schemes of work, and weekly records in seconds. 
+
+To help you get the most out of BooxClash, we have a VIP WhatsApp group where we share:
 ✅ Instant support for Scheme/Lesson generation
-✅ Updates on new Ministry formats (Zambia)
+✅ Updates on new Ministry formats
 ✅ Tips from other Head Teachers
 
-It's the fastest way to get help.
+👉 Click here to Join the Group: {WHATSAPP_LINK}
 
-👉 Click here to Join: {WHATSAPP_LINK}
+*(Note: If you have already joined our WhatsApp group, please ignore this message!)*
 
 See you there!
 

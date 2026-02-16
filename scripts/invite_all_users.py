@@ -3,7 +3,6 @@ from firebase_admin import credentials, firestore
 import sys
 import os
 
-
 # Get the folder where this script lives
 script_dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -36,7 +35,7 @@ if not firebase_admin._apps:
 db = firestore.client()
 
 # --- 3. MAIN FUNCTION ---
-def invite_existing_users():
+def invite_all_users():
     print("🔄 Fetching all users from Firestore...")
     
     # Get all users
@@ -52,26 +51,22 @@ def invite_existing_users():
         # Try to find a name, fallback to 'Teacher'
         name = data.get("displayName") or data.get("name") or "Teacher"
         
-        # Check if they have an email and haven't been invited yet
-        # We check 'whatsapp_invited' flag to prevent spamming people twice
-        if email and not data.get("whatsapp_invited"):
-            print(f"📩 Sending invite to {email}...")
+        # Check ONLY if they have an email. We no longer check if they were already invited.
+        if email:
+            print(f"📩 Sending routine invite to {email}...")
             
             # Send the email
             sent = send_whatsapp_invite(email, name)
             
             if sent:
                 success_count += 1
-                # Mark as invited in database
-                users_ref.document(doc.id).update({"whatsapp_invited": True})
             
             count += 1
         else:
-            # Optional: Print skipped users
-            # print(f"⏩ Skipping {email} (Already invited or no email)")
+            # Optional: Print skipped users without emails
             pass
 
-    print(f"\n🎉 Finished! Sent {success_count} invites out of {count} uninvited users found.")
+    print(f"\n🎉 Finished! Sent {success_count} invites out of {count} total users found.")
 
 if __name__ == "__main__":
-    invite_existing_users()
+    invite_all_users()

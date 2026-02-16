@@ -97,6 +97,17 @@ class RecordOfWorkRequest(BaseModel):
     schoolId: Optional[str] = None
     schoolLogo: Optional[str] = None # ✅ ADDED: Logo URL Support
 
+
+class TeacherEditRequest(BaseModel):
+    uid: str
+    planType: str  # e.g., "weekly_plan" or "lesson_plan"
+    grade: str
+    subject: str
+    term: str
+    weekNumber: int
+    schoolId: Optional[str] = None
+    # This is the goldmine: the final, human-approved data
+    finalEditedData: Dict[str, Any]
 # ==========================================
 # 🛠️ HELPERS
 # ==========================================
@@ -455,5 +466,57 @@ async def generate_record_route(
         return {"status": "success", "data": record_data}
 
     except Exception as e:
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/capture-teacher-edits")
+async def capture_teacher_edits(
+    request: TeacherEditRequest,
+    x_user_id: Optional[str] = Header(None, alias="X-User-ID"),
+    x_school_id: Optional[str] = Header(None, alias="X-School-ID")
+):
+    """
+    🛡️ THE MOAT BUILDER 🛡️
+    Captures the final, human-edited version of a plan.
+    We save this alongside the raw AI version to build a fine-tuning dataset.
+    """
+    uid = resolve_user_id(x_user_id, request.uid)
+    school_id = x_school_id or request.schoolId
+
+    print(f"🛡️ Moat Capture: {uid} edited a {request.planType} for {request.subject}")
+
+    try:
+        # 1. We store this in a dedicated "training_data" collection, 
+        # OR we update the existing document to include an "edited_by_human" flag.
+        
+        # Example using firestore directly (you can move this to file_manager.py):
+        from firebase_admin import firestore
+        db = firestore.client()
+        
+        # We create a record of the diff
+        training_record = {
+            "uid": uid,
+            "school_id": school_id,
+            "plan_type": request.planType,
+            "grade": request.grade,
+            "subject": request.subject,
+            "term": request.term,
+            "week": request.weekNumber,
+            "final_human_data": request.finalEditedData,
+            "captured_at": firestore.SERVER_TIMESTAMP,
+            "is_human_verified": True
+        }
+        
+        # Save to a dedicated dataset collection
+        db.collection("ai_training_flywheel").add(training_record)
+
+        # 2. You would also update the actual user's saved document here
+        # so they see their changes next time they log in.
+        
+        return {"status": "success", "message": "Edits captured for fine-tuning"}
+
+    except Exception as e:
+        import traceback
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
