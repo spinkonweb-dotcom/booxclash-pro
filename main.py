@@ -15,10 +15,10 @@ load_dotenv()
 
 # --- CLOUDINARY CONFIGURATION ---
 cloudinary.config( 
-  cloud_name = os.getenv("CLOUDINARY_CLOUD_NAME"), 
-  api_key = os.getenv("CLOUDINARY_API_KEY"), 
-  api_secret = os.getenv("CLOUDINARY_API_SECRET"),
-  secure = True
+    cloud_name = os.getenv("CLOUDINARY_CLOUD_NAME"), 
+    api_key = os.getenv("CLOUDINARY_API_KEY"), 
+    api_secret = os.getenv("CLOUDINARY_API_SECRET"),
+    secure = True
 )
 
 # --- IMPORTS ---
@@ -33,6 +33,7 @@ from api.schemes import router as schemes_router
 from api.school_settings import router as settings_router 
 from api.relay_routes import router as relay_router 
 from api.school_routes import router as school_engine_router
+from api.sba import router as sba_router # 👈 ADDED THIS: IMPORT SBA ROUTER
 from services.notification_service import send_whatsapp_invite # 👈 IMPORT SERVICE
 
 # 2. Setup Logging
@@ -93,8 +94,10 @@ async def log_requests(request: Request, call_next):
 
 # === 📂 HELPER: SCAN SYLLABUS FOLDERS ===
 def get_subjects_for_grade(grade_input: str):
+    logger.info(f"🔍 [Subject Scanner] Scanning for grade: '{grade_input}'")
     found_subjects = set()
     clean_grade = grade_input.lower().replace("grade", "").strip()
+    logger.info(f"   🎯 Parsed clean grade number: '{clean_grade}'")
 
     base_paths = [
         os.path.join("syllabi", "new"),
@@ -104,8 +107,11 @@ def get_subjects_for_grade(grade_input: str):
     for folder in base_paths:
         if not os.path.exists(folder):
             folder = os.path.join("..", folder)
-            if not os.path.exists(folder): continue
+            if not os.path.exists(folder): 
+                logger.warning(f"   ⚠️ Folder not found: {folder}")
+                continue
             
+        logger.info(f"   📂 Scanning folder: {folder}")
         files = glob.glob(os.path.join(folder, "*.json"))
         
         for file_path in files:
@@ -117,9 +123,12 @@ def get_subjects_for_grade(grade_input: str):
                 subject_name = " ".join(clean_parts).title()
                 
                 if subject_name:
+                    logger.info(f"      ✅ Match found in file '{filename}' -> Subject: '{subject_name}'")
                     found_subjects.add(subject_name)
 
-    return list(sorted(found_subjects))
+    final_list = list(sorted(found_subjects))
+    logger.info(f"🚀 [Subject Scanner] Final Subject List for {grade_input}: {final_list}")
+    return final_list
 
 # === 📝 DATA MODELS ===
 class WelcomeRequest(BaseModel):
@@ -147,9 +156,14 @@ async def upload_to_cloudinary(file: UploadFile = File(...)):
 # === 🚀 ENDPOINT: GET SUBJECTS ===
 @app.get("/get-subjects/{grade}")
 async def get_subjects_endpoint(grade: str):
+    logger.info(f"⚡ API HIT: /get-subjects/{grade}")
     subjects = get_subjects_for_grade(grade)
+    
     if not subjects:
+        logger.warning(f"⚠️ API RETURN: No syllabus files found for {grade}")
         return {"subjects": [], "message": f"No syllabus files found for {grade}"}
+        
+    logger.info(f"✅ API RETURN: Returning {len(subjects)} subjects for {grade}")
     return {"subjects": subjects}
 
 # 6. Register Routes
@@ -161,6 +175,7 @@ app.include_router(admin_router, prefix="/api/v1/admin", tags=["Admin"])
 app.include_router(school_engine_router, prefix="/api/school", tags=["School Engine"])
 app.include_router(settings_router, prefix="/api/school", tags=["School Settings"]) 
 app.include_router(relay_router, prefix="/api/relay", tags=["Smart Dispatcher"]) 
+app.include_router(sba_router, prefix="/api/sba", tags=["School-Based Assessment"]) # 👈 ADDED THIS: REGISTER SBA ROUTER
 
 # 7. Startup Event & Health Check
 @app.on_event("startup")
@@ -185,7 +200,7 @@ def health_check():
             "/api/v1/teacher/new", 
             "/api/school/update-settings", 
             "/api/relay/dispatch/generate",
-            "/api/welcome-email" # ✅ Added to list
+            "/api/welcome-email" 
         ] 
     }
 
