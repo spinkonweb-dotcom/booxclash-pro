@@ -72,7 +72,7 @@ def extract_json_string(text: str) -> str:
         return text
 
 # =====================================================
-# 1. PROFESSIONAL SCHEME GENERATOR (OLD FORMAT)
+# 1. PROFESSIONAL SCHEME GENERATOR (PACED DISTRIBUTION)
 # =====================================================
 async def generate_scheme_with_ai(
     syllabus_data: Any,
@@ -81,7 +81,7 @@ async def generate_scheme_with_ai(
     term: str,
     num_weeks: int,
     start_date: str = "2026-01-12",
-    locked_context: Optional[Dict[str, Any]] = None # 🆕 ADDED
+    locked_context: Optional[Dict[str, Any]] = None
 ) -> List[dict]:
     
     print(f"\n📘 [Scheme Generator] Processing {subject} Grade {grade} for Term {term}...")
@@ -104,24 +104,27 @@ async def generate_scheme_with_ai(
     end_index = start_index + chunk_size
     term_syllabus_slice = full_topic_list[start_index:end_index]
     
+    # Lookup dictionary
     syllabus_lookup = {}
     for item in term_syllabus_slice:
-        key = str(item.get('unit', '')).strip()
-        if not key: key = str(item.get('topic_title', '')).strip()
-        if key: syllabus_lookup[key] = item
+        title_key = str(item.get('topic_title', item.get('topic', ''))).strip().lower()
+        if title_key: syllabus_lookup[title_key] = item
+        
+        unit_key = str(item.get('unit', '')).strip().lower()
+        if unit_key and unit_key not in syllabus_lookup:
+            syllabus_lookup[unit_key] = item
 
-    # ⚡️ DYNAMIC TEMPLATE INJECTION
     format_instruction = """
     OUTPUT JSON:
     [
       {
         "week_number": 1,
-        "unit": "10.1",
-        "topic": "...", 
-        "outcomes": ["..."],
-        "methods": "Group Work, Demonstration", 
-        "resources": "Charts, Realia",
-        "external_ref": "Khan Academy..."
+        "unit": "7.1",
+        "topic": "GOVERNANCE", 
+        "content": ["7.1.1 Democratic Governance", "7.1.2 Organs of Government"], 
+        "outcomes": ["Describe democracy", "Identify the organs of government"],
+        "methods": ["Group Work", "Demonstration"], 
+        "resources": ["Charts", "Realia"]
       }
     ]
     """
@@ -132,26 +135,28 @@ async def generate_scheme_with_ai(
         🚨 CRITICAL TEMPLATE LOCK: The teacher uses a custom spreadsheet. 
         Instead of the standard format, your JSON objects inside the array MUST use EXACTLY these keys:
         {json.dumps(custom_keys)}
-        Map your generated content logically to these keys (e.g. put topic info in 'topic' or 'subtopic' keys).
+        Map your generated content logically to these keys.
         """
 
     model = get_model()
     data_context = json.dumps(term_syllabus_slice)
 
+    # ✅ PROMPT UPDATED TO FORCE PACING AND SPREAD
     prompt = f"""
     Act as a Senior Head Teacher. Create a Scheme of Work for **Term {term_int}**.
     
     DETAILS: 
     - Subject: {subject}, Grade: {grade}, Duration: {num_weeks} Weeks
     
-    SOURCE DATA: 
+    SOURCE DATA (Pay close attention to 'page_number'): 
     {data_context}
 
     INSTRUCTIONS:
-    1. Map the topics to weeks.
-    2. **External References**: Suggest ONE book/website in 'external_ref'.
-    3. **Methods & Resources**: You MUST generate specific methods (e.g. "Group Work") and resources (e.g. "Charts") for every week.
-    4. **CRITICAL**: Return the `unit` identifier exactly as it appears in source.
+    1. **PACING & SPREAD (CRITICAL)**: Distribute the `subtopics` logically across the {num_weeks} weeks. DO NOT cram all subtopics of a large unit into one week. Assign 1 or 2 subtopics per week.
+    2. **OUTCOMES ALIGNMENT**: For each week, ONLY select the `learning_outcomes` from the Source Data that match the specific `subtopics` assigned to that week.
+    3. **References**: You MUST create a `references` array for every week. The first item MUST be the syllabus reference using the exact `page_number` from the SOURCE DATA (e.g. "{subject} Syllabus Grade {grade} Pg 45").
+    4. **Methods & Resources**: Recommend specific, practical pedagogical methods and learning resources.
+    5. **COMPLIANCE**: Return the `topic`, `unit`, `content` (subtopics), and `outcomes` EXACTLY as they are phrased in the SOURCE DATA. Do not hallucinate or invent new ones.
 
     {format_instruction}
     """
@@ -168,33 +173,44 @@ async def generate_scheme_with_ai(
             week_num = item.get('week_number', item.get('week_num', i + 1))
             if int(week_num) > num_weeks: continue
 
-            ai_unit_key = str(item.get('unit', '')).strip()
-            original_data = syllabus_lookup.get(ai_unit_key)
+            ai_topic_key = str(item.get('topic', '')).strip().lower()
+            ai_unit_key = str(item.get('unit', '')).strip().lower()
+            
+            original_data = syllabus_lookup.get(ai_topic_key)
+            if not original_data: original_data = syllabus_lookup.get(ai_unit_key)
             if not original_data and i < len(term_syllabus_slice):
                 original_data = term_syllabus_slice[i]
 
             if original_data:
-                official_page = str(original_data.get('page_number', 'Ref Text'))
+                # 1. Exact Topic Title
                 source_topic = original_data.get('topic_title') or original_data.get('topic')
-                if source_topic and 'topic' in item: item['topic'] = source_topic
+                if source_topic: item['topic'] = source_topic
                 
-                source_content = original_data.get('subtopics') or original_data.get('content') or original_data.get('topics')
-                if source_content and 'content' in item: item['content'] = source_content
+                # ✅ FIX: DO NOT overwrite the AI's chunked subtopics and outcomes!
+                # Only provide a fallback if the AI failed to generate them entirely.
+                if not item.get('content') and not item.get('subtopics'):
+                    item['content'] = original_data.get('subtopics') or original_data.get('content') or original_data.get('topics')
 
-                source_outcomes = original_data.get('specific_outcomes') or original_data.get('outcomes')
-                if source_outcomes and 'outcomes' in item and not item.get('outcomes'):
-                    item['outcomes'] = source_outcomes
+                if not item.get('outcomes'):
+                    item['outcomes'] = original_data.get('learning_outcomes') or original_data.get('specific_outcomes') or original_data.get('outcomes')
+                
+                # 4. Strict Syllabus Reference Construction
+                official_page = str(original_data.get('page_number', original_data.get('syllabus_page', '')))
+                strict_ref = f"{subject} Syllabus Grade {grade}"
+                if official_page and official_page.lower() not in ["", "nan", "none"]:
+                    strict_ref += f" Pg {official_page}"
+                
+                item['references'] = [strict_ref]
+            else:
+                item['references'] = [f"{subject} Syllabus Grade {grade}"]
 
-            if 'methods' in item and not item.get('methods'): item['methods'] = "Explanation, Group Work"
-            if 'resources' in item and not item.get('resources'): item['resources'] = "Textbook, Charts"
+            if 'external_ref' in item: del item['external_ref']
 
-            ai_ref = item.get('external_ref', '')
-            if 'references' in item:
-                item['references'] = f"Syllabus Pg: {official_page}\nExt: {ai_ref}" if ai_ref else f"Syllabus Pg: {official_page}"
-
+            # Generate accurate dates
             date_info = calculate_week_dates(start_date, int(week_num))
             item['week'] = week_num
             item['date_range'] = date_info['range_display'] 
+            item['month'] = date_info['month']
             
             cleaned_data.append(item)
 
@@ -219,12 +235,12 @@ async def generate_weekly_plan_with_ai(
     subtopic: Optional[str] = None,
     references: Optional[str] = None,
     school_logo: Optional[str] = None,
-    locked_context: Optional[Dict[str, Any]] = None # 🆕 ADDED
+    locked_context: Optional[Dict[str, Any]] = None
 ) -> Dict[str, Any]:
     
     final_logo = school_logo if school_logo else DEFAULT_LOGO
     topic_context = topic if topic and len(topic) > 1 else f"Week {week_number} Syllabus Topic"
-    ref_context = references if references and len(references) > 1 else "Syllabus, Approved Textbooks"
+    ref_context = references if references and len(references) > 1 else f"{subject} Syllabus Grade {grade}"
 
     print(f"🧠 AI Generating Weekly Plan | Subject: {subject} | Week: {week_number}")
     
@@ -232,7 +248,6 @@ async def generate_weekly_plan_with_ai(
     if subtopic and len(subtopic) > 1:
         subtopic_instruction = f"The teacher has specifically selected the sub-topic: '{subtopic}'. Ensure all {days_count} daily lessons are logical steps within this specific sub-topic."
 
-    # ⚡️ DYNAMIC TEMPLATE INJECTION
     format_instruction = f"""
     STRICT JSON OUTPUT FORMAT:
     {{
@@ -333,7 +348,7 @@ async def generate_specific_lesson_plan(
     scheme_references: str = "Standard Zambian Syllabus",
     blooms_level: str = "",
     school_logo: Optional[str] = None,
-    locked_context: Optional[Dict[str, Any]] = None # 🆕 ADDED
+    locked_context: Optional[Dict[str, Any]] = None
 ) -> Dict[str, Any]:
     
     final_logo = school_logo if school_logo else DEFAULT_LOGO
@@ -371,8 +386,6 @@ async def generate_specific_lesson_plan(
         **STRICT RULES**: You MUST use reputable External Journals or Standard Textbooks.
         """
 
-    ref_placeholder = final_reference if strict_ref_override else "List specific external sources used..."
-
     blooms_instruction = ""
     if blooms_level:
         blooms_instruction = f"""
@@ -380,7 +393,6 @@ async def generate_specific_lesson_plan(
         This lesson MUST differ from a standard lesson by focusing on the **{blooms_level}** level of Bloom's Taxonomy.
         """
 
-    # ⚡️ DYNAMIC TEMPLATE INJECTION
     steps_format = """
       "steps": [
         { "stage": "INTRODUCTION", "time": "5 min", "teacherActivity": "...", "learnerActivity": "...", "method": "..." },
@@ -401,6 +413,8 @@ async def generate_specific_lesson_plan(
         """
 
     model = get_model()
+    
+    # ✅ PROMPT UPDATED: Explicitly request textbook (no page) and website links.
     prompt = f"""
     Act as a Zambian Teacher. Create a **Learner-Centered Lesson Plan** (Old Curriculum).
     Topic: {theme}, Subtopic: {subtopic}
@@ -408,6 +422,10 @@ async def generate_specific_lesson_plan(
     
     {blooms_instruction}
     {module_prompt_insert}
+
+    CRITICAL INSTRUCTION FOR REFERENCES:
+    For the "references" field, you MUST generate a realistic citation for the "{grade} {subject} Textbook" (do NOT include a specific page number) AND provide 1 or 2 relevant educational website links (e.g., BBC Bitesize, Wikipedia, or an official educational site related to {subtopic}). 
+    {f"EXCEPTION: Because this is a strict module lesson, you must ALSO append this exact reference to your generated links: '{final_reference}'" if strict_ref_override else ""}
 
     OUTPUT JSON (Strict):
     {{
@@ -422,7 +440,7 @@ async def generate_specific_lesson_plan(
       "standard": "Clear statement of the expected standard.", 
       "prerequisite": "What learners already know.", 
       "materials": "List specific aids (Module, Realia, or External).", 
-      "references": "{ref_placeholder}",
+      "references": "Generated Textbook citation and relevant website links here...",
       "enrolment": {{ "boys": {boys}, "girls": {girls}, "total": {total} }},
       {steps_format}
     }}
@@ -432,7 +450,12 @@ async def generate_specific_lesson_plan(
         response = await model.generate_content_async(prompt, generation_config={"response_mime_type": "application/json"})
         data = json.loads(extract_json_string(response.text))
         
-        if strict_ref_override: data["references"] = final_reference
+        # ✅ FIX: Only override the references if the AI completely failed to generate them.
+        # This protects the AI's generated website links from being overwritten by the Python script!
+        placeholder = "Generated Textbook citation and relevant website links here..."
+        if "references" not in data or not data["references"] or data["references"] == placeholder:
+            data["references"] = final_reference
+            
         data["logo_url"] = final_logo
         data["schoolName"] = school_name
             
@@ -457,7 +480,7 @@ async def generate_record_of_work(
     start_date: str,
     scheme_data: List[Dict],
     school_logo: Optional[str] = None,
-    locked_context: Optional[Dict[str, Any]] = None # 🆕 ADDED
+    locked_context: Optional[Dict[str, Any]] = None
 ) -> Dict[str, Any]:
 
     final_logo = school_logo if school_logo else DEFAULT_LOGO
@@ -516,9 +539,8 @@ async def generate_record_of_work(
         print(f"❌ ROW Error: {e}")
         return {"header": {"logo_url": final_logo, "school_name": school_name}, "records": []}
 
-
 # =====================================================
-# 5. LESSON NOTES GENERATOR (ADDED FOR COMPLETENESS)
+# 5. LESSON NOTES GENERATOR 
 # =====================================================
 async def generate_lesson_notes(
     grade: str, 
