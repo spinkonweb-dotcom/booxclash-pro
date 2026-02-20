@@ -11,6 +11,7 @@ google-genai
 # Vector database:
 pinecone
 httpx
+pdfplumber
 firebase_admin
 cloudinary
 jinja2
