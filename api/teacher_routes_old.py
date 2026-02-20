@@ -133,7 +133,8 @@ def get_locked_template_context(uid: str, plan_type: str, grade: str, subject: s
 # ------------------------------------------------------------------
 # 1. Generate Scheme of Work
 # ------------------------------------------------------------------
-@router.post("/generate-scheme", response_model=List[SchemeRow])
+# NOTE: Removed `response_model=List[SchemeRow]` to allow returning credits in a dictionary
+@router.post("/generate-scheme")
 async def generate_scheme(
     request: SchemeRequest,
     x_user_id: Optional[str] = Header(None, alias="X-User-ID"),
@@ -144,15 +145,29 @@ async def generate_scheme(
 
     print(f"📅 Generating Scheme: {request.subject} | Grade {request.grade} | School: {school_id}")
 
+    credit_status = {}
+
     # 1️⃣ Check Cache 
     cached = load_generated_scheme(uid, request.subject, request.grade, request.term)
     if cached:
         print("✅ Using cached scheme (No credit deduction)")
         ai_scheme_list = cached
+        
+        # We still want to return current credits even if we didn't deduct
+        try:
+            user_doc = db.collection("users").document(uid).get()
+            if user_doc.exists:
+                ud = user_doc.to_dict()
+                credit_status["remaining_credits"] = ud.get("credits", 0)
+                exp = ud.get("expires_at")
+                credit_status["expires_at"] = exp.isoformat() if exp else None
+        except Exception:
+            pass
+            
     else:
         # 2️⃣ Deduct Credit
         try:
-            check_and_deduct_credit(uid, cost=1, school_id=school_id)
+            credit_status = check_and_deduct_credit(uid, cost=1, school_id=school_id)
         except Exception as e:
             raise HTTPException(status_code=402, detail=str(e)) 
 
@@ -247,7 +262,12 @@ async def generate_scheme(
 
         rows.append(SchemeRow(**row_data))
 
-    return rows
+    # 📥 Return the rows AND the credit info wrapped in a dictionary!
+    return {
+        "data": rows,
+        "credits_remaining": credit_status.get("remaining_credits"),
+        "expires_at": credit_status.get("expires_at")
+    }
 
 
 # ------------------------------------------------------------------
@@ -280,7 +300,8 @@ async def generate_weekly_plan(
     print(f"📅 Generating Weekly Plan: {request.subject} | Week {request.weekNumber}")
 
     try:
-        check_and_deduct_credit(uid, cost=1, school_id=school_id)
+        # 💰 Capture credit status here
+        credit_status = check_and_deduct_credit(uid, cost=1, school_id=school_id)
     except Exception as e:
         raise HTTPException(status_code=402, detail=str(e))
 
@@ -321,7 +342,13 @@ async def generate_weekly_plan(
             school_id=school_id 
         )
 
-        return {"status": "success", "data": plan_data}
+        # 📥 Return data along with updated credit and expiry details
+        return {
+            "status": "success", 
+            "data": plan_data,
+            "credits_remaining": credit_status.get("remaining_credits"),
+            "expires_at": credit_status.get("expires_at")
+        }
 
     except HTTPException:
         raise
@@ -345,7 +372,8 @@ async def generate_lesson_plan(
     print(f"📝 Generating Lesson Plan (Old): {request.subject} | {request.topic} | Bloom's: {request.bloomsLevel}")
 
     try:
-        check_and_deduct_credit(uid, cost=1, school_id=school_id)
+        # 💰 Capture credit status here
+        credit_status = check_and_deduct_credit(uid, cost=1, school_id=school_id)
     except Exception as e:
         raise HTTPException(status_code=402, detail=str(e))
 
@@ -390,7 +418,13 @@ async def generate_lesson_plan(
         except Exception as save_error:
             print(f"⚠️ Could not save lesson plan to DB: {save_error}")
 
-        return {"status": "success", "data": plan_data}
+        # 📥 Return data along with updated credit and expiry details
+        return {
+            "status": "success", 
+            "data": plan_data,
+            "credits_remaining": credit_status.get("remaining_credits"),
+            "expires_at": credit_status.get("expires_at")
+        }
 
     except HTTPException:
         raise

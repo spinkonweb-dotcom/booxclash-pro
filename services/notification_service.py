@@ -9,11 +9,14 @@ SMTP_PORT = 587
 # Ideally load these from environment variables for security
 SENDER_EMAIL = os.getenv("EMAIL_USER", "booxclash@gmail.com")
 SENDER_PASSWORD = os.getenv("EMAIL_PASS", "ygbh vgzy dvfw nies") 
-WHATSAPP_LINK = "https://chat.whatsapp.com/GK2ahWLvPe3AN7ZkikXzhZ"
+
+# IMPORTANT: Put your actual WhatsApp number here (include the country code, no + or spaces)
+# Example for Zambia: "https://wa.me/260971234567"
+WHATSAPP_LINK = "https://wa.me/260967001972" 
 
 def send_whatsapp_invite(user_email: str, user_name: str = None):
     """
-    Sends a friendly email inviting the user to the WhatsApp Community.
+    Sends a personal email from the founder offering 50 free credits for a chat.
     Autodetects the first name for a personal touch.
     """
     if not user_email or "@" not in user_email:
@@ -29,32 +32,23 @@ def send_whatsapp_invite(user_email: str, user_name: str = None):
 
     try:
         msg = MIMEMultipart()
-        msg['From'] = f"BooxClash Team <{SENDER_EMAIL}>"
+        # Make it look like it's coming directly from you, not a generic "Team"
+        msg['From'] = f"Kondwani from BooxClash <{SENDER_EMAIL}>"
         msg['To'] = user_email
-        msg['Subject'] = f"Hi {greeting_name}! Claim your Free Credits & Join our Community 🚀"
+        msg['Subject'] = "Can I give you 50 free Booxclash credits? 🎁"
 
-        # --- 2. THE UPDATED EMAIL BODY ---
+        # --- 2. THE FOUNDER MESSAGE ---
         body = f"""Hi {greeting_name},
 
-Thank you for joining BooxClash! We are thrilled to have you.
+I'm Kondwani, the founder of Booxclash. I saw you signed up recently, and I want to make sure the platform is actually saving you time on your lesson plans.
 
-🎁 We have free credits for those joining our platform for the first time!
+I am talking to a few early users this week to learn how I can improve the app for Zambian teachers. If you have 5 minutes to chat with me on WhatsApp, I will add 50 free credits to your account right now.
 
-We teach you how to generate the lesson plans, schemes of work, and weekly records in seconds. 
+Reply to this email with your WhatsApp number, or click here to message me directly: {WHATSAPP_LINK}
 
-To help you get the most out of BooxClash, we have a VIP WhatsApp group where we share:
-✅ Instant support for Scheme/Lesson generation
-✅ Updates on new Ministry formats
-✅ Tips from other Head Teachers
+Thank you for building with me!
 
-👉 Click here to Join the Group: {WHATSAPP_LINK}
-
-*(Note: If you have already joined our WhatsApp group, please ignore this message!)*
-
-See you there!
-
-Best,
-The BooxClash Team
+Kondwani
 """
         
         msg.attach(MIMEText(body, 'plain')) 
@@ -66,7 +60,7 @@ The BooxClash Team
         server.send_message(msg)
         server.quit()
         
-        print(f"✅ Invite sent to: {user_email} (Hi {greeting_name})")
+        print(f"✅ Founder invite sent to: {user_email} (Hi {greeting_name})")
         return True
 
     except Exception as e:

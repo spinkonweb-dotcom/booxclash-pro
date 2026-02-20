@@ -96,7 +96,6 @@ class RecordOfWorkRequest(BaseModel):
     schoolId: Optional[str] = None
     schoolLogo: Optional[str] = None # Logo URL Support
 
-
 class TeacherEditRequest(BaseModel):
     uid: str
     planType: str  # e.g., "weekly_plan" or "lesson_plan"
@@ -190,7 +189,8 @@ def get_locked_template_context(uid: str, plan_type: str, grade: str, subject: s
 # 🚀 ROUTES
 # ==========================================
 
-@router.post("/generate-scheme", response_model=SchemeResponse)
+# NOTE: Removed `response_model=SchemeResponse` from the decorator so FastAPI allows the extra credit fields to pass through to the frontend.
+@router.post("/generate-scheme")
 async def generate_scheme(
     request: SchemeRequest,
     x_user_id: str = Header(None, alias="X-User-ID"),
@@ -202,7 +202,8 @@ async def generate_scheme(
     print(f"📅 GENERATING SCHEME | User: {user_id} | School: {school_id} | Subject: {request.subject}")
     
     try:
-        check_and_deduct_credit(user_id, cost=1, school_id=school_id)
+        # 💰 Capture the new dictionary from our updated credit manager
+        credit_status = check_and_deduct_credit(user_id, cost=1, school_id=school_id)
     except Exception as e:
         raise HTTPException(status_code=403, detail=str(e))
 
@@ -284,7 +285,12 @@ async def generate_scheme(
             school_id=school_id 
         )
 
-        return final_response
+        # 📥 Merge the Pydantic dictionary with the credit status fields!
+        response_dict = final_response.dict()
+        response_dict["credits_remaining"] = credit_status.get("remaining_credits")
+        response_dict["expires_at"] = credit_status.get("expires_at")
+        
+        return response_dict
 
     except Exception as e:
         traceback.print_exc()
@@ -319,7 +325,8 @@ async def generate_weekly(
     locked_context = get_locked_template_context(user_id, "weekly_forecast", request.grade, request.subject)
 
     try:
-        check_and_deduct_credit(user_id, cost=1, school_id=school_id)
+        # 💰 Capture credit status here
+        credit_status = check_and_deduct_credit(user_id, cost=1, school_id=school_id)
         
         # 2. 🤖 Pass it to AI
         plan = await generate_weekly_plan_from_scheme(
@@ -354,7 +361,13 @@ async def generate_weekly(
             data=plan,
             school_id=school_id 
         )
-        return {"data": plan}
+        
+        # 📥 Return data along with updated credit and expiry details
+        return {
+            "data": plan,
+            "credits_remaining": credit_status.get("remaining_credits"),
+            "expires_at": credit_status.get("expires_at")
+        }
     except Exception as e:
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
@@ -375,7 +388,8 @@ async def generate_lesson(
     locked_context = get_locked_template_context(user_id, "lesson_plan", request.grade, request.subject)
 
     try:
-        check_and_deduct_credit(user_id, cost=1, school_id=school_id)
+        # 💰 Capture credit status here
+        credit_status = check_and_deduct_credit(user_id, cost=1, school_id=school_id)
         
         attendance = {"boys": request.boys, "girls": request.girls}
         module_data = load_module(country="Zambia", grade=request.grade, subject=request.subject)
@@ -414,7 +428,13 @@ async def generate_lesson(
             school_id=school_id,
             topic=generated_topic 
         )
-        return {"data": lesson}
+        
+        # 📥 Return data along with updated credit and expiry details
+        return {
+            "data": lesson,
+            "credits_remaining": credit_status.get("remaining_credits"),
+            "expires_at": credit_status.get("expires_at")
+        }
     except Exception as e:
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
@@ -470,7 +490,8 @@ async def generate_record_route(
                 "resources": ["Chalkboard"]
             }]
 
-        check_and_deduct_credit(user_id, cost=1, school_id=school_id)
+        # 💰 Capture credit status here
+        credit_status = check_and_deduct_credit(user_id, cost=1, school_id=school_id)
 
         # 2. 🤖 Pass it to AI
         record_data = await generate_record_of_work(
@@ -498,7 +519,13 @@ async def generate_record_route(
             school_id=school_id
         )
         
-        return {"status": "success", "data": record_data}
+        # 📥 Return data along with updated credit and expiry details
+        return {
+            "status": "success", 
+            "data": record_data,
+            "credits_remaining": credit_status.get("remaining_credits"),
+            "expires_at": credit_status.get("expires_at")
+        }
 
     except Exception as e:
         traceback.print_exc()

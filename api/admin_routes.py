@@ -1,6 +1,6 @@
 import os
 import google.generativeai as genai
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from fastapi import APIRouter, HTTPException, Header, Query
 from firebase_admin import firestore, auth
 from typing import List, Optional
@@ -11,7 +11,14 @@ from pydantic import BaseModel
 
 router = APIRouter()
 db = firestore.client()
+from firebase_admin import firestore
 
+router = APIRouter()
+db = firestore.client()
+
+class ReferralRequest(BaseModel):
+    new_user_uid: str
+    referred_by_uid: str
 # ==========================================
 # 📦 MODELS
 # ==========================================
@@ -102,6 +109,7 @@ async def get_all_schools(x_user_id: str = Header(None, alias="X-User-ID")):
     except Exception as e:
         raise HTTPException(500, f"Failed to load schools: {str(e)}")
 
+
 @router.post("/schools/topup")
 async def top_up_school(action: SchoolTopUpRequest, x_user_id: str = Header(None, alias="X-User-ID")):
     await verify_admin(x_user_id)
@@ -117,10 +125,20 @@ async def top_up_school(action: SchoolTopUpRequest, x_user_id: str = Header(None
         else:
             raise HTTPException(404, f"School with ID {action.school_id} not found")
 
+    # 🆕 Calculate Expiry Date based on plan
+    now = datetime.now(timezone.utc)
+    days_to_add = 30 # Default to 30 days
+
     plan_name = "Custom Admin Approval"
-    if action.amount_paid == 35: plan_name = "Bulk Monthly (K35)"
-    elif action.amount_paid == 50: plan_name = "Standard Monthly (K50)"
-    elif action.amount_paid == 120: plan_name = "Termly Boss (K120)"
+    if action.amount_paid == 35: 
+        plan_name = "Bulk Monthly (K35)"
+    elif action.amount_paid == 50: 
+        plan_name = "Standard Monthly (K50)"
+    elif action.amount_paid == 120: 
+        plan_name = "Termly Boss (K120)"
+        days_to_add = 90 # Termly gets 90 days
+
+    new_expiry = now + timedelta(days=days_to_add)
 
     update_data = {
         "credits": firestore.Increment(action.credits_to_add),
@@ -129,27 +147,29 @@ async def top_up_school(action: SchoolTopUpRequest, x_user_id: str = Header(None
         "subscriptionPlan": plan_name,
         "subscriptionStatus": True,
         "isApproved": True,
+        "expiresAt": new_expiry, # 👈 FIX: Save the calculated expiry date!
         "pendingRequest": firestore.DELETE_FIELD
     }
+    
     if action.teachers_to_add is not None:
         update_data["maxTeachers"] = action.teachers_to_add
 
     school_ref.update(update_data)
     
     s_data = doc_snap.to_dict()
-    # Return receipt data compatible with new frontend
     return {
         "status": "success",
         "receipt_no": f"SCH-{doc_snap.id[:6].upper()}-{int(datetime.now().timestamp())}",
         "date": datetime.now().strftime('%Y-%m-%d'),
-        "receipt_user_name": s_data.get("schoolName", "Valued School"), # Standardized key
+        "receipt_user_name": s_data.get("schoolName", "Valued School"),
         "plan_name": plan_name,
         "credits": action.credits_to_add,
         "amount": action.amount_paid
     }
 
+
 # ==========================================
-# 👥 USERS (UPDATED TO FETCH NAME & DATE)
+# 👥 USERS
 # ==========================================
 
 @router.get("/users")
@@ -167,7 +187,6 @@ async def get_all_users(x_user_id: str = Header(None, alias="X-User-ID")):
         if role in ["school_admin", "admin", "super_admin"]:
             continue
             
-        # ✅ FIX: Handle 'createdAt' vs 'joined_at' based on your data structure
         raw_date = data.get("createdAt") or data.get("joined_at")
         joined_str = ""
         if raw_date:
@@ -189,10 +208,22 @@ async def get_all_users(x_user_id: str = Header(None, alias="X-User-ID")):
         
     return sorted(users, key=lambda x: x["joined_at"], reverse=True)
 
+
 @router.post("/users/topup")
 async def top_up_user(action: UserTopUpRequest, x_user_id: str = Header(None, alias="X-User-ID")):
     await verify_admin(x_user_id)
-    credits, plan = (80, "Individual Monthly (K50)") if action.amount_paid == 50 else (300, "Individual Termly (K120)") if action.amount_paid == 120 else (int(action.amount_paid * 1.5), "Custom Top-up")
+    
+    # 🆕 Calculate Expiry Date based on plan
+    now = datetime.now(timezone.utc)
+    
+    if action.amount_paid == 50:
+        credits, plan, days_to_add = 80, "Individual Monthly (K50)", 30
+    elif action.amount_paid == 120:
+        credits, plan, days_to_add = 300, "Individual Termly (K120)", 90
+    else:
+        credits, plan, days_to_add = int(action.amount_paid * 1.5), "Custom Top-up", 30
+
+    new_expiry = now + timedelta(days=days_to_add)
 
     user_ref = db.collection("users").document(action.target_uid)
     user_doc = user_ref.get()
@@ -206,7 +237,8 @@ async def top_up_user(action: UserTopUpRequest, x_user_id: str = Header(None, al
         "is_approved": True,
         "subscriptionPlan": plan,
         "last_payment_amount": action.amount_paid,
-        "last_payment_date": firestore.SERVER_TIMESTAMP
+        "last_payment_date": firestore.SERVER_TIMESTAMP,
+        "expiresAt": new_expiry # 👈 FIX: Save the calculated expiry date!
     })
 
     return {
@@ -218,6 +250,7 @@ async def top_up_user(action: UserTopUpRequest, x_user_id: str = Header(None, al
         "credits": credits,
         "amount": action.amount_paid
     }
+
 
 @router.delete("/users/{uid}")
 async def delete_user(uid: str, x_user_id: str = Header(None, alias="X-User-ID")):
@@ -231,7 +264,7 @@ async def delete_user(uid: str, x_user_id: str = Header(None, alias="X-User-ID")
         raise HTTPException(500, str(e))
 
 # ==========================================
-# 📧 AI CAMPAIGN LOGIC (NEW)
+# 📧 AI CAMPAIGN LOGIC (UNCHANGED)
 # ==========================================
 
 async def generate_email_content(user_name: str, goal: str):
@@ -306,11 +339,13 @@ async def get_all_content(type: str = Query(...), x_user_id: str = Header(None, 
     docs = db.collection(cmap[type]).order_by("createdAt", direction=firestore.Query.DESCENDING).limit(50).stream()
     return [{**d.to_dict(), "id": d.id, "createdAt": str(d.to_dict().get("createdAt"))} for d in docs]
 
+
 @router.delete("/content/delete")
 async def delete_content(action: ContentAction, x_user_id: str = Header(None, alias="X-User-ID")):
     await verify_admin(x_user_id)
     db.collection(action.collection_name).document(action.doc_id).delete()
     return {"status": "success"}
+
 
 @router.get("/stats")
 async def get_stats(x_user_id: str = Header(None, alias="X-User-ID")):
@@ -322,3 +357,36 @@ async def get_stats(x_user_id: str = Header(None, alias="X-User-ID")):
         "total_schemes": count_collection("generated_schemes"),
         "total_lessons": count_collection("generated_lesson_plans")
     }
+
+@router.post("/api/reward-referral")
+async def reward_referral(req: ReferralRequest):
+    """
+    Rewards the referring user with 10 credits when a new user signs up.
+    """
+    try:
+        # 1. Look up the referring user
+        referrer_ref = db.collection("users").document(req.referred_by_uid)
+        referrer_doc = referrer_ref.get()
+
+        if not referrer_doc.exists:
+            return {"status": "ignored", "message": "Referrer not found."}
+
+        # 2. Add 10 credits to the person who shared the link!
+        referrer_ref.update({
+            "credits": firestore.Increment(10)
+        })
+
+        # 3. (Optional) Log the referral for analytics
+        db.collection("referral_logs").add({
+            "referrer_uid": req.referred_by_uid,
+            "new_user_uid": req.new_user_uid,
+            "reward_credits": 10,
+            "timestamp": firestore.SERVER_TIMESTAMP
+        })
+
+        print(f"🎉 Viral Loop: {req.referred_by_uid} earned 10 credits for referring {req.new_user_uid}!")
+        return {"status": "success", "message": "Referrer rewarded."}
+
+    except Exception as e:
+        print(f"Referral Error: {e}")
+        raise HTTPException(status_code=500, detail="Failed to process referral reward.")

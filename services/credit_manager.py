@@ -1,20 +1,23 @@
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 from google.cloud.firestore import Increment
 from services.firebase_setup import db 
 
 def check_and_deduct_credit(uid: str, cost: int = 1, school_id: str = None):
     """
     Checks credits and deducts 'cost' credits atomically.
-    - 🏫 If 'school_id' is provided, it deducts from the SCHOOL document.
-    - 👤 If NOT provided, it deducts from the USER document (individual).
+    Also checks for subscription expiration.
+    Returns a dictionary with remaining credits and expiration date.
     """
 
     # 🔧 Dev fallback
     if not uid or uid == "default_user":
         print("⚠️ Dev mode credit bypass")
-        return True
+        return {"success": True, "remaining_credits": 999, "expires_at": None}
 
     print(f"🔑 Credit Check | UID: {uid} | School ID: {school_id} | Cost: {cost}")
+    
+    # Get current time in UTC (Firestore uses UTC datetimes)
+    now = datetime.now(timezone.utc)
 
     # =========================================================
     # 🏫 PATH A: SCHOOL CREDIT DEDUCTION
@@ -29,6 +32,11 @@ def check_and_deduct_credit(uid: str, cost: int = 1, school_id: str = None):
 
         school_data = doc.to_dict()
         current_credits = int(school_data.get("credits", 0))
+        expires_at = school_data.get("expires_at")
+
+        # ⏳ Check Expiration for School
+        if expires_at and expires_at < now:
+            raise Exception("School subscription has expired. Please contact Admin to renew.")
 
         if current_credits < cost:
             print(f"⛔ SCHOOL Credit exhausted for {school_id}. Has: {current_credits}, Needs: {cost}")
@@ -37,7 +45,12 @@ def check_and_deduct_credit(uid: str, cost: int = 1, school_id: str = None):
         # Deduct from School
         school_ref.update({ "credits": Increment(-cost) })
         print(f"💰 SCHOOL Credit deducted. Remaining: {current_credits - cost}")
-        return True
+        
+        return {
+            "success": True, 
+            "remaining_credits": current_credits - cost,
+            "expires_at": expires_at.isoformat() if expires_at else None
+        }
 
     # =========================================================
     # 👤 PATH B: INDIVIDUAL USER DEDUCTION
@@ -48,24 +61,45 @@ def check_and_deduct_credit(uid: str, cost: int = 1, school_id: str = None):
     # 🆕 FIRST-TIME USER (Initialize & Deduct)
     if not doc.exists:
         initial_credits = 3
+        # Give free credits a 14-day expiry to create urgency
+        trial_expires_at = now + timedelta(days=14) 
+        
         user_ref.set({
             "credits": initial_credits - cost, 
             "is_approved": False,
-            "joined_at": datetime.utcnow(),
+            "joined_at": now,
+            "expires_at": trial_expires_at, # Store expiration
             "email": "user@example.com" 
         })
         print(f"🆕 User initialized with 3 credits. Deducted {cost}. Remaining: {initial_credits - cost}")
-        return True
+        return {
+            "success": True, 
+            "remaining_credits": initial_credits - cost, 
+            "expires_at": trial_expires_at.isoformat()
+        }
 
     user_data = doc.to_dict()
+    current_credits = int(user_data.get("credits", 0))
+    expires_at = user_data.get("expires_at")
+
+    # ⏳ Check Expiration for Individual
+    if expires_at and expires_at < now:
+        raise Exception("Your subscription has expired! Please renew your K50 Monthly or K120 Termly plan.")
 
     # 🛡️ SAFETY: Missing credits field (Reset to 3)
     if "credits" not in user_data:
-        user_ref.update({"credits": 3 - cost})
+        # Give them 3 credits, valid for 14 days
+        reset_expires_at = now + timedelta(days=14)
+        user_ref.update({
+            "credits": 3 - cost,
+            "expires_at": reset_expires_at
+        })
         print(f"♻️ Credits field missing — reset to 3 and deducted {cost}")
-        return True
-
-    current_credits = int(user_data.get("credits", 0))
+        return {
+            "success": True, 
+            "remaining_credits": 3 - cost, 
+            "expires_at": reset_expires_at.isoformat()
+        }
 
     # ⛔ NO CREDITS LEFT
     if current_credits < cost:
@@ -77,4 +111,10 @@ def check_and_deduct_credit(uid: str, cost: int = 1, school_id: str = None):
     # 💰 ATOMIC CREDIT DEDUCTION
     user_ref.update({ "credits": Increment(-cost) })
     print(f"💰 Credit deducted for {uid}. Remaining: {current_credits - cost}")
-    return True
+    
+    # Return success and expiration date to send to the frontend
+    return {
+        "success": True, 
+        "remaining_credits": current_credits - cost, 
+        "expires_at": expires_at.isoformat() if expires_at else None
+    }
