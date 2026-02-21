@@ -15,7 +15,9 @@ from services.llm_teacher_engine_new import (
     generate_weekly_plan_from_scheme, 
     generate_specific_lesson_plan,
     generate_lesson_notes,
-    generate_record_of_work  
+    generate_record_of_work,
+    generate_chalkboard_diagram,  # 🆕 NEW
+    evaluate_lesson_feedback      # 🆕 NEW
 )
 
 # Services: Content Loading
@@ -55,10 +57,10 @@ class WeeklyPlanRequest(BaseModel):
     days: int = 5
     startDate: str = "2026-01-12"
     schoolId: Optional[str] = None
-    lessonTitle: Optional[str] = None # Subtopic Override
+    lessonTitle: Optional[str] = None 
     topic: Optional[str] = None         
     references: Optional[str] = None
-    schoolLogo: Optional[str] = None  # Logo URL Support
+    schoolLogo: Optional[str] = None  
 
 class LessonPlanRequest(BaseModel):
     uid: Optional[str] = None
@@ -77,8 +79,11 @@ class LessonPlanRequest(BaseModel):
     girls: int = 0
     objectives: List[str] = []
     schoolId: Optional[str] = None
-    schoolLogo: Optional[str] = None # Logo URL Support
+    schoolLogo: Optional[str] = None 
     bloomsLevel: Optional[str] = "" 
+    # 🆕 REMEDIAL SUPPORT FIELDS
+    is_remedial: bool = False
+    teacher_feedback: Optional[str] = None
 
 class RecordOfWorkRequest(BaseModel): 
     uid: Optional[str] = None
@@ -94,17 +99,36 @@ class RecordOfWorkRequest(BaseModel):
     topic: str
     references: Optional[str] = None
     schoolId: Optional[str] = None
-    schoolLogo: Optional[str] = None # Logo URL Support
+    schoolLogo: Optional[str] = None 
 
 class TeacherEditRequest(BaseModel):
     uid: str
-    planType: str  # e.g., "weekly_plan" or "lesson_plan"
+    planType: str  
     grade: str
     subject: str
     term: str
     weekNumber: int
     schoolId: Optional[str] = None
     finalEditedData: Dict[str, Any]
+
+# 🆕 NEW: SVG DIAGRAM REQUEST
+class ChalkboardDiagramRequest(BaseModel):
+    uid: Optional[str] = None
+    prompt: str 
+    lesson_id: Optional[str] = None
+    schoolId: Optional[str] = None # Added for school credit support
+
+# 🆕 NEW: EVALUATION REQUEST
+class LessonEvaluationRequest(BaseModel):
+    uid: Optional[str] = None
+    lesson_id: Optional[str] = None
+    grade: str
+    subject: str
+    topic: str
+    subtopic: str
+    feedback: str
+    schoolId: Optional[str] = None # Added for school credit support
+
 
 # ==========================================
 # 🛠️ HELPERS
@@ -132,10 +156,6 @@ def resolve_user_id(x_user_id: str | None, payload_uid: str | None) -> str:
     return x_user_id or payload_uid or "default_user"
 
 def get_best_available_scheme(user_id: str, subject: str, grade: str, term: str):
-    """
-    Attempts to load a generated scheme from Firestore to provide context 
-    (Topics, References) to other generators.
-    """
     user_scheme = load_generated_scheme(user_id, subject, grade, term)
     if user_scheme: return user_scheme
     
@@ -155,7 +175,6 @@ def get_best_available_scheme(user_id: str, subject: str, grade: str, term: str)
         print(f"⚠️ Warning: Could not fetch scheme context: {e}")
     return None
 
-# 🆕 THE MAGIC HELPER: Fetches locked custom layouts and template content
 def get_locked_template_context(uid: str, plan_type: str, grade: str, subject: str) -> Optional[Dict[str, Any]]:
     try:
         flywheel_ref = db.collection("ai_training_flywheel")
@@ -171,7 +190,6 @@ def get_locked_template_context(uid: str, plan_type: str, grade: str, subject: s
             data = doc.to_dict()
             human_data = data.get("final_human_data", {})
             
-            # Check if this specific document was locked by the teacher
             if human_data.get("isLocked") is True:
                 print(f"🔒 FOUND LOCKED TEMPLATE for {uid} -> {plan_type} ({subject})")
                 return {
@@ -189,7 +207,6 @@ def get_locked_template_context(uid: str, plan_type: str, grade: str, subject: s
 # 🚀 ROUTES
 # ==========================================
 
-# NOTE: Removed `response_model=SchemeResponse` from the decorator so FastAPI allows the extra credit fields to pass through to the frontend.
 @router.post("/generate-scheme")
 async def generate_scheme(
     request: SchemeRequest,
@@ -202,18 +219,14 @@ async def generate_scheme(
     print(f"📅 GENERATING SCHEME | User: {user_id} | School: {school_id} | Subject: {request.subject}")
     
     try:
-        # 💰 Capture the new dictionary from our updated credit manager
         credit_status = check_and_deduct_credit(user_id, cost=1, school_id=school_id)
     except Exception as e:
         raise HTTPException(status_code=403, detail=str(e))
 
     real_syllabus_data = load_syllabus(country="Zambia", grade=request.grade, subject=request.subject)
-
-    # 1. 🔒 Look for locked template
     locked_context = get_locked_template_context(user_id, "scheme_of_work", request.grade, request.subject)
 
     try:
-        # 2. 🤖 Pass it to AI
         ai_result = await generate_scheme_with_ai(
             syllabus_data=real_syllabus_data,
             subject=request.subject,
@@ -221,7 +234,7 @@ async def generate_scheme(
             term=request.term,
             num_weeks=request.weeks,
             start_date=request.startDate or "2026-01-13",
-            locked_context=locked_context # <--- NEW INJECTION
+            locked_context=locked_context
         )
 
         intro_data = ai_result.get("intro_info", {})
@@ -247,7 +260,6 @@ async def generate_scheme(
                 match = re.search(r"\b(\d+\.\d+)\b", topic_text)
                 if match: unit_val = match.group(1)
             
-            # Map dynamic AI attributes (Standard or Custom locked columns)
             row_data = {
                 "month": month_name,
                 "week": week_display,
@@ -265,7 +277,6 @@ async def generate_scheme(
                 "isSpecialRow": item.get("isSpecialRow", is_last_week)
             }
 
-            # Safely capture any custom columns returned by AI
             for key, val in item.items():
                 if key.startswith("custom_") and key not in row_data:
                     row_data[key] = val
@@ -285,7 +296,6 @@ async def generate_scheme(
             school_id=school_id 
         )
 
-        # 📥 Merge the Pydantic dictionary with the credit status fields!
         response_dict = final_response.dict()
         response_dict["credits_remaining"] = credit_status.get("remaining_credits")
         response_dict["expires_at"] = credit_status.get("expires_at")
@@ -320,15 +330,11 @@ async def generate_weekly(
                           scheme_context.get("weeks", [])
 
     module_data = load_module(country="Zambia", grade=request.grade, subject=request.subject)
-
-    # 1. 🔒 Look for locked template
     locked_context = get_locked_template_context(user_id, "weekly_forecast", request.grade, request.subject)
 
     try:
-        # 💰 Capture credit status here
         credit_status = check_and_deduct_credit(user_id, cost=1, school_id=school_id)
         
-        # 2. 🤖 Pass it to AI
         plan = await generate_weekly_plan_from_scheme(
             school=request.school,
             subject=request.subject,
@@ -342,7 +348,7 @@ async def generate_weekly(
             school_logo=request.schoolLogo,
             manual_topic=request.topic, 
             manual_subtopic=request.lessonTitle,
-            locked_context=locked_context # <--- NEW INJECTION
+            locked_context=locked_context 
         )
 
         if request.topic:
@@ -362,7 +368,6 @@ async def generate_weekly(
             school_id=school_id 
         )
         
-        # 📥 Return data along with updated credit and expiry details
         return {
             "data": plan,
             "credits_remaining": credit_status.get("remaining_credits"),
@@ -382,19 +387,18 @@ async def generate_lesson(
     user_id = resolve_user_id(x_user_id, request.uid)
     school_id = x_school_id or request.schoolId
 
-    print(f"📝 LESSON PLAN | User: {user_id} | Topic: {request.topic} | Bloom's: {request.bloomsLevel}")
+    mode_label = "REMEDIAL" if request.is_remedial else "STANDARD"
+    print(f"📝 LESSON PLAN [{mode_label}] | User: {user_id} | Topic: {request.topic} | Bloom's: {request.bloomsLevel}")
     
-    # 1. 🔒 Look for locked template
     locked_context = get_locked_template_context(user_id, "lesson_plan", request.grade, request.subject)
 
     try:
-        # 💰 Capture credit status here
+        # Standard AND Remedial lesson plans cost 1 credit
         credit_status = check_and_deduct_credit(user_id, cost=1, school_id=school_id)
         
         attendance = {"boys": request.boys, "girls": request.girls}
         module_data = load_module(country="Zambia", grade=request.grade, subject=request.subject)
 
-        # 2. 🤖 Pass it to AI
         lesson = await generate_specific_lesson_plan(
             grade=request.grade, subject=request.subject, theme=request.topic,
             subtopic=request.subtopic, objectives=request.objectives,
@@ -403,7 +407,9 @@ async def generate_lesson(
             module_data=module_data,
             blooms_level=request.bloomsLevel,
             school_logo=request.schoolLogo,
-            locked_context=locked_context # <--- NEW INJECTION
+            locked_context=locked_context,
+            is_remedial=request.is_remedial,            
+            teacher_feedback=request.teacher_feedback   
         )
 
         if isinstance(lesson, dict):
@@ -415,8 +421,7 @@ async def generate_lesson(
                 lesson["lesson_steps"] = lesson["steps"]
 
         generated_topic = lesson.get("topic") or request.topic or "General Topic"
-        generated_subtopic = lesson.get("subtopic") or request.subtopic or generated_topic
-
+        
         save_lesson_plan(
             uid=user_id, 
             subject=request.subject, 
@@ -429,7 +434,6 @@ async def generate_lesson(
             topic=generated_topic 
         )
         
-        # 📥 Return data along with updated credit and expiry details
         return {
             "data": lesson,
             "credits_remaining": credit_status.get("remaining_credits"),
@@ -451,7 +455,6 @@ async def generate_record_route(
 
     print(f"🔔 [API] Generating Record of Work for Week {request.weekNumber}")
     
-    # 1. 🔒 Look for locked template
     locked_context = get_locked_template_context(user_id, "record_of_work", request.grade, request.subject)
 
     try:
@@ -490,10 +493,8 @@ async def generate_record_route(
                 "resources": ["Chalkboard"]
             }]
 
-        # 💰 Capture credit status here
         credit_status = check_and_deduct_credit(user_id, cost=1, school_id=school_id)
 
-        # 2. 🤖 Pass it to AI
         record_data = await generate_record_of_work(
             teacher_name=request.teacherName,
             school_name=request.school,
@@ -504,7 +505,7 @@ async def generate_record_route(
             start_date=request.startDate,
             scheme_data=filtered_scheme_data,
             school_logo=request.schoolLogo,
-            locked_context=locked_context # <--- NEW INJECTION
+            locked_context=locked_context 
         )
 
         save_record_of_work(
@@ -519,7 +520,6 @@ async def generate_record_route(
             school_id=school_id
         )
         
-        # 📥 Return data along with updated credit and expiry details
         return {
             "status": "success", 
             "data": record_data,
@@ -535,22 +535,102 @@ async def generate_record_route(
 @router.post("/generate-lesson-notes")
 async def generate_notes(
     request: LessonNotesRequest, 
-    x_user_id: str = Header(None, alias="X-User-ID")
+    x_user_id: str = Header(None, alias="X-User-ID"),
+    x_school_id: str = Header(None, alias="X-School-ID")
 ):
     user_id = resolve_user_id(x_user_id, request.uid)
+    school_id = x_school_id or request.schoolId
     print(f"📝 GENERATING NOTES | Subject: {request.subject} | Topic: {request.topic}")
     
     try:
+        # Added a 1-credit deduction here so users can't generate notes endlessly for free
+        credit_status = check_and_deduct_credit(user_id, cost=1, school_id=school_id)
+
         notes_data = await generate_lesson_notes(
             grade=request.grade,
             subject=request.subject,
             topic=request.topic,
             subtopic=request.subtopic
         )
-        return {"status": "success", "data": notes_data}
+        return {
+            "status": "success", 
+            "data": notes_data,
+            "credits_remaining": credit_status.get("remaining_credits"),
+            "expires_at": credit_status.get("expires_at")
+        }
     except Exception as e:
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
+
+
+# ==========================================
+# 🆕 CHALKBOARD DIAGRAM GENERATOR
+# ==========================================
+@router.post("/generate-diagram")
+async def generate_diagram_route(
+    request: ChalkboardDiagramRequest,
+    x_user_id: str = Header(None, alias="X-User-ID"),
+    x_school_id: str = Header(None, alias="X-School-ID")
+):
+    user_id = resolve_user_id(x_user_id, request.uid)
+    school_id = x_school_id or request.schoolId
+    print(f"🎨 DIAGRAM REQUEST | User: {user_id} | Prompt: {request.prompt}")
+    
+    try:
+        # 💰 Premium feature: Costs 3 credits
+        credit_status = check_and_deduct_credit(user_id, cost=3, school_id=school_id)
+
+        result = await generate_chalkboard_diagram(request.prompt)
+        
+        # Ensure we return the credit status alongside the diagram
+        if isinstance(result, dict):
+            result["credits_remaining"] = credit_status.get("remaining_credits")
+            result["expires_at"] = credit_status.get("expires_at")
+            return result
+        else:
+            return {
+                "data": result,
+                "credits_remaining": credit_status.get("remaining_credits"),
+                "expires_at": credit_status.get("expires_at")
+            }
+            
+    except Exception as e:
+        traceback.print_exc()
+        raise HTTPException(status_code=403 if "credits" in str(e).lower() else 500, detail=str(e))
+
+
+# ==========================================
+# 🆕 LESSON EVALUATION & TROUBLESHOOTER
+# ==========================================
+@router.post("/evaluate-lesson")
+async def evaluate_lesson_route(
+    request: LessonEvaluationRequest,
+    x_user_id: str = Header(None, alias="X-User-ID"),
+    x_school_id: str = Header(None, alias="X-School-ID")
+):
+    user_id = resolve_user_id(x_user_id, request.uid)
+    school_id = x_school_id or request.schoolId
+    print(f"🧠 EVALUATING LESSON | User: {user_id} | Topic: {request.topic}")
+    
+    try:
+        # 💰 Standard feature: Costs 1 credit
+        credit_status = check_and_deduct_credit(user_id, cost=1, school_id=school_id)
+
+        result = await evaluate_lesson_feedback(
+            topic=request.topic,
+            subtopic=request.subtopic,
+            grade=request.grade,
+            teacher_feedback=request.feedback
+        )
+        return {
+            "status": "success", 
+            "data": result,
+            "credits_remaining": credit_status.get("remaining_credits"),
+            "expires_at": credit_status.get("expires_at")
+        }
+    except Exception as e:
+        traceback.print_exc()
+        raise HTTPException(status_code=403 if "credits" in str(e).lower() else 500, detail=str(e))
 
 
 @router.post("/capture-teacher-edits")

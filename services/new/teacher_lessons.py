@@ -6,7 +6,7 @@ from datetime import datetime
 from .teacher_shared import get_model, extract_json_string, find_structured_module_content
 
 # ==============================================================================
-# 1. GENERATE SPECIFIC LESSON PLAN (Dynamic References + Bloom's Taxonomy + Logo + Template Lock)
+# 1. GENERATE SPECIFIC LESSON PLAN (Supports Standard & Remedial Loops)
 # ==============================================================================
 async def generate_specific_lesson_plan(
     grade: str, 
@@ -20,33 +20,33 @@ async def generate_specific_lesson_plan(
     attendance: Dict[str, int],
     teacher_name: str = "Class Teacher", 
     school_name: str = "Primary School",
-    school_logo: Optional[str] = None,  # ✅ ADDED THIS ARGUMENT
+    school_logo: Optional[str] = None,
     module_data: Optional[Dict[str, Any]] = None,
     scheme_references: str = "Standard Zambian Syllabus",
     blooms_level: str = "",
-    locked_context: Optional[Dict[str, Any]] = None # 🆕 TEMPLATE LOCK SUPPORT
+    locked_context: Optional[Dict[str, Any]] = None,
+    # 🆕 REMEDIAL LOOP SUPPORT
+    is_remedial: bool = False,
+    teacher_feedback: Optional[str] = None
 ) -> Dict[str, Any]:
     
-    print(f"\n🔍 [Lesson Generator] Processing: {theme} - {subtopic} | Bloom's: {blooms_level}")
+    mode_label = "REMEDIAL" if is_remedial else "STANDARD"
+    print(f"\n🔍 [Lesson Generator - {mode_label}] Processing: {theme} - {subtopic}")
 
     # 1. SMART MODULE SEARCH
     module_info = find_structured_module_content(module_data, subtopic)
     if not module_info:
         module_info = find_structured_module_content(module_data, theme)
 
-    # 2. CALCULATE CONTEXT
     boys = attendance.get('boys', 0)
     girls = attendance.get('girls', 0)
     total_students = boys + girls
 
-    # 3. DETERMINE SOURCE MATERIAL & REFERENCES
+    # 2. SOURCE MATERIAL & REFERENCES
     module_prompt_insert = ""
-    
-    # We use this to decide if we should overwrite the AI's output later
     strict_ref_override = False 
     final_reference_string = scheme_references
 
-    # ✅ SCENARIO A: OFFICIAL MODULE FOUND
     if module_info:
         unit_id = module_info.get("topic_id", module_info.get("unit_id", "N/A"))
         pages = module_info.get("pages", "N/A")
@@ -54,74 +54,73 @@ async def generate_specific_lesson_plan(
 
         if pages and pages != "N/A":
             final_reference_string = f"Official Module Unit {unit_id}, Page {pages}"
-            strict_ref_override = True # Force this exact string
-            print(f"   ↳ ✅ OFFICIAL MODULE FOUND: {final_reference_string}")
-        else:
-            print("   ↳ ⚠️ Module found but missing page numbers.")
-
+            strict_ref_override = True
+        
         module_prompt_insert = f"""
         🔥🔥 **SOURCE MATERIAL: OFFICIAL GOVERNMENT MODULE** 🔥🔥
         **STRICT RULES**:
-        1. **TEACHER ACTIVITY**: You MUST derive the steps EXACTLY from the text below.
-        2. **INTERNAL CITATIONS**: When describing a step, cite the specific Activity Number (e.g., "Activity 1.2").
-        3. **REFERENCE FIELD**: In the JSON output, you MUST set "references" to exactly: "{final_reference_string}".
+        1. **TEACHER ACTIVITY**: Derive steps EXACTLY from the text below.
+        2. **INTERNAL CITATIONS**: Cite specific Activity Numbers if present.
+        3. **REFERENCE FIELD**: MUST be exactly: "{final_reference_string}".
 
         **MODULE CONTENT START** {module_text}  
         **MODULE CONTENT END**
         """
-
-    # ❌ SCENARIO B: FALLBACK (EXTERNAL RESOURCES)
     else:
-        print(f"   ↳ ⚠️ No Module Match. Enabling External Resource Search.")
-        strict_ref_override = False # Let AI generate the list
-
+        strict_ref_override = False
         module_prompt_insert = f"""
         🔥🔥 **SOURCE MATERIAL: EXTERNAL RESEARCH REQUIRED** 🔥🔥
         **STRICT RULES**:
-        1. **CONTENT SOURCE**: Since no official module is available, you MUST incorporate content from reputable **external journals, educational websites, and standard textbooks**.
-        2. **ACTIVITIES**: Create engaging activities and **explicitly reference these external materials** inside the steps (e.g., "Using resources from Khan Academy...", "Referencing [Journal Name] activity...").
-        3. **REFERENCE FIELD**: 
-           - DO NOT just write "Standard Zambian Syllabus".
-           - **LIST the specific sources** you used for this lesson.
-           - Example: "Zambian Syllabus, Khan Academy (Algebra), Oxford Mathematics Book 9".
+        1. Incorporate content from reputable educational websites and textbooks.
+        2. Explicitly reference these materials inside the steps.
         """
 
     model = get_model()
-    
-    # Decide what to show in the prompt example
-    ref_placeholder = final_reference_string if strict_ref_override else "List specific external sources used (Websites, Books, Journals)..."
+    ref_placeholder = final_reference_string if strict_ref_override else "List specific external sources used..."
 
-    # ✅ BLOOM'S TAXONOMY INSTRUCTION
-    blooms_instruction = ""
-    if blooms_level:
-        blooms_instruction = f"""
-        🧠 **PEDAGOGICAL FOCUS**: 
-        This lesson MUST differ from a standard lesson by focusing on the **{blooms_level}** level of Bloom's Taxonomy.
-        - Ensure the **Specific Outcomes** use verbs associated with {blooms_level} (e.g., if Analyzing, use 'Differentiate', 'Compare').
-        - Ensure **Learner Activities** challenge students at this cognitive level.
+    # 3. 🆕 INJECT REMEDIAL PEDAGOGY IF NEEDED
+    remedial_instruction = ""
+    if is_remedial and teacher_feedback:
+        remedial_instruction = f"""
+        🚨 **CRITICAL: THIS IS A REMEDIAL LESSON PLAN** 🚨
+        The teacher taught this recently, but the students failed to understand it.
+        **TEACHER'S FEEDBACK FROM LAST LESSON**: "{teacher_feedback}"
+        
+        **YOUR TASK**:
+        - DO NOT teach this the exact same way as a standard lesson.
+        - You MUST use alternative, highly simplified teaching methods (e.g., analogies, visual aids, or games) to address the specific struggle mentioned in the feedback.
+        - Set the "expected_standard" to focus on overcoming this specific gap.
         """
 
-    # ⚡️ DYNAMIC TEMPLATE INJECTION
+    # 4. BLOOM'S TAXONOMY INSTRUCTION
+    blooms_instruction = ""
+    if blooms_level and not is_remedial:
+        blooms_instruction = f"""
+        🧠 **PEDAGOGICAL FOCUS**: 
+        Focus on the **{blooms_level}** level of Bloom's Taxonomy.
+        """
+
+    # 5. DYNAMIC TEMPLATE INJECTION
     steps_format = """
       "steps": [
         {
             "stage": "INTRODUCTION",
             "time": "5 min",
-            "teacherActivity": "Hook learners using the subtopic.",
+            "teacherActivity": "...",
             "learnerActivity": "...",
             "assessment_criteria": "..."
         },
         {
             "stage": "DEVELOPMENT",
             "time": "30 min",
-            "teacherActivity": "Step-by-step instructions. IF MODULE FOUND: Cite Activity #. IF NOT: Cite external resource.",
-            "learnerActivity": "Corresponding learner tasks.",
+            "teacherActivity": "...",
+            "learnerActivity": "...",
             "assessment_criteria": "..."
         },
         {
             "stage": "CONCLUSION",
             "time": "5 min",
-            "teacherActivity": "Summarise key ideas.",
+            "teacherActivity": "...",
             "learnerActivity": "...",
             "assessment_criteria": "..."
         }
@@ -133,13 +132,13 @@ async def generate_specific_lesson_plan(
         steps_format = f"""
       "steps": [
         {{
-            // 🚨 CRITICAL LOCK: YOU MUST USE THESE EXACT KEYS FOR EACH LESSON STEP:
+            // 🚨 CRITICAL LOCK: YOU MUST USE THESE EXACT KEYS:
             {', '.join([f'"{k}": "..."' for k in custom_keys])}
         }}
       ]
         """
 
-    # 4. PROMPT (Strict Structure)
+    # 6. ASSEMBLE PROMPT
     prompt = f"""
     Act as a professional teacher in Zambia. Create a **Competence Based Curriculum (CBC)** Lesson Plan.
 
@@ -151,14 +150,15 @@ async def generate_specific_lesson_plan(
     - Subtopic: "{subtopic}"
     - Objectives: {json.dumps(objectives)}
     
+    {remedial_instruction}
     {blooms_instruction}
-
     {module_prompt_insert}
 
     OUTPUT JSON (Strict Structure):
     {{
       "teacherName": "{teacher_name}",
       "schoolName": "{school_name}",
+      "date": "{date}",
       "grade": "{grade}",
       "subject": "{subject}",
       "topic": "{theme}",
@@ -168,14 +168,14 @@ async def generate_specific_lesson_plan(
       "enrolment": {{ "boys": {boys}, "girls": {girls}, "total": {total_students} }},
 
       "expected_standard": "Learners should be able to...",
-
+      "rationale": "Why this lesson is important...",
       "learning_environment": {{
           "natural": "Classroom",
           "technological": "N/A",
           "artificial": "Desks/Chalkboard"
       }},
 
-      "materials": "List specific aids from the module OR external materials used (websites, journals, realia).",
+      "materials": "List specific aids...",
       "references": "{ref_placeholder}",
 
       {steps_format},
@@ -184,7 +184,7 @@ async def generate_specific_lesson_plan(
     }}
     """
 
-    # 5. EXECUTE AND CLEAN
+    # 7. EXECUTE
     try:
         response = await model.generate_content_async(
             prompt,
@@ -192,42 +192,27 @@ async def generate_specific_lesson_plan(
         )
         data = json.loads(extract_json_string(response.text))
 
-        # ✅ LOGIC UPDATE: Only overwrite references if we found an Official Module
         if strict_ref_override:
             data["references"] = final_reference_string
-        
-        # ✅ INJECT LOGO IF PROVIDED
         if school_logo:
             data["schoolLogo"] = school_logo
 
-        # Add Footer for printing
         data["evaluation_footer"] = "LESSON EVALUATION:\n" + ("." * 200)
+
+        # Flag it for the frontend
+        data["is_remedial_plan"] = is_remedial 
 
         return data
 
     except Exception as e:
         print(f"❌ Error: {e}")
-        return {
-            "topic": theme,
-            "subtopic": subtopic,
-            "references": scheme_references, # Fallback on error
-            "steps": [],
-            "error": "Failed to generate lesson plan.",
-            "schoolLogo": school_logo # Return logo even on error
-        }
+        return {"error": "Failed to generate lesson plan."}
 
 
 # ==============================================================================
-# 2. GENERATE LESSON NOTES (Blackboard Content)
+# 2. GENERATE LESSON NOTES
 # ==============================================================================
-async def generate_lesson_notes(
-    grade: str, 
-    subject: str, 
-    topic: str, 
-    subtopic: str,
-    module_data: Optional[Dict[str, Any]] = None
-) -> Dict[str, Any]:
-    
+async def generate_lesson_notes(grade: str, subject: str, topic: str, subtopic: str, module_data: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     print(f"\n📝 [Notes Generator] Generating for: {topic} - {subtopic}")
     
     # 1. Find Module Context
@@ -307,4 +292,92 @@ async def generate_lesson_notes(
             "reference": reference_str, 
             "explanation_points": ["Error generating notes."], 
             "class_exercise": []
+        }
+
+
+# ==============================================================================
+# 3. 🆕 CHALKBOARD DIAGRAM GENERATOR (SVG Trick)
+# ==============================================================================
+async def generate_chalkboard_diagram(prompt_text: str) -> Dict[str, str]:
+    """
+    Uses the LLM to write raw SVG code for a simple chalkboard diagram.
+    This saves money by not using DALL-E and produces crisp, scalable line art.
+    """
+    print(f"\n🎨 [Diagram Generator] Creating SVG for: {prompt_text}")
+    model = get_model()
+
+    prompt = f"""
+    You are an expert graphic designer and educator.
+    Create a highly educational, simple line-art diagram of: "{prompt_text}".
+    
+    STRICT REQUIREMENTS:
+    1. Output MUST be ONLY valid, raw SVG code. Do not wrap in markdown or markdown code blocks (no ```svg).
+    2. Use ONLY black strokes and white/transparent fills. It must look like a clean drawing on a whiteboard/chalkboard.
+    3. Include clear text labels pointing to the main parts.
+    4. Keep the paths simple and bold.
+    5. Set the viewBox to "0 0 800 600".
+    
+    START IMMEDIATELY WITH <svg> AND END WITH </svg>.
+    """
+    
+    try:
+        response = await model.generate_content_async(prompt)
+        # Strip out any potential markdown blocks the AI might accidentally include
+        svg_code = response.text.replace("```svg", "").replace("```", "").strip()
+        
+        return {
+            "status": "success",
+            "diagram_type": "svg",
+            "content": svg_code
+        }
+    except Exception as e:
+        print(f"❌ SVG Error: {e}")
+        return {"status": "error", "message": str(e)}
+
+
+# ==============================================================================
+# 4. 🆕 LESSON EVALUATION & TROUBLESHOOTER
+# ==============================================================================
+async def evaluate_lesson_feedback(topic: str, subtopic: str, grade: str, teacher_feedback: str) -> Dict[str, Any]:
+    """
+    Analyzes post-lesson feedback and suggests quick pedagogical fixes.
+    """
+    print(f"\n🧠 [Lesson Evaluator] Analyzing feedback for {topic}")
+    model = get_model()
+
+    prompt = f"""
+    Act as a Master Teacher Trainer. 
+    A teacher just taught a {grade} lesson on "{topic} - {subtopic}".
+    
+    The teacher submitted this post-lesson evaluation/struggle:
+    "{teacher_feedback}"
+
+    Your task:
+    1. Provide a short, empathetic response.
+    2. Suggest 2 quick, highly practical, low-resource teaching strategies or analogies to fix this specific misunderstanding tomorrow.
+    3. Decide if this gap is severe enough to warrant a full Remedial Lesson Plan.
+
+    OUTPUT JSON:
+    {{
+        "empathy_statement": "...",
+        "quick_fixes": [
+            "Method 1: ...",
+            "Method 2: ..."
+        ],
+        "suggest_remedial": true/false
+    }}
+    """
+    
+    try:
+        response = await model.generate_content_async(
+            prompt,
+            generation_config={"response_mime_type": "application/json"}
+        )
+        return json.loads(extract_json_string(response.text))
+    except Exception as e:
+        print(f"❌ Evaluation Error: {e}")
+        return {
+            "empathy_statement": "I understand that was a challenging lesson.",
+            "quick_fixes": ["Try breaking the concept down into smaller, visual steps."],
+            "suggest_remedial": True
         }

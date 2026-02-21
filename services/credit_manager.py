@@ -61,6 +61,12 @@ def check_and_deduct_credit(uid: str, cost: int = 1, school_id: str = None):
     # 🆕 FIRST-TIME USER (Initialize & Deduct)
     if not doc.exists:
         initial_credits = 3
+        
+        # 🛡️ SAFETY CHECK: Prevent negative balance on expensive first actions
+        if initial_credits < cost:
+            print(f"⛔ New user tried premium action. Has: {initial_credits}, Needs: {cost}")
+            raise Exception(f"Insufficient free credits for this action (Required: {cost}, Available: {initial_credits}). Please upgrade to Premium.")
+
         # Give free credits a 14-day expiry to create urgency
         trial_expires_at = now + timedelta(days=14) 
         
@@ -88,6 +94,11 @@ def check_and_deduct_credit(uid: str, cost: int = 1, school_id: str = None):
 
     # 🛡️ SAFETY: Missing credits field (Reset to 3)
     if "credits" not in user_data:
+        # 🛡️ SAFETY CHECK: Prevent negative balance if resetting account
+        if 3 < cost:
+            print(f"⛔ Missing credits user tried premium action. Has: 3, Needs: {cost}")
+            raise Exception(f"Insufficient free credits (Required: {cost}, Available: 3). Please upgrade.")
+
         # Give them 3 credits, valid for 14 days
         reset_expires_at = now + timedelta(days=14)
         user_ref.update({

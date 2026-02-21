@@ -9,7 +9,7 @@ from typing import List, Optional, Any, Dict, Literal, Union
 STRICT_IGNORE_EXTRA = ConfigDict(extra='ignore')
 
 # ==========================================
-# 🍎 SCHEME MODELS (The Source of your Error)
+# 🍎 SCHEME MODELS
 # ==========================================
 
 class SchemeRequest(BaseModel):
@@ -121,7 +121,7 @@ class WeeklyPlanRequest(BaseModel):
 
 
 # ==========================================
-# 📝 LESSON PLAN REQUEST (ROBUST)
+# 📝 LESSON PLAN REQUEST
 # ==========================================
 class LessonPlanRequest(BaseModel):
     uid: Optional[str] = None
@@ -144,16 +144,17 @@ class LessonPlanRequest(BaseModel):
     timeStart: Optional[str] = "08:00"
     timeEnd: Optional[str] = "08:40"
     
-    # ✅ FIX: Use Optional so they default to 0 if missing
     boys: Optional[int] = 0
     girls: Optional[int] = 0
     objectives: List[str] = []
 
-    # ✅ CRITICAL VALIDATOR: This converts strings like "1" or "" into integers 1 or 0
+    # Used to flag if this is a remedial lesson being generated
+    is_remedial: Optional[bool] = False
+    parent_lesson_id: Optional[str] = None 
+
     @validator('weekNumber', 'boys', 'girls', pre=True)
     def parse_ints(cls, v):
         if isinstance(v, str):
-            # If string is empty, return 0. If it has numbers, convert to int.
             return int(v) if v.strip() else 0
         return v
 
@@ -212,7 +213,7 @@ class WorksheetResponse(BaseModel):
     blocks: List[WorksheetBlock]
 
 # ==========================================
-# ⚙️ GENERIC GENERATION REQUEST (If used)
+# ⚙️ GENERIC GENERATION REQUEST
 # ==========================================
 class GenerationRequest(BaseModel):
     type: str = "lesson"
@@ -227,4 +228,51 @@ class GenerationRequest(BaseModel):
     weeks: Optional[int] = 13
     days: Optional[int] = 5
     startDate: Optional[str] = None
+    model_config = STRICT_IGNORE_EXTRA
+
+
+# ====================================================================================
+# 🔄 LESSON LIFECYCLE & AI ASSISTANT MODELS (NEW)
+# ====================================================================================
+
+class ChalkboardDiagramRequest(BaseModel):
+    """Schema for generating simple line-art diagrams for the chalkboard."""
+    uid: Optional[str] = None
+    prompt: str  # e.g., "Human Heart" or "Water Cycle"
+    lesson_id: Optional[str] = None # To optionally link it to a specific lesson
+    
+    model_config = STRICT_IGNORE_EXTRA
+
+
+class ClassroomTroubleshooterRequest(BaseModel):
+    """Schema for the quick text-based advice tool (The Lesson Fixer)."""
+    uid: Optional[str] = None
+    grade: str
+    subject: str
+    topic: str
+    struggle_description: str # e.g., "Students failed to find the common denominator"
+    
+    model_config = STRICT_IGNORE_EXTRA
+
+
+class LessonEvaluationRequest(BaseModel):
+    """Schema to submit post-lesson evaluation feedback."""
+    uid: str
+    lesson_id: str
+    feedback: str # e.g., "Half the class didn't understand how leaves make food"
+    
+    model_config = STRICT_IGNORE_EXTRA
+
+
+class RemedialLessonRequest(BaseModel):
+    """Schema to generate a follow-up remedial lesson based on an evaluation."""
+    uid: str
+    original_lesson_id: str
+    grade: str
+    subject: str
+    topic: str
+    subtopic: Optional[str] = ""
+    teacher_feedback: str # Feeds into the AI to specifically target the learning gap
+    duration: Optional[str] = "20 minutes" # Remedials are usually shorter
+    
     model_config = STRICT_IGNORE_EXTRA
