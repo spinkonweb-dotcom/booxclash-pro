@@ -14,7 +14,7 @@
     {
       "unit": "4.1",
       "topic_title": "FOOD SAFETY",
-      "page_number": 12,
+      "page_number": 2,
       "subtopics": [
         "Food Hygiene",
         "Kitchen Safety",
@@ -29,7 +29,7 @@
     {
       "unit": "4.2",
       "topic_title": "THE KITCHEN",
-      "page_number": 13,
+      "page_number": 3,
       "subtopics": [
         "Cooking Utensils and Equipment"
       ],
@@ -40,7 +40,7 @@
     {
       "unit": "4.3",
       "topic_title": "FOOD",
-      "page_number": 14,
+      "page_number": 4,
       "subtopics": [
         "Food Groups",
         "Portion and Serving Sizes",
@@ -61,7 +61,7 @@
     {
       "unit": "4.4",
       "topic_title": "HOUSEKEEPING",
-      "page_number": 17,
+      "page_number": 7,
       "subtopics": [
         "Cleaning",
         "Sanitation",
@@ -76,7 +76,7 @@
     {
       "unit": "4.5",
       "topic_title": "HEALTH",
-      "page_number": 18,
+      "page_number": 8,
       "subtopics": [
         "Personal Hygiene",
         "Cosmetology"
@@ -89,7 +89,7 @@
     {
       "unit": "4.6",
       "topic_title": "HUMAN DEVELOPMENT",
-      "page_number": 19,
+      "page_number": 9,
       "subtopics": [
         "Bodily Integrity"
       ],
@@ -100,7 +100,7 @@
     {
       "unit": "4.7",
       "topic_title": "TOURISM",
-      "page_number": 22,
+      "page_number": 12,
       "subtopics": [
         "Introduction to Tourism",
         "Sustainable Tourism",
@@ -117,7 +117,7 @@
     {
       "unit": "4.8",
       "topic_title": "SEWING",
-      "page_number": 25,
+      "page_number": 15,
       "subtopics": [
         "Basic Sewing Skills"
       ],
@@ -128,7 +128,7 @@
     {
       "unit": "4.9",
       "topic_title": "CRAFTS",
-      "page_number": 25,
+      "page_number": 15,
       "subtopics": [
         "Knitting",
         "Crocheting"
@@ -141,7 +141,7 @@
     {
       "unit": "4.10",
       "topic_title": "CONSUMER EDUCATION",
-      "page_number": 26,
+      "page_number": 16,
       "subtopics": [
         "Consumer rights and protection"
       ],

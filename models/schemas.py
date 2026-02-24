@@ -272,7 +272,7 @@ class RemedialLessonRequest(BaseModel):
     subject: str
     topic: str
     subtopic: Optional[str] = ""
-    teacher_feedback: str # Feeds into the AI to specifically target the learning gap
+    teacher_feedback: str # Feeds into the AI to specifically target the learnin
     duration: Optional[str] = "20 minutes" # Remedials are usually shorter
     
     model_config = STRICT_IGNORE_EXTRA
