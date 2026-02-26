@@ -276,3 +276,35 @@ class RemedialLessonRequest(BaseModel):
     duration: Optional[str] = "20 minutes" # Remedials are usually shorter
     
     model_config = STRICT_IGNORE_EXTRA
+
+
+# ==========================================
+# 📝 EXAM ASSISTANT REQUEST (NEW)
+# ==========================================
+class ExamBlueprint(BaseModel):
+    mcq: int = 10
+    true_false: int = 0
+    matching: int = 0
+    short_answer: int = 5
+    computational: int = 0
+    essay: int = 2
+    case_study: int = 0
+    model_config = STRICT_IGNORE_EXTRA
+
+class ExamRequest(BaseModel):
+    uid: Optional[str] = None
+    grade: str
+    subject: str
+    term: Optional[str] = "Term 1"
+    
+    # Core Exam Fields
+    topics: List[str] = ["General Review"]
+    blueprint: ExamBlueprint
+    
+    # Flexible Context Fields (Catches both 'school' and 'school_name')
+    school: Optional[str] = "Unknown School"
+    school_name: Optional[str] = None
+    schoolId: Optional[str] = None
+    schoolLogo: Optional[str] = None
+    
+    model_config = STRICT_IGNORE_EXTRA

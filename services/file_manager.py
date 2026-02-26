@@ -248,3 +248,32 @@ def save_resource(uid: str, resource_type: str, data: dict, meta: dict, school_i
     }
 
     return save_to_firestore_dual(col_name, payload, school_id)
+
+
+    # ==========================================
+# 6. EXAMS & ASSESSMENTS
+# ==========================================
+def save_generated_exam(
+    uid: str, subject: str, grade: str, term: str, 
+    school_name: str, exam_data: dict, school_id: str = None
+):
+    """
+    Saves the generated exam and answer key to root AND 'schools/{id}/generated_exams'.
+    """
+    if not isinstance(exam_data, dict):
+        print(f"❌ Save Exam Error: Expected dict, got {type(exam_data)}. Aborting.")
+        return False
+
+    payload = {
+        "userId": uid,
+        "schoolName": school_name,
+        "subject": subject,
+        "grade": grade,
+        "term": term,
+        "examData": exam_data, 
+        "createdAt": datetime.now(),
+        "type": "Exam/Assessment",
+        "source": "backend_auto_save"
+    }
+    
+    return save_to_firestore_dual("generated_exams", payload, school_id)

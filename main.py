@@ -32,6 +32,7 @@ from api.admin_routes import router as admin_router
 from api.schemes import router as schemes_router 
 from api.school_settings import router as settings_router 
 from api.relay_routes import router as relay_router 
+from api.exams import router as exams_router
 from api.school_routes import router as school_engine_router
 from api.sba import router as sba_router # 👈 ADDED THIS: IMPORT SBA ROUTER
 from services.notification_service import send_whatsapp_invite # 👈 IMPORT SERVICE
@@ -176,7 +177,7 @@ app.include_router(school_engine_router, prefix="/api/school", tags=["School Eng
 app.include_router(settings_router, prefix="/api/school", tags=["School Settings"]) 
 app.include_router(relay_router, prefix="/api/relay", tags=["Smart Dispatcher"]) 
 app.include_router(sba_router, prefix="/api/sba", tags=["School-Based Assessment"]) # 👈 ADDED THIS: REGISTER SBA ROUTER
-
+app.include_router(exams_router)
 # 7. Startup Event & Health Check
 @app.on_event("startup")
 async def startup_event():
