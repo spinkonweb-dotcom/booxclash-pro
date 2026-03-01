@@ -50,6 +50,7 @@ class LessonNotesRequest(BaseModel):
 class WeeklyPlanRequest(BaseModel):
     uid: Optional[str] = None
     grade: str
+    unit_id: Optional[str] = None
     subject: str
     term: str
     school: str

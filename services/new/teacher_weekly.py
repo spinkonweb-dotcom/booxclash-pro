@@ -15,34 +15,27 @@ async def generate_weekly_plan_from_scheme(
     school_logo: Optional[str] = None,
     manual_topic: Optional[str] = None,
     manual_subtopic: Optional[str] = None,
-    locked_context: Optional[Dict[str, Any]] = None # 🆕 TEMPLATE LOCK SUPPORT
+    locked_context: Optional[Dict[str, Any]] = None,
+    objectives: Optional[List[str]] = None # 👈 ADDED OBJECTIVES HERE
 ) -> Dict[str, Any]:
     
     print(f"\n🗓️ [Weekly Generator] Request: Week {week_number}...")
     
     # 1. ALWAYS EXTRACT SCHEME DATA FIRST
-    # We do this first so we can grab the 'refs' (References) from the database
-    # regardless of whether the user provided a manual topic name or not.
     details = extract_scheme_details(scheme_data, week_number)
 
     # 2. APPLY MANUAL OVERRIDES (If provided)
-    # Instead of creating a new 'details' dict, we just update the existing one.
     if manual_topic and manual_topic.strip():
         print(f"  🎯 [Override] Using Manually Selected Topic: {manual_topic}")
         details["topic"] = manual_topic
-        details["found"] = True # Force found since we have user input
-        
-        # NOTE: We do NOT overwrite details['refs'] here. 
-        # We keep the references found in step 1.
+        details["found"] = True 
 
-    # If still not found (no scheme data AND no manual input), use fallbacks
     if not details["found"]:
         print(f"   ⚠️ Week {week_number} not found in Scheme. Using generic fallback.")
         details["topic"] = f"General {subject} Concepts"
         details["refs"] = ["Standard Syllabus"]
 
     # 3. DETERMINE TARGET FOR MODULE SEARCH
-    # If a subtopic is provided (lessonTitle), use that for the specific content search
     target_topic_for_module = manual_subtopic if manual_subtopic else details['topic']
 
     # 4. FETCH STRUCTURED MODULE CONTENT
@@ -52,30 +45,31 @@ async def generate_weekly_plan_from_scheme(
     
     # 5. CONSTRUCT REFERENCE LOGIC
     if module_info:
-        print(f"  ↳ ✅ Module Found: Unit {module_info['unit_id']}, Pages: {module_info['pages']}")
+        # 🛡️ BULLETPROOF COMPLIANCE FIX: 
+        # If activity_id is hidden/missing, fallback to the Topic Name so it never says "Unknown"
+        ref_title = module_info.get('activity_id') or module_info.get('unit_id') or manual_subtopic or details['topic']
+        page_nums = module_info.get('pages', 'N/A')
+        
+        print(f"  ↳ ✅ Module Found: {ref_title}, Pages: {page_nums}")
+        
         module_prompt_insert = f"""
         🔥🔥 **OFFICIAL MODULE DATA FOUND** 🔥🔥
-        1. **UNIT ID**: {module_info['unit_id']}
-        2. **PAGE NUMBERS**: {module_info['pages']}
+        1. **UNIT/TOPIC**: {ref_title}
+        2. **PAGE NUMBERS**: {page_nums}
         3. **CONTENT SOURCE**: Use the specific activities below.
         
         --- MODULE CONTENT START ---
-        {module_info['context_text']}
+        {module_info.get('context_text', '')}
         --- MODULE CONTENT END ---
         
         **MANDATORY INSTRUCTION**: 
-        In the 'reference' field of the JSON, you MUST write: "Module Unit {module_info['unit_id']}, Page {module_info['pages']}".
+        In the 'reference' field of the JSON, you MUST write exactly: "Module: {ref_title}, Page {page_nums}".
         """
     else:
-        # FALLBACK TO SCHEME REFERENCES
-        # Now this works because we preserved 'details["refs"]' in Step 2
         print(f"  ↳ ⚠️ Module not found for '{target_topic_for_module}'. Falling back to Scheme References.")
         
         scheme_refs = details.get('refs', [])
-        
-        # Handle list vs string
         if isinstance(scheme_refs, list):
-            # Filter out empty strings/None
             valid_refs = [str(r) for r in scheme_refs if r]
             scheme_refs_str = ", ".join(valid_refs)
         else:
@@ -91,6 +85,12 @@ async def generate_weekly_plan_from_scheme(
         You MUST use the 'REFERENCES' from the Scheme: "{scheme_refs_str}".
         In the 'reference' field of the JSON output, write exactly: "{scheme_refs_str}".
         """
+
+    # 🛑 INJECT OBJECTIVES TO STOP HALLUCINATION
+    objectives_instruction = ""
+    if objectives and len(objectives) > 0:
+        obj_list = "\n    - ".join(objectives)
+        objectives_instruction = f"\n    TARGET OBJECTIVES / OUTCOMES:\n    - {obj_list}\n    (Distribute these specific objectives logically across the {days} daily lessons. DO NOT hallucinate other topics.)"
 
     model = get_model() 
     
@@ -154,6 +154,7 @@ async def generate_weekly_plan_from_scheme(
     - Subject: {subject}, Grade: {grade}, Term: {term}, Week: {week_number}
     - Main Topic: {details['topic']}
     - Competencies: {", ".join(details.get('specific_competences', []))}
+    {objectives_instruction} 
     
     {module_prompt_insert}
 

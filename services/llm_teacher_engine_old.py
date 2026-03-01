@@ -235,18 +235,25 @@ async def generate_weekly_plan_with_ai(
     subtopic: Optional[str] = None,
     references: Optional[str] = None,
     school_logo: Optional[str] = None,
-    locked_context: Optional[Dict[str, Any]] = None
+    locked_context: Optional[Dict[str, Any]] = None,
+    objectives: Optional[List[str]] = None  # 👈 Added objectives parameter
 ) -> Dict[str, Any]:
     
     final_logo = school_logo if school_logo else DEFAULT_LOGO
     topic_context = topic if topic and len(topic) > 1 else f"Week {week_number} Syllabus Topic"
     ref_context = references if references and len(references) > 1 else f"{subject} Syllabus Grade {grade}"
-
+    print(f"🎯 RECEIVED OBJECTIVES FROM FRONTEND: {objectives}")
     print(f"🧠 AI Generating Weekly Plan | Subject: {subject} | Week: {week_number}")
     
     subtopic_instruction = ""
     if subtopic and len(subtopic) > 1:
         subtopic_instruction = f"The teacher has specifically selected the sub-topic: '{subtopic}'. Ensure all {days_count} daily lessons are logical steps within this specific sub-topic."
+
+    # 👇 Format the incoming objectives into a prompt-friendly string
+    objectives_instruction = ""
+    if objectives and len(objectives) > 0:
+        obj_list = "\n    - ".join(objectives)
+        objectives_instruction = f"\n    TARGET OBJECTIVES / OUTCOMES:\n    - {obj_list}\n    (Distribute these specific objectives logically across the {days_count} daily lessons.)"
 
     format_instruction = f"""
     STRICT JSON OUTPUT FORMAT:
@@ -298,6 +305,7 @@ async def generate_weekly_plan_with_ai(
     - Grade: {grade} | Subject: {subject} | Term: {term} | Week: {week_number}
     - MAIN TOPIC: "{topic_context}" 
     {"- FOCUS SUB-TOPIC: " + subtopic if subtopic else ""}
+    {objectives_instruction}  # 👈 Injected into the prompt!
     
     CRITICAL INSTRUCTIONS:
     1. **Content Priority**: {subtopic_instruction if subtopic_instruction else "Break the main topic into logical daily lessons."}

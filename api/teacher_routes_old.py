@@ -54,6 +54,7 @@ class WeeklyPlanRequest(BaseModel):
     theme: Optional[str] = None
     schoolId: Optional[str] = None
     schoolLogo: Optional[str] = None  
+    objectives: Optional[List[str]] = []
 
 class LessonPlanRequest(BaseModel):
     uid: str
@@ -320,7 +321,8 @@ async def generate_weekly_plan(
             subtopic=clean_subtopic, 
             references=clean_refs,
             school_logo=request.schoolLogo,
-            locked_context=locked_context 
+            locked_context=locked_context,
+            objectives=request.objectives 
         )
 
         if not plan_data:
