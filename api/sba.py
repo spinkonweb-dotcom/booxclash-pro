@@ -199,7 +199,7 @@ async def get_available_secondary_subjects(grade: str):
     print(f"🚀 [SBA Subjects] Returning final list for Grade {target_grade_str}: {sorted_subjects}\n")
     return {"subjects": sorted_subjects}
 # ==========================================
-# 3️⃣ GENERATE SBA TASK USING GEMINI
+# 3️⃣ GENERATE SBA TASK USING GEMINI 
 # ==========================================
 
 @router.post("/generate", response_model=GenerateSBAResponse)
