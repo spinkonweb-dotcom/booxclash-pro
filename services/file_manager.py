@@ -277,3 +277,29 @@ def save_generated_exam(
     }
     
     return save_to_firestore_dual("generated_exams", payload, school_id)
+
+
+# ==========================================
+# 7. CATCH-UP (TaRL) PLANS
+# ==========================================
+def save_catchup_plan(uid: str, school_id: str, plan_data: dict, meta: dict):
+    """
+    Saves the generated Catch-Up lesson plan to Firestore.
+    """
+    if not isinstance(plan_data, dict):
+        print(f"❌ Save Error: Expected dict, got {type(plan_data)}. Aborting.")
+        return False
+
+    payload = {
+        "userId": uid,
+        "type": "catchup", # Critical for your recent docs feed to recognize it
+        "planData": plan_data,
+        "meta": meta,
+        "createdAt": datetime.now(),
+        "topic": plan_data.get("topic", "Catch-Up Lesson"),
+        "subtopic": plan_data.get("subtopic", ""),
+        "schoolId": school_id
+    }
+
+    # Saving it under "generated_catchup" (or change to your preferred collection name)
+    return save_to_firestore_dual("generated_catchup", payload, school_id)

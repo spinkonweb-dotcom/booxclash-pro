@@ -9,7 +9,7 @@ from fastapi import FastAPI, Request, UploadFile, File, HTTPException, Backgroun
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from dotenv import load_dotenv
-
+from api.catch_up import router as catchup_router
 # 1. Load Environment Variables
 load_dotenv()
 
@@ -178,6 +178,7 @@ app.include_router(settings_router, prefix="/api/school", tags=["School Settings
 app.include_router(relay_router, prefix="/api/relay", tags=["Smart Dispatcher"]) 
 app.include_router(sba_router, prefix="/api/sba", tags=["School-Based Assessment"]) # 👈 ADDED THIS: REGISTER SBA ROUTER
 app.include_router(exams_router)
+app.include_router(catchup_router)
 # 7. Startup Event & Health Check
 @app.on_event("startup")
 async def startup_event():

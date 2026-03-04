@@ -1,7 +1,7 @@
 {
   "levels": [
     {
-      "level_name": "Beginner / Level 1",
+      "level_name": "Level 1: Beginner & Single Digit Numbers",
       "activities": [
         {
           "activity_name": "Clap and Snap",
@@ -176,7 +176,7 @@
       ]
     },
     {
-      "level_name": "Level 2 / Level 3",
+      "level_name": "Level 2: 2 & 3 Digit Numbers ",
       "activities": [
         {
           "activity_name": "Expansion Chart Reading",
@@ -346,7 +346,7 @@
       ]
     },
     {
-      "level_name": "Level 4",
+      "level_name": "Level 3: 4 & 5 Digit Numbers",
       "activities": [
         {
           "activity_name": "Expansion Chart Reading",
