@@ -1,15 +1,16 @@
+import os
+import httpx
 from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel, ConfigDict
 from typing import List, Optional
-import httpx  # Ensure you pip install httpx
 
 # Import your custom modules
 from services.llm_exams import generate_localized_exam
 from services.file_manager import save_generated_exam
 from services.syllabus_manager import load_syllabus 
 
-# Import get_model for the diagram generator
-from services.new.teacher_shared import get_model 
+# IMPORT YOUR CREDIT CHECKER HERE (Adjust the import path if you named the file differently)
+from services.credit_manager import check_and_deduct_credit
 
 # Initialize the router
 router = APIRouter(prefix="/api/exams", tags=["Exams"])
@@ -43,7 +44,8 @@ class GenerateExamRequest(BaseModel):
 
 class DiagramRequest(BaseModel):
     prompt: str
-    uid: Optional[str] = None
+    uid: str # Made mandatory to charge credits
+    school_id: Optional[str] = None # Added to allow school credit deductions for images
     
     model_config = ConfigDict(extra='ignore')
 
@@ -60,7 +62,6 @@ async def get_syllabus_topics(
     """
     try:
         # Load the syllabus using your existing syllabus_manager
-        # Hardcoding "zambia" as the country per your local context
         syllabus_data = load_syllabus(country="zambia", grade=grade, subject=subject)
         
         if not syllabus_data:
@@ -70,7 +71,6 @@ async def get_syllabus_topics(
         
         # Safely extract topic names from the returned list of dictionaries
         for item in syllabus_data:
-            # Check for common keys used in your JSON files for the topic name
             topic_name = item.get("topic") or item.get("title") or item.get("topic_name") or item.get("name")
             if topic_name:
                 topics_list.append(str(topic_name))
@@ -83,20 +83,28 @@ async def get_syllabus_topics(
 
 
 # ==========================================
-# 2. GENERATE EXAM ROUTE
+# 2. GENERATE EXAM ROUTE (COST: 1 CREDIT)
 # ==========================================
 @router.post("/generate")
 async def create_exam(req: GenerateExamRequest):
     """
     Generates a localized exam using the LLM and saves it to Firestore.
+    Costs 1 Credit.
     """
+    # 0. 💰 DEDUCT CREDITS FIRST (Cost = 1)
+    try:
+        credit_info = check_and_deduct_credit(uid=req.uid, cost=1, school_id=req.school_id)
+    except Exception as e:
+        # 402 Payment Required is standard for insufficient funds/credits
+        raise HTTPException(status_code=402, detail=str(e)) 
+
     try:
         # 1. Generate the Exam via the LLM Engine
         exam_data = await generate_localized_exam(
             grade=req.grade,
             subject=req.subject,
             topics=req.topics,
-            blueprint=req.blueprint.model_dump() # use .dict() if on older Pydantic v1
+            blueprint=req.blueprint.model_dump()
         )
 
         if "error" in exam_data:
@@ -120,7 +128,8 @@ async def create_exam(req: GenerateExamRequest):
         return {
             "status": "success",
             "message": "Exam generated successfully",
-            "data": exam_data
+            "data": exam_data,
+            "credits_remaining": credit_info.get("remaining_credits") # Optional: send back updated balance
         }
 
     except Exception as e:
@@ -129,99 +138,77 @@ async def create_exam(req: GenerateExamRequest):
 
 
 # ==========================================
-# 3. GENERATE DIAGRAM ROUTE (WIKIMEDIA + SVG FALLBACK)
+# 3. GENERATE DIAGRAM ROUTE (COST: 5 CREDITS)
 # ==========================================
 @router.post("/generate-diagram")
 async def create_diagram(req: DiagramRequest):
     """
-    Attempts to fetch a real image from Wikimedia first.
-    If it fails, falls back to generating an SVG via LLM.
+    Generates a pixel image using Google's Imagen 3.0 model via REST API.
+    Costs 5 Credits.
     """
-    print(f"\n🎨 [Diagram Generator] Processing request for: {req.prompt}")
+    print(f"\n🎨 [Imagen Generator] Requesting image for: {req.prompt}")
     
-# ---------------------------------------------------------
-    # ATTEMPT 1: SEARCH WIKIMEDIA COMMONS
-    # ---------------------------------------------------------
-    image_url = None
+    # 0. 💰 DEDUCT CREDITS FIRST (Cost = 5)
     try:
-        url = "https://commons.wikimedia.org/w/api.php"
-        search_query = f"{req.prompt} diagram"
-        
-        params = {
-            "action": "query",
-            "format": "json",
-            "generator": "search",
-            "gsrsearch": f"filetype:bitmap|drawing {search_query}",
-            "gsrlimit": 1, 
-            "prop": "imageinfo",
-            "iiprop": "url"
+        credit_info = check_and_deduct_credit(uid=req.uid, cost=5, school_id=req.school_id)
+    except Exception as e:
+        raise HTTPException(status_code=402, detail=str(e))
+
+    # Ensure you have your Gemini API key loaded in your environment variables
+    api_key = os.environ.get("GEMINI_API_KEY")
+    if not api_key:
+        print("❌ GEMINI_API_KEY environment variable is missing.")
+        raise HTTPException(status_code=500, detail="Server configuration error: Missing API Key")
+
+    # API Endpoint for Imagen
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-fast-generate-001:predict?key={api_key}"
+    
+    # We heavily modify the prompt to ensure it looks like a school exam drawing
+    enhanced_prompt = (
+        f"A clean, simple, minimalist black-and-white line-art educational diagram of {req.prompt}. "
+        "Solid white background, dark black outlines, no shading, 2d style, suitable for printing on a school exam paper."
+    )
+
+    payload = {
+        "instances": [
+            {"prompt": enhanced_prompt}
+        ],
+        "parameters": {
+            "sampleCount": 1
         }
-        
-        # 🆕 ADD THIS HEADER BLOCK
-        headers = {
-            "User-Agent": "Booxclash App/1.0 (booxclash@gmail.com) httpx"
-        }
-        
-        # 🆕 PASS THE HEADERS TO HTTPX
-        async with httpx.AsyncClient(headers=headers) as client:
-            resp = await client.get(url, params=params, timeout=8.0)
+    }
+
+    try:
+        # Increase timeout slightly as image generation can take ~5-15 seconds
+        async with httpx.AsyncClient() as client:
+            resp = await client.post(url, json=payload, timeout=30.0)
             
-            if resp.status_code == 200:
-                data = resp.json()
-                pages = data.get("query", {}).get("pages", {})
-                if pages:
-                    first_page = list(pages.values())[0]
-                    image_url = first_page.get("imageinfo", [{}])[0].get("url")
+            if resp.status_code != 200:
+                print(f"⚠️ Imagen API Error: {resp.status_code} - {resp.text}")
+                # Ideally refund the 5 credits here if API fails, but we'll raise an error for now
+                raise HTTPException(status_code=500, detail="Failed to generate image from Google API")
+                
+            data = resp.json()
+
+            # Extract the Base64 image string from the predictions array
+            if "predictions" in data and len(data["predictions"]) > 0:
+                base64_img = data["predictions"][0]["bytesBase64Encoded"]
+                
+                # Prepend the data URI scheme so it's ready to use in HTML
+                img_data_url = f"data:image/png;base64,{base64_img}"
+
+                return {
+                    "status": "success",
+                    "type": "base64",
+                    "data": img_data_url,
+                    "credits_remaining": credit_info.get("remaining_credits") # Optional UI helper
+                }
             else:
-                print(f"⚠️ [Wikimedia] API returned status code: {resp.status_code}")
-                    
-        if image_url:
-            print(f"🌍 [Wikimedia] Found image: {image_url}")
-            return {
-                "status": "success",
-                "type": "url",
-                "data": image_url
-            }
-            
+                print("⚠️ Unexpected response format from Imagen:", data)
+                raise HTTPException(status_code=500, detail="Unexpected response from image generator")
+
+    except HTTPException:
+        raise
     except Exception as e:
-        print(f"⚠️ [Wikimedia Search] Failed or timed out: {e}. Falling back to SVG...")
-
-    # ---------------------------------------------------------
-    # ATTEMPT 2: FALLBACK TO LLM SVG GENERATION
-    # ---------------------------------------------------------
-    print(f"🖍️ [SVG Generator] Falling back to AI SVG for: {req.prompt}")
-    try:
-        model = get_model()
-        
-        sys_prompt = f"""You are an expert chalkboard artist and educational illustrator.
-        Your task is to draw a clean, simple, minimalist line-art diagram for a school exam paper.
-        
-        Prompt: {req.prompt}
-        
-        STRICT RULES:
-        1. ONLY output valid SVG code. Do not include any text before or after.
-        2. DO NOT wrap the response in markdown blocks (no ```xml or ```svg).
-        3. Use simple black lines (stroke="black") and no fill (fill="none" or "white").
-        4. Make it scalable (include a viewBox).
-        5. Keep the design visually clear so it prints well on black-and-white paper.
-        """
-        
-        response = await model.generate_content_async(sys_prompt)
-        raw_svg = response.text.strip()
-        
-        # Cleanup markdown if the AI disobeys
-        if raw_svg.startswith("```"):
-            lines = raw_svg.split("\n")
-            if lines[0].startswith("```"): lines = lines[1:]
-            if lines[-1].startswith("```"): lines = lines[:-1]
-            raw_svg = "\n".join(lines).strip()
-
-        return {
-            "status": "success",
-            "type": "svg",
-            "data": raw_svg  # Notice we are sending it under 'data' so it matches the URL response structure
-        }
-
-    except Exception as e:
-        print(f"❌ Error generating diagram fallback: {e}")
+        print(f"❌ Error generating diagram with Imagen: {e}")
         raise HTTPException(status_code=500, detail="Failed to generate diagram")

@@ -7,6 +7,9 @@ from fastapi.responses import JSONResponse
 from services.catchup_llm import generate_catchup_lesson_plan
 from services.file_manager import save_catchup_plan
 
+# IMPORT YOUR CREDIT CHECKER HERE
+from services.credit_manager import check_and_deduct_credit
+
 # Initialize the router
 router = APIRouter(
     prefix="/api/v1/catchup",
@@ -59,13 +62,26 @@ async def get_catchup_activities(
         )
 
 # ==========================================================
-# 2. POST ROUTE: GENERATE LESSON PLAN VIA LLM
+# 2. POST ROUTE: GENERATE LESSON PLAN VIA LLM (COST: 1 CREDIT)
 # ==========================================================
 @router.post("/generate-catchup-plan", description="Generate a Catch-Up Lesson Plan using AI")
 async def create_catchup_plan(request: Request):
     try:
         data = await request.json()
         
+        uid = data.get("uid")
+        school_id = data.get("schoolId")
+        
+        if not uid:
+             raise HTTPException(status_code=400, detail="User ID (uid) is required to generate a plan.")
+
+        # 0. 💰 DEDUCT CREDITS FIRST (Cost = 1)
+        try:
+            credit_info = check_and_deduct_credit(uid=uid, cost=1, school_id=school_id)
+        except Exception as e:
+            # 402 Payment Required for insufficient credits/expired sub
+            raise HTTPException(status_code=402, detail=str(e))
+
         # Extract Catch-Up specific logic
         subject_name = data.get("subject", "Catch-Up")
         catchup_level = data.get("catchupLevel", "Beginner")
@@ -89,8 +105,6 @@ async def create_catchup_plan(request: Request):
         )
         
         # 2. SAVE TO FIRESTORE 🔥
-        uid = data.get("uid")
-        school_id = data.get("schoolId")
         if uid:
             # 💡 TRICK: We save `catchup_level` inside the `grade` property here.
             # This guarantees that the UI dashboard "Recent Documents" cards 
@@ -103,8 +117,15 @@ async def create_catchup_plan(request: Request):
             save_catchup_plan(uid, school_id, plan, meta_data)
         
         # 3. Return to frontend
-        return {"status": "success", "data": plan}
+        return {
+            "status": "success", 
+            "data": plan,
+            "credits_remaining": credit_info.get("remaining_credits") # Optional UI update helper
+        }
         
+    except HTTPException:
+        # Re-raise HTTPExceptions so they aren't caught by the general Exception block below
+        raise
     except Exception as e:
         print(f"❌ Route Error Generating Catch-Up Plan: {e}")
         raise HTTPException(status_code=500, detail=str(e))

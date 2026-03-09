@@ -38,9 +38,13 @@ db = firestore.client()
 def invite_all_users():
     print("🔄 Fetching all users from Firestore...")
     
-    # Get all users
     users_ref = db.collection("users")
-    docs = users_ref.stream()
+    
+    # 🚨 THE FIX: Convert the stream to a list immediately!
+    # This downloads all 93 users instantly so the database doesn't time out.
+    docs = list(users_ref.stream())
+    
+    print(f"✅ Successfully downloaded {len(docs)} users. Starting email blast...")
     
     count = 0
     success_count = 0
@@ -48,25 +52,21 @@ def invite_all_users():
     for doc in docs:
         data = doc.to_dict()
         email = data.get("email")
-        # Try to find a name, fallback to 'Teacher'
         name = data.get("displayName") or data.get("name") or "Teacher"
         
-        # Check ONLY if they have an email. We no longer check if they were already invited.
         if email:
-            print(f"📩 Sending routine invite to {email}...")
+            print(f"📩 [{count+1}/{len(docs)}] Sending K60 Exam Promo to {email}...")
             
-            # Send the email
+            # Send the email using the imported function
             sent = send_whatsapp_invite(email, name)
             
             if sent:
                 success_count += 1
             
             count += 1
-        else:
-            # Optional: Print skipped users without emails
-            pass
 
-    print(f"\n🎉 Finished! Sent {success_count} invites out of {count} total users found.")
+    print(f"\n🎉 Finished! Sent {success_count} promos out of {count} valid emails found.")
+    print("📲 Keep your phone loud. The mobile money notifications are about to start.")
 
 if __name__ == "__main__":
     invite_all_users()

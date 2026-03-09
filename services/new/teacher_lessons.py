@@ -1,3 +1,5 @@
+import os
+import httpx
 import json
 import logging
 from typing import List, Dict, Any, Optional
@@ -296,42 +298,65 @@ async def generate_lesson_notes(grade: str, subject: str, topic: str, subtopic: 
 
 
 # ==============================================================================
-# 3. 🆕 CHALKBOARD DIAGRAM GENERATOR (SVG Trick)
+# 3. 🆕 CHALKBOARD DIAGRAM GENERATOR (IMAGEN 4.0)
 # ==============================================================================
 async def generate_chalkboard_diagram(prompt_text: str) -> Dict[str, str]:
     """
-    Uses the LLM to write raw SVG code for a simple chalkboard diagram.
-    This saves money by not using DALL-E and produces crisp, scalable line art.
+    Uses Google's Imagen 4.0 model via REST API to generate a line-art diagram.
+    Returns a Base64 data URL ready to be displayed on the frontend.
     """
-    print(f"\n🎨 [Diagram Generator] Creating SVG for: {prompt_text}")
-    model = get_model()
+    print(f"\n🎨 [Diagram Generator] Requesting Imagen 4.0 for: {prompt_text}")
+    
+    api_key = os.environ.get("GEMINI_API_KEY")
+    if not api_key:
+        print("❌ GEMINI_API_KEY environment variable is missing.")
+        return {"status": "error", "message": "Server configuration error: Missing API Key"}
 
-    prompt = f"""
-    You are an expert graphic designer and educator.
-    Create a highly educational, simple line-art diagram of: "{prompt_text}".
+    # API Endpoint for Imagen 4.0
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-fast-generate-001:predict?key={api_key}"
     
-    STRICT REQUIREMENTS:
-    1. Output MUST be ONLY valid, raw SVG code. Do not wrap in markdown or markdown code blocks (no ```svg).
-    2. Use ONLY black strokes and white/transparent fills. It must look like a clean drawing on a whiteboard/chalkboard.
-    3. Include clear text labels pointing to the main parts.
-    4. Keep the paths simple and bold.
-    5. Set the viewBox to "0 0 800 600".
-    
-    START IMMEDIATELY WITH <svg> AND END WITH </svg>.
-    """
-    
-    try:
-        response = await model.generate_content_async(prompt)
-        # Strip out any potential markdown blocks the AI might accidentally include
-        svg_code = response.text.replace("```svg", "").replace("```", "").strip()
-        
-        return {
-            "status": "success",
-            "diagram_type": "svg",
-            "content": svg_code
+    # Enhanced prompt for educational chalkboard/line-art style
+    enhanced_prompt = (
+        f"A clean, simple, minimalist black-and-white line-art educational diagram of {prompt_text}. "
+        "Solid white background, dark black outlines, no shading, 2d style, suitable for drawing on a chalkboard or printing on paper."
+    )
+
+    payload = {
+        "instances": [
+            {"prompt": enhanced_prompt}
+        ],
+        "parameters": {
+            "sampleCount": 1
         }
+    }
+
+    try:
+        # Generate image (timeout adjusted to 30s as image generation takes time)
+        async with httpx.AsyncClient() as client:
+            resp = await client.post(url, json=payload, timeout=30.0)
+            
+            if resp.status_code != 200:
+                print(f"⚠️ Imagen API Error: {resp.status_code} - {resp.text}")
+                return {"status": "error", "message": "Failed to generate image from Google API"}
+                
+            data = resp.json()
+
+            # Extract the Base64 image string from the predictions array
+            if "predictions" in data and len(data["predictions"]) > 0:
+                base64_img = data["predictions"][0]["bytesBase64Encoded"]
+                img_data_url = f"data:image/png;base64,{base64_img}"
+
+                return {
+                    "status": "success",
+                    "diagram_type": "base64",
+                    "content": img_data_url
+                }
+            else:
+                print("⚠️ Unexpected response format from Imagen:", data)
+                return {"status": "error", "message": "Unexpected response from image generator"}
+
     except Exception as e:
-        print(f"❌ SVG Error: {e}")
+        print(f"❌ Error generating diagram with Imagen: {e}")
         return {"status": "error", "message": str(e)}
 
 

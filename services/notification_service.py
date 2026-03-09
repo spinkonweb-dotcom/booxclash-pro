@@ -16,8 +16,8 @@ WHATSAPP_LINK = "https://wa.me/260967001972"
 
 def send_whatsapp_invite(user_email: str, user_name: str = None):
     """
-    Sends a personal email from the founder offering 50 free credits for a chat.
-    Autodetects the first name for a personal touch.
+    Sends a targeted 72-hour flash promo email to free users,
+    pitching the new Exam/Revision feature and offering a K60 Termly upgrade.
     """
     if not user_email or "@" not in user_email:
         print(f"⚠️ Invalid email: {user_email}")
@@ -35,20 +35,28 @@ def send_whatsapp_invite(user_email: str, user_name: str = None):
         # Make it look like it's coming directly from you, not a generic "Team"
         msg['From'] = f"Kondwani from BooxClash <{SENDER_EMAIL}>"
         msg['To'] = user_email
-        msg['Subject'] = "Can I give you 50 free Booxclash credits? 🎁"
+        msg['Subject'] = "🚨 Generate your Term 1 Exams in 30 Seconds (72-Hour Promo)"
 
-        # --- 2. THE FOUNDER MESSAGE ---
+        # --- 2. THE FOUNDER MESSAGE (UPDATED FOR EXAM PROMO) ---
         body = f"""Hi {greeting_name},
 
-I'm Kondwani, the founder of Booxclash. I saw you signed up recently, and I want to make sure the platform is actually saving you time on your lesson plans.
+Week 10 Assessments are almost here. Stop typing your exams manually.
 
-I am talking to a few early users this week to learn how I can improve the app for Zambian teachers. If you have 5 minutes to chat with me on WhatsApp, I will add 50 free credits to your account right now.
+Booxclash can now automatically generate your End-of-Term Exams, Revision Catch-up plans, and Marking Keys—perfectly aligned to the Zambian syllabus in seconds.
 
-Reply to this email with your WhatsApp number, or click here to message me directly: {WHATSAPP_LINK}
+🎁 72-HOUR FLASH PROMO:
+To help you prepare, we are cutting the Termly Plan from K120 down to K60. Pay just K60 today, and you get full access to generate all your Week 10 assessments and revision materials instantly.
 
-Thank you for building with me!
+You have exactly 3 days to claim this K60 promo before it goes back to normal pricing. 
 
+To pay via Mobile Money and get your account activated instantly, click here to message me directly on WhatsApp: 
+{WHATSAPP_LINK}
+
+Let's get your exams done today.
+
+Best,
 Kondwani
+Founder, Booxclash
 """
         
         msg.attach(MIMEText(body, 'plain')) 
@@ -60,7 +68,7 @@ Kondwani
         server.send_message(msg)
         server.quit()
         
-        print(f"✅ Founder invite sent to: {user_email} (Hi {greeting_name})")
+        print(f"✅ Exam Promo sent to: {user_email} (Hi {greeting_name})")
         return True
 
     except Exception as e:
